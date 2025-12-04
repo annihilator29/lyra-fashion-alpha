@@ -71,6 +71,58 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 | `npm run lint`         | Run ESLint to check code quality                         |
 | `npm run format`       | Format code with Prettier                                |
 | `npm run format:check` | Check if code is formatted correctly                     |
+| `npm run type-check`   | Run TypeScript type checking                             |
+
+## 🚀 Deployment
+
+### Vercel Deployment
+
+This project is deployed on [Vercel](https://vercel.com/) with automatic deployments:
+
+- **Production**: Deployed on merge to `main` branch
+- **Preview**: Deployed for every pull request
+
+#### Initial Setup
+
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Click "Add New Project" → Import from GitHub
+3. Select the repository and configure:
+   - **Framework Preset**: Next.js (auto-detected)
+   - **Root Directory**: `lyra-fashion/`
+   - **Build Command**: `npm run build` (default)
+   - **Install Command**: `npm install` (default)
+
+#### Environment Variables
+
+Configure the following in Vercel Project Settings → Environment Variables:
+
+| Variable | Scope | Description |
+|----------|-------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | All | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | All | Supabase anonymous key (public) |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Production Only** | Supabase service role key (secret) |
+| `NEXT_PUBLIC_APP_URL` | All | Application base URL |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | All | Stripe publishable key (when configured) |
+| `STRIPE_SECRET_KEY` | Production Only | Stripe secret key (when configured) |
+| `STRIPE_WEBHOOK_SECRET` | Production Only | Stripe webhook secret (when configured) |
+
+> ⚠️ **Security**: Never add `SUPABASE_SERVICE_ROLE_KEY` or `STRIPE_SECRET_KEY` to Preview deployments.
+
+#### Rollback
+
+If a deployment fails or causes issues:
+1. Go to Vercel Dashboard → Project → Deployments
+2. Find the last working deployment
+3. Click "..." menu → "Promote to Production"
+
+### CI/CD Pipeline
+
+GitHub Actions runs on every pull request:
+- ESLint code quality checks
+- TypeScript type checking
+- Production build verification
+
+All checks must pass before merging.
 
 ## 🔧 Development Workflow
 
