@@ -1,5 +1,7 @@
 # Lyra Fashion
 
+[![CI](https://github.com/bibekthapa007/lyra-fashion/actions/workflows/ci.yml/badge.svg)](https://github.com/bibekthapa007/lyra-fashion/actions/workflows/ci.yml)
+
 A premium, factory-direct e-commerce platform bringing ethically-made artisan fashion directly to consumers. Built with modern web technologies for performance, SEO, and a seamless shopping experience.
 
 ## 🌟 About
