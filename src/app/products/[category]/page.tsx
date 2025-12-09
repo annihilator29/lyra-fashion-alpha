@@ -1,8 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
-import { ProductGrid, ProductGridSkeleton } from '@/components/shop/product-grid';
 import { VALID_CATEGORIES, type ProductCategory, type SortOption } from '@/types/product';
 import type { Product } from '@/types/database.types';
 import { CategoryFilters } from '@/app/products/[category]/category-filters';
@@ -81,6 +79,16 @@ async function getProducts(
         case 'price-desc':
             query = query.order('price', { ascending: false });
             break;
+        case 'popularity':
+            // TODO: Add popularity_score column to products table
+            // Fallback to newest until column is added
+            query = query.order('created_at', { ascending: false });
+            break;
+        case 'craft-rating':
+            // TODO: Add craft_rating column to products table
+            // Fallback to newest until column is added
+            query = query.order('created_at', { ascending: false });
+            break;
         case 'newest':
         default:
             query = query.order('created_at', { ascending: false });
@@ -110,7 +118,7 @@ export default async function ProductListingPage({ params, searchParams }: PageP
     }
 
     // Fetch products
-    const { products, count } = await getProducts(category, filters);
+    const { products } = await getProducts(category, filters);
 
     // Category display name
     const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1);
@@ -135,9 +143,7 @@ export default async function ProductListingPage({ params, searchParams }: PageP
 
                 {/* Filters and Products */}
                 <CategoryFilters
-                    category={category}
                     initialProducts={products}
-                    initialCount={count}
                     initialFilters={{
                         priceMin: filters.priceMin ? Number(filters.priceMin) : undefined,
                         priceMax: filters.priceMax ? Number(filters.priceMax) : undefined,

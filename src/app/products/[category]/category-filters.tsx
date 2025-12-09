@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useCallback, useState, useTransition } from 'react';
 import { FilterSidebar } from '@/components/shop/filter-sidebar';
 import { SortDropdown } from '@/components/shop/sort-dropdown';
@@ -9,9 +9,7 @@ import type { Product } from '@/types/database.types';
 import type { ProductFilters, SortOption } from '@/types/product';
 
 interface CategoryFiltersProps {
-    category: string;
     initialProducts: Product[];
-    initialCount: number;
     initialFilters: ProductFilters;
     initialSort: SortOption;
 }
@@ -23,15 +21,12 @@ interface CategoryFiltersProps {
  * Wraps FilterSidebar, SortDropdown, and ProductGrid.
  */
 export function CategoryFilters({
-    category,
     initialProducts,
-    initialCount,
     initialFilters,
     initialSort,
 }: CategoryFiltersProps) {
     const router = useRouter();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
     const [isPending, startTransition] = useTransition();
 
     const [filters, setFilters] = useState<ProductFilters>(initialFilters);
@@ -116,8 +111,8 @@ export function CategoryFilters({
                             'Loading...'
                         ) : (
                             <>
-                                Showing <span className="font-medium text-foreground">{initialCount}</span>{' '}
-                                {initialCount === 1 ? 'product' : 'products'}
+                                Showing <span className="font-medium text-foreground">{initialProducts.length}</span>{' '}
+                                {initialProducts.length === 1 ? 'product' : 'products'}
                             </>
                         )}
                     </p>
