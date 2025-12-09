@@ -31,13 +31,13 @@ export const metadata: Metadata = {
   },
 };
 
-// Categories for navigation
+// Categories for navigation with unique icons
 const CATEGORIES = [
-  { name: 'Dresses', slug: 'dresses', description: 'Elegant and versatile' },
-  { name: 'Tops', slug: 'tops', description: 'Everyday essentials' },
-  { name: 'Bottoms', slug: 'bottoms', description: 'Perfect fits' },
-  { name: 'Outerwear', slug: 'outerwear', description: 'Layered style' },
-  { name: 'Accessories', slug: 'accessories', description: 'Finishing touches' },
+  { name: 'Dresses', slug: 'dresses', description: 'Elegant and versatile', icon: '👗' },
+  { name: 'Tops', slug: 'tops', description: 'Everyday essentials', icon: '👚' },
+  { name: 'Bottoms', slug: 'bottoms', description: 'Perfect fits', icon: '👖' },
+  { name: 'Outerwear', slug: 'outerwear', description: 'Layered style', icon: '🧥' },
+  { name: 'Accessories', slug: 'accessories', description: 'Finishing touches', icon: '👜' },
 ];
 
 // JSON-LD Structured Data
@@ -83,9 +83,16 @@ async function getFeaturedProducts(): Promise<Product[]> {
 // Hero Section Component
 function HeroSection() {
   return (
-    <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden bg-gradient-to-br from-secondary via-background to-accent px-4 py-24 sm:px-6 lg:px-8">
+    <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-4 py-24 sm:px-6 lg:px-8">
+      {/* Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-white to-amber-50 dark:from-stone-900 dark:via-stone-950 dark:to-stone-900" />
+
+      {/* Decorative Circles */}
+      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 blur-3xl" />
+      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-gradient-to-tr from-amber-200/20 to-rose-200/20 blur-3xl" />
+
       {/* Background Pattern */}
-      <div className="pointer-events-none absolute inset-0 opacity-5">
+      <div className="pointer-events-none absolute inset-0 opacity-[0.03]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,_currentColor_1px,_transparent_1px)] bg-[length:32px_32px]" />
       </div>
 
@@ -218,9 +225,9 @@ function CategoryNavigation() {
               href={`/products/${category.slug}`}
               className="group flex flex-col items-center justify-center rounded-lg bg-card p-6 text-center shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md"
             >
-              {/* Category Icon Placeholder */}
+              {/* Category Icon */}
               <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 transition-colors group-hover:bg-primary/20">
-                <span className="text-2xl">👗</span>
+                <span className="text-2xl">{category.icon}</span>
               </div>
 
               {/* Category Name */}

@@ -1,8 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  reactCompiler: true,
+  // React Compiler (experimental in Next.js 15)
+  experimental: {
+    reactCompiler: true,
+  },
 
   // Image optimization configuration
   images: {

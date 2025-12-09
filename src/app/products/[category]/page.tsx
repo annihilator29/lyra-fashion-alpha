@@ -116,8 +116,13 @@ export default async function ProductListingPage({ params, searchParams }: PageP
     const categoryTitle = category.charAt(0).toUpperCase() + category.slice(1);
 
     return (
-        <main className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-7xl">
+        <main className="relative min-h-screen overflow-hidden px-4 py-8 sm:px-6 lg:px-8">
+            {/* Background Effects */}
+            <div className="absolute inset-0 bg-gradient-to-br from-rose-50/50 via-white to-amber-50/50 dark:from-stone-900 dark:via-stone-950 dark:to-stone-900" />
+            <div className="pointer-events-none absolute -top-40 -right-40 h-80 w-80 rounded-full bg-gradient-to-br from-primary/5 to-transparent blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-gradient-to-tr from-amber-200/10 to-transparent blur-3xl" />
+
+            <div className="relative mx-auto max-w-7xl">
                 {/* Page Header */}
                 <div className="mb-8">
                     <h1 className="font-serif text-3xl font-bold text-foreground sm:text-4xl">
