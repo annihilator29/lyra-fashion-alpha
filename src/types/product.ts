@@ -68,3 +68,16 @@ export const COLOR_OPTIONS = [
     { value: 'red', label: 'Red', hex: '#DC143C' },
     { value: 'pink', label: 'Pink', hex: '#FFC0CB' },
 ] as const;
+
+/**
+ * Search suggestion returned from the search API.
+ */
+export interface SearchSuggestion {
+    id: string;
+    name: string;
+    slug: string;
+    price: number;
+    image: string | null;
+    category: string;
+}
+
