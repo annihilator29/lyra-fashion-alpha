@@ -34,7 +34,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
 
     return (
         <Link
-            href={`/products/${slug}`}
+            href={`/products/${category}/${slug}`}
             className={cn(
                 'group relative flex flex-col overflow-hidden rounded-lg bg-card transition-all duration-300',
                 'hover:shadow-lg hover:-translate-y-1',

@@ -65,6 +65,56 @@ export interface Database {
                 };
                 Relationships: [];
             };
+            product_variants: {
+                Row: {
+                    id: string;
+                    product_id: string;
+                    sku: string;
+                    size: string;
+                    color: string;
+                    color_hex: string | null;
+                    price_modifier: number;
+                    image_url: string | null;
+                    stock_quantity: number;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    product_id: string;
+                    sku: string;
+                    size: string;
+                    color: string;
+                    color_hex?: string | null;
+                    price_modifier?: number;
+                    image_url?: string | null;
+                    stock_quantity?: number;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    product_id?: string;
+                    sku?: string;
+                    size?: string;
+                    color?: string;
+                    color_hex?: string | null;
+                    price_modifier?: number;
+                    image_url?: string | null;
+                    stock_quantity?: number;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'product_variants_product_id_fkey';
+                        columns: ['product_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'products';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             customers: {
                 Row: {
                     id: string;
@@ -236,6 +286,7 @@ export type UpdateTables<T extends keyof Database['public']['Tables']> =
 
 // Type aliases for common use
 export type Product = Tables<'products'>;
+export type ProductVariant = Tables<'product_variants'>;
 export type Customer = Tables<'customers'>;
 export type Order = Tables<'orders'>;
 export type OrderItem = Tables<'order_items'>;
