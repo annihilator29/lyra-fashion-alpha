@@ -118,13 +118,18 @@ export interface ProductVariantRow {
 
 /**
  * Craftsmanship content structure for product details.
+ * Updated for Story 2-5 with full Materials/Construction/Quality sections.
  */
 export interface CraftsmanshipContent {
-    material?: string;
+    materials: {
+        fabric: string;
+        origin?: string;
+        composition?: string;
+    };
+    construction: string[];
+    quality_checks: string[];
     care_instructions?: string[];
-    origin?: string;
-    artisan_notes?: string;
-    sustainability?: string;
+    factory_story_link?: string;
 }
 
 /**

@@ -4,10 +4,10 @@ import { useState, useCallback } from 'react';
 import { ImageGallery } from '@/components/shop/image-gallery';
 import { VariantSelector } from '@/components/shop/variant-selector';
 import { SizeGuideModal } from '@/components/shop/size-guide-modal';
+import { CraftsmanshipSection } from '@/components/transparency/craftsmanship-section';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, ChevronDown, ChevronUp, Sparkles, Leaf } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import type { ProductWithVariants, ProductVariantRow, CraftsmanshipContent } from '@/types/product';
-import { cn } from '@/lib/utils';
 
 interface ProductDetailClientProps {
     product: ProductWithVariants;
@@ -28,8 +28,6 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product, craftsmanship }: ProductDetailClientProps) {
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantRow | null>(null);
     const [currentImages, setCurrentImages] = useState<string[]>(product.images || []);
-    const [materialExpanded, setMaterialExpanded] = useState(false);
-    const [careExpanded, setCareExpanded] = useState(false);
 
     // Handle variant-specific image changes
     const handleImageChange = useCallback((imageUrl: string | null) => {
@@ -150,95 +148,8 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
                     )}
                 </div>
 
-                {/* Material & Care Accordions */}
-                <div className="space-y-2 border-t pt-6">
-                    {/* Material Section */}
-                    {craftsmanship?.material && (
-                        <div className="rounded-lg border">
-                            <button
-                                onClick={() => setMaterialExpanded(!materialExpanded)}
-                                className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/50"
-                                aria-expanded={materialExpanded}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Sparkles className="h-4 w-4 text-primary" />
-                                    <span className="font-medium text-foreground">Material & Composition</span>
-                                </div>
-                                {materialExpanded ? (
-                                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                                )}
-                            </button>
-                            <div
-                                className={cn(
-                                    'overflow-hidden transition-all duration-200',
-                                    materialExpanded ? 'max-h-96' : 'max-h-0'
-                                )}
-                            >
-                                <div className="border-t px-4 py-3 text-sm text-muted-foreground">
-                                    <p>{craftsmanship.material}</p>
-                                    {craftsmanship.origin && (
-                                        <p className="mt-2">
-                                            <strong className="text-foreground">Origin:</strong> {craftsmanship.origin}
-                                        </p>
-                                    )}
-                                    {craftsmanship.sustainability && (
-                                        <p className="mt-2">
-                                            <strong className="text-foreground">Sustainability:</strong> {craftsmanship.sustainability}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Care Instructions Section */}
-                    {craftsmanship?.care_instructions && craftsmanship.care_instructions.length > 0 && (
-                        <div className="rounded-lg border">
-                            <button
-                                onClick={() => setCareExpanded(!careExpanded)}
-                                className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-muted/50"
-                                aria-expanded={careExpanded}
-                            >
-                                <div className="flex items-center gap-2">
-                                    <Leaf className="h-4 w-4 text-primary" />
-                                    <span className="font-medium text-foreground">Care Instructions</span>
-                                </div>
-                                {careExpanded ? (
-                                    <ChevronUp className="h-4 w-4 text-muted-foreground" />
-                                ) : (
-                                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
-                                )}
-                            </button>
-                            <div
-                                className={cn(
-                                    'overflow-hidden transition-all duration-200',
-                                    careExpanded ? 'max-h-96' : 'max-h-0'
-                                )}
-                            >
-                                <ul className="border-t px-4 py-3 space-y-1">
-                                    {craftsmanship.care_instructions.map((instruction, index) => (
-                                        <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-                                            <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-primary" />
-                                            {instruction}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Artisan Notes Section */}
-                    {craftsmanship?.artisan_notes && (
-                        <div className="rounded-lg border bg-muted/20 px-4 py-3">
-                            <p className="text-sm italic text-muted-foreground">
-                                &ldquo;{craftsmanship.artisan_notes}&rdquo;
-                            </p>
-                            <p className="mt-2 text-xs text-muted-foreground">— Lyra Fashion Artisan</p>
-                        </div>
-                    )}
-                </div>
+                {/* Craftsmanship Section */}
+                <CraftsmanshipSection craftsmanship={craftsmanship} className="mt-6" />
             </div>
         </>
     );
