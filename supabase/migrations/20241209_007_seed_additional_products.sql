@@ -13,7 +13,7 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS featured BOOLEAN DEFAULT false;
 INSERT INTO products (name, slug, description, price, category, images, craftsmanship_content, transparency_data, featured)
 VALUES 
   ('Silk Midi Dress', 'silk-midi-dress', 'Elegant silk midi dress with flowing silhouette', 245.00, 'dresses',
-   ARRAY['https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-1.jpg'],
    '{"story": "Hand-finished in a family-owned atelier in France", "materials": ["Mulberry Silk"], "techniques": ["French Seams"]}',
    '{"origin": "France", "carbonFootprint": "3.2kg CO2", "certifications": ["OEKO-TEX"]}', true),
   
@@ -23,32 +23,32 @@ VALUES
    '{"origin": "Belgium", "carbonFootprint": "2.1kg CO2", "certifications": ["European Flax"]}', false),
   
   ('Cotton Maxi Dress', 'cotton-maxi-dress', 'Flowy maxi dress in organic cotton', 155.00, 'dresses',
-   ARRAY['https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-2.jpg'],
    '{"story": "Crafted by women artisans in India", "materials": ["Organic Cotton"], "techniques": ["Block Printing"]}',
    '{"origin": "India", "carbonFootprint": "2.8kg CO2", "certifications": ["GOTS", "Fair Trade"]}', true),
 
   ('Velvet Evening Dress', 'velvet-evening-dress', 'Luxurious velvet dress for special occasions', 295.00, 'dresses',
-   ARRAY['https://images.unsplash.com/photo-1518611012118-696072aa579a?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-2.png'],
    '{"story": "Handcrafted in Milan with vintage techniques", "materials": ["Silk Velvet"], "techniques": ["Hand Draping"]}',
    '{"origin": "Italy", "carbonFootprint": "4.5kg CO2", "certifications": ["Made in Italy"]}', false),
 
   ('Embroidered Shift Dress', 'embroidered-shift-dress', 'Classic shift dress with delicate embroidery', 198.00, 'dresses',
-   ARRAY['https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/product-1.png'],
    '{"story": "Each dress features 20 hours of hand embroidery", "materials": ["Cotton Voile"], "techniques": ["Hand Embroidery"]}',
    '{"origin": "Vietnam", "carbonFootprint": "2.0kg CO2", "certifications": ["SA8000"]}', false),
 
   ('Jersey Wrap Dress', 'jersey-wrap-dress', 'Comfortable jersey dress with flattering wrap style', 135.00, 'dresses',
-   ARRAY['https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-3.png'],
    '{"story": "Made in our solar-powered facility", "materials": ["Recycled Jersey"], "techniques": ["Zero-Waste Cutting"]}',
    '{"origin": "Portugal", "carbonFootprint": "1.5kg CO2", "certifications": ["GRS", "SA8000"]}', false),
 
   ('Pleated Satin Dress', 'pleated-satin-dress', 'Shimmering satin dress with permanent pleats', 265.00, 'dresses',
-   ARRAY['https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-3.jpg'],
    '{"story": "Precision pleating by master craftsmen", "materials": ["Recycled Satin"], "techniques": ["Heat-Set Pleating"]}',
    '{"origin": "Japan", "carbonFootprint": "3.0kg CO2", "certifications": ["JIS"]}', true),
 
   ('Tiered Ruffle Dress', 'tiered-ruffle-dress', 'Romantic tiered dress with flowing ruffles', 185.00, 'dresses',
-   ARRAY['https://images.unsplash.com/photo-1572804013427-4d7ca7268217?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/new-product-2.png'],
    '{"story": "Designed for movement and comfort", "materials": ["Organic Cotton Voile"], "techniques": ["Bias Cutting"]}',
    '{"origin": "India", "carbonFootprint": "2.2kg CO2", "certifications": ["GOTS"]}', false),
 
@@ -59,7 +59,7 @@ VALUES
 
 -- TOPS (9 products)
   ('Cashmere Turtleneck', 'cashmere-turtleneck', 'Luxuriously soft cashmere turtleneck', 285.00, 'tops',
-   ARRAY['https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-4.jpg'],
    '{"story": "Made from ethically sourced Mongolian cashmere", "materials": ["Grade A Cashmere"], "techniques": ["Hand Finishing"]}',
    '{"origin": "Mongolia", "carbonFootprint": "5.2kg CO2", "certifications": ["Good Cashmere Standard"]}', true),
 
@@ -74,7 +74,7 @@ VALUES
    '{"origin": "Turkey", "carbonFootprint": "1.2kg CO2", "certifications": ["GOTS", "OEKO-TEX"]}', false),
 
   ('Linen Button-Up', 'linen-button-up', 'Relaxed linen shirt with mother of pearl buttons', 145.00, 'tops',
-   ARRAY['https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-5.jpg'],
    '{"story": "Woven from European flax", "materials": ["European Linen"], "techniques": ["Garment Washed"]}',
    '{"origin": "Lithuania", "carbonFootprint": "1.8kg CO2", "certifications": ["European Flax", "OEKO-TEX"]}', true),
 
@@ -99,13 +99,13 @@ VALUES
    '{"origin": "Portugal", "carbonFootprint": "0.8kg CO2", "certifications": ["GOTS"]}', false),
 
   ('Embroidered Peasant Top', 'embroidered-peasant-top', 'Bohemian top with colorful embroidery', 115.00, 'tops',
-   ARRAY['https://images.unsplash.com/photo-1518622358385-8ea7d0794bf6?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-6.jpg'],
    '{"story": "Traditional patterns passed down through generations", "materials": ["Organic Cotton"], "techniques": ["Hand Embroidery"]}',
    '{"origin": "Mexico", "carbonFootprint": "1.5kg CO2", "certifications": ["Fair Trade"]}', true),
 
 -- BOTTOMS (9 products)
   ('Wide Leg Trousers', 'wide-leg-trousers', 'Flowing wide leg trousers in sustainable viscose', 145.00, 'bottoms',
-   ARRAY['https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-7.jpg'],
    '{"story": "Designed for comfort and elegance", "materials": ["TENCEL Lyocell"], "techniques": ["Precision Cutting"]}',
    '{"origin": "Austria", "carbonFootprint": "2.5kg CO2", "certifications": ["FSC", "OEKO-TEX"]}', true),
 
@@ -125,7 +125,7 @@ VALUES
    '{"origin": "Portugal", "carbonFootprint": "1.8kg CO2", "certifications": ["GOTS"]}', false),
 
   ('Pleated Midi Skirt', 'pleated-midi-skirt', 'Elegant pleated skirt in flowing fabric', 145.00, 'bottoms',
-   ARRAY['https://images.unsplash.com/photo-1583496661160-fb5886a0uj3e?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/new-product-1.png'],
    '{"story": "Each pleat set by skilled technicians", "materials": ["Recycled Polyester"], "techniques": ["Heat Pleating"]}',
    '{"origin": "Japan", "carbonFootprint": "2.2kg CO2", "certifications": ["GRS"]}', true),
 
@@ -151,7 +151,7 @@ VALUES
 
 -- OUTERWEAR (9 products)
   ('Wool Blend Coat', 'wool-blend-coat', 'Classic tailored coat in Italian wool', 395.00, 'outerwear',
-   ARRAY['https://images.unsplash.com/photo-1539533018447-63fcce2678e3?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/hero-0.jpg'],
    '{"story": "Crafted in a century-old Italian mill", "materials": ["Italian Wool", "Cashmere"], "techniques": ["Hand Finished"]}',
    '{"origin": "Italy", "carbonFootprint": "8.5kg CO2", "certifications": ["Made in Italy"]}', true),
 
@@ -171,7 +171,7 @@ VALUES
    '{"origin": "Japan", "carbonFootprint": "4.8kg CO2", "certifications": ["GOTS"]}', false),
 
   ('Linen Blazer', 'linen-blazer', 'Relaxed linen blazer for warm weather', 195.00, 'outerwear',
-   ARRAY['https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/new-product-3.png'],
    '{"story": "Perfect for summer evenings", "materials": ["Belgian Linen"], "techniques": ["Unconstructed Tailoring"]}',
    '{"origin": "Belgium", "carbonFootprint": "2.8kg CO2", "certifications": ["European Flax"]}', false),
 
@@ -197,7 +197,7 @@ VALUES
 
 -- ACCESSORIES (9 products)
   ('Leather Tote Bag', 'leather-tote-bag', 'Spacious tote in vegetable-tanned leather', 245.00, 'accessories',
-   ARRAY['https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=800'],
+   ARRAY['/https://pexsipchcidsoqydigbt.supabase.co/storage/v1/object/public/products/product-2.png'],
    '{"story": "Tanned using traditional Italian methods", "materials": ["Vegetable-Tanned Leather"], "techniques": ["Hand Stitched"]}',
    '{"origin": "Italy", "carbonFootprint": "6.5kg CO2", "certifications": ["Leather Working Group"]}', true),
 
