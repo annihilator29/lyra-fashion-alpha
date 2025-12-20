@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Menu, Search } from 'lucide-react';
 import { SearchAutocomplete } from '@/components/search/search-autocomplete';
+import { CartBadge } from '@/components/shop/cart-badge';
+import { CartSlideOver } from '@/components/shop/cart-slide-over';
 import { Button } from '@/components/ui/button';
 import {
     Sheet,
@@ -37,6 +39,7 @@ interface HeaderProps {
 export function Header({ className }: HeaderProps) {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
 
     return (
         <header
@@ -67,13 +70,19 @@ export function Header({ className }: HeaderProps) {
                     ))}
                 </nav>
 
-                {/* Desktop Search */}
-                <div className="hidden w-72 lg:block">
-                    <SearchAutocomplete placeholder="Search products..." />
+                {/* Desktop Search & Cart */}
+                <div className="hidden items-center gap-2 lg:flex">
+                    <div className="w-72">
+                        <SearchAutocomplete placeholder="Search products..." />
+                    </div>
+                    <CartBadge onClick={() => setIsCartOpen(true)} />
                 </div>
 
                 {/* Mobile Actions */}
-                <div className="flex items-center gap-2 lg:hidden">
+                <div className="flex items-center gap-1 lg:hidden">
+                    {/* Cart Badge */}
+                    <CartBadge onClick={() => setIsCartOpen(true)} />
+                    
                     {/* Mobile Search Button */}
                     <Sheet open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                         <SheetTrigger asChild>
@@ -127,6 +136,9 @@ export function Header({ className }: HeaderProps) {
                     </Sheet>
                 </div>
             </div>
+
+            {/* Cart Slide-Over */}
+            <CartSlideOver open={isCartOpen} onOpenChange={setIsCartOpen} />
         </header>
     );
 }
