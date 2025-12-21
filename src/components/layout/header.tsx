@@ -6,6 +6,7 @@ import { Menu, Search } from 'lucide-react';
 import { SearchAutocomplete } from '@/components/search/search-autocomplete';
 import { CartBadge } from '@/components/shop/cart-badge';
 import { CartSlideOver } from '@/components/shop/cart-slide-over';
+import { useCartStore } from '@/lib/cart-store';
 import { Button } from '@/components/ui/button';
 import {
     Sheet,
@@ -39,7 +40,7 @@ interface HeaderProps {
 export function Header({ className }: HeaderProps) {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-    const [isCartOpen, setIsCartOpen] = useState(false);
+    const setIsCartOpen = useCartStore((state) => state.setIsOpen);
 
     return (
         <header
@@ -138,7 +139,7 @@ export function Header({ className }: HeaderProps) {
             </div>
 
             {/* Cart Slide-Over */}
-            <CartSlideOver open={isCartOpen} onOpenChange={setIsCartOpen} />
+            <CartSlideOver />
         </header>
     );
 }

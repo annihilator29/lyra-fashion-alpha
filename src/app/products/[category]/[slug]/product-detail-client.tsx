@@ -5,8 +5,8 @@ import { ImageGallery } from '@/components/shop/image-gallery';
 import { VariantSelector } from '@/components/shop/variant-selector';
 import { SizeGuideModal } from '@/components/shop/size-guide-modal';
 import { CraftsmanshipSection } from '@/components/transparency/craftsmanship-section';
-import { Button } from '@/components/ui/button';
-import { ShoppingBag } from 'lucide-react';
+import { AddToCartButton } from '@/components/shop/add-to-cart-button';
+import { useCartStore } from '@/lib/cart-store';
 import type { ProductWithVariants, ProductVariantRow, CraftsmanshipContent } from '@/types/product';
 
 interface ProductDetailClientProps {
@@ -28,6 +28,7 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product, craftsmanship }: ProductDetailClientProps) {
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantRow | null>(null);
     const [currentImages, setCurrentImages] = useState<string[]>(product.images || []);
+    const setCartOpen = useCartStore((state) => state.setIsOpen);
 
     // Handle variant-specific image changes
     const handleImageChange = useCallback((imageUrl: string | null) => {
@@ -122,28 +123,19 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
                         </div>
                     )}
 
-                    <Button
-                        size="lg"
-                        className="w-full gap-2"
-                        disabled={!canAddToCart}
-                    >
-                        <ShoppingBag className="h-5 w-5" />
-                        {!selectedVariant
-                            ? 'Select Size & Color'
-                            : selectedVariant.stock_quantity === 0
-                                ? 'Out of Stock'
-                                : 'Add to Cart'}
-                    </Button>
+                    <div className="pt-2">
+                        <AddToCartButton
+                            product={product}
+                            selectedSize={selectedVariant?.size || null}
+                            selectedColor={selectedVariant?.color || null}
+                            price={displayPrice}
+                            onCartOpen={() => setCartOpen(true)}
+                        />
+                    </div>
 
                     {!canAddToCart && selectedVariant && (
                         <p className="text-center text-sm text-muted-foreground">
                             This variant is currently out of stock.
-                        </p>
-                    )}
-
-                    {!selectedVariant && (product.product_variants?.length ?? 0) > 0 && (
-                        <p className="text-center text-sm text-muted-foreground">
-                            Please select your size and color to add to cart.
                         </p>
                     )}
                 </div>

@@ -32,13 +32,24 @@ describe('AddToCartButton', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Mock Zustand store selector
-    (useCartStore as any).mockImplementation((selector: any) =>
-      selector ? selector({ addItem: mockAddItem }) : { addItem: mockAddItem }
-    );
-    (toast as any).error = jest.fn();
-    (toast as any).success = jest.fn();
-    (checkStock as any).mockResolvedValue({ inStock: true, quantity: 10 });
+    // Mock Zustand store selector with proper typing
+    (useCartStore as jest.MockedFunction<typeof useCartStore>).mockImplementation((selector) => {
+      const storeState = {
+        items: [],
+        totalItems: 0,
+        subtotal: 0,
+        isOpen: false,
+        setIsOpen: jest.fn(),
+        addItem: mockAddItem,
+        updateQuantity: jest.fn(),
+        removeItem: jest.fn(),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any;
+      return selector ? selector(storeState) : storeState;
+    });
+    (toast as jest.MockedFunction<typeof toast>).error = jest.fn();
+    (toast as jest.MockedFunction<typeof toast>).success = jest.fn();
+    (checkStock as jest.MockedFunction<typeof checkStock>).mockResolvedValue({ inStock: true, quantity: 10 });
   });
 
   it('should be disabled when no size selected', () => {
@@ -88,7 +99,7 @@ describe('AddToCartButton', () => {
 
   it('should show error toast when product is out of stock', async () => {
     const user = userEvent.setup();
-    (checkStock as any).mockResolvedValue({ inStock: false, quantity: 0 });
+    (checkStock as jest.MockedFunction<typeof checkStock>).mockResolvedValue({ inStock: false, quantity: 0 });
 
     render(
       <AddToCartButton
@@ -102,7 +113,7 @@ describe('AddToCartButton', () => {
     await user.click(button);
 
     await waitFor(() => {
-      expect((toast as any).error).toHaveBeenCalledWith(
+      expect((toast as jest.MockedFunction<typeof toast>).error).toHaveBeenCalledWith(
         'This item is currently out of stock'
       );
     });
@@ -125,10 +136,14 @@ describe('AddToCartButton', () => {
     await user.click(button);
 
     await waitFor(() => {
-      expect(mockAddItem).toHaveBeenCalledWith(mockProduct, {
-        size: 'Medium',
-        color: 'Blue',
-      });
+      expect(mockAddItem).toHaveBeenCalledWith(
+        mockProduct,
+        {
+          size: 'Medium',
+          color: 'Blue',
+        },
+        undefined
+      );
     });
   });
 
@@ -147,7 +162,7 @@ describe('AddToCartButton', () => {
     await user.click(button);
 
     await waitFor(() => {
-      expect((toast as any).success).toHaveBeenCalledWith(
+      expect((toast as jest.MockedFunction<typeof toast>).success).toHaveBeenCalledWith(
         'Added to cart',
         expect.objectContaining({
           description: 'Organic Cotton Dress - Medium, Blue',

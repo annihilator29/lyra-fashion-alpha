@@ -8,15 +8,20 @@ import type { CartItem } from '@/types/cart';
 jest.mock('@/lib/cart-store');
 jest.mock('next/image', () => ({
   __esModule: true,
-  default: (props: any) => {
+  default: (props: React.ImgHTMLAttributes<HTMLImageElement>) => {
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
     return <img {...props} />;
   },
 }));
-jest.mock('next/link', () => ({
-  __esModule: true,
-  default: ({ children, ...props }: any) => <a {...props}>{children}</a>,
-}));
+jest.mock('next/link', () => {
+  const MockLink = ({ children, ...props }: { children: React.ReactNode; [key: string]: unknown }) => {
+    return <a {...props}>{children}</a>;
+  };
+  return {
+    __esModule: true,
+    default: MockLink,
+  };
+});
 
 const mockUseCartStore = useCartStore as jest.MockedFunction<
   typeof useCartStore
@@ -53,11 +58,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [],
       subtotal: 0,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     expect(screen.getByText(/your cart is empty/i)).toBeInTheDocument();
     expect(
@@ -69,11 +77,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
       subtotal: 24000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     expect(screen.getByText('Organic Cotton Dress')).toBeInTheDocument();
     expect(screen.getByText('Medium / Blue')).toBeInTheDocument();
@@ -85,11 +96,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
       subtotal: 24000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     expect(screen.getByText('Subtotal')).toBeInTheDocument();
     expect(screen.getByText('$240.00')).toBeInTheDocument();
@@ -100,11 +114,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
       subtotal: 24000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     const increaseButton = screen.getByRole('button', {
       name: /increase quantity/i,
@@ -122,11 +139,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
       subtotal: 24000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     const decreaseButton = screen.getByRole('button', {
       name: /decrease quantity/i,
@@ -146,11 +166,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [itemWithQuantityOne],
       subtotal: 12000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     const decreaseButton = screen.getByRole('button', {
       name: /decrease quantity/i,
@@ -165,11 +188,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
       subtotal: 24000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     const removeButton = screen.getByRole('button', { name: /remove/i });
     await user.click(removeButton);
@@ -182,11 +208,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
       subtotal: 24000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     const continueButton = screen.getByRole('button', {
       name: /continue shopping/i,
@@ -200,11 +229,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
       subtotal: 24000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     const checkoutLink = screen.getByRole('link', {
       name: /proceed to checkout/i,
@@ -216,11 +248,14 @@ describe('CartSlideOver', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem, { ...mockCartItem, id: 'different-id' }],
       subtotal: 48000,
+      isOpen: true,
+      setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
-    });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any);
 
-    render(<CartSlideOver open={true} onOpenChange={mockOnOpenChange} />);
+    render(<CartSlideOver />);
 
     expect(screen.getByText(/your cart \(2\)/i)).toBeInTheDocument();
   });

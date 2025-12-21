@@ -1,6 +1,12 @@
-import type { Database } from './database.types';
-
-type Product = Database['public']['Tables']['products']['Row'];
+export interface MinimalProduct {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  images: string[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
+}
 
 export interface CartItem {
   id: string; // Unique cart item ID (product_id + variant)
@@ -21,7 +27,9 @@ export interface CartState {
   items: CartItem[];
   totalItems: number;
   subtotal: number;
-  addItem: (product: Product, variant: { size: string; color: string }) => void;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
+  addItem: (product: MinimalProduct, variant: { size: string; color: string }, price?: number) => void;
   updateQuantity: (itemId: string, quantity: number) => void;
   removeItem: (itemId: string) => void;
   clearCart: () => void;

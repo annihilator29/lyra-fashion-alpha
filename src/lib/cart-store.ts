@@ -1,19 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { CartState, CartItem } from '@/types/cart';
+import type { CartState, CartItem, MinimalProduct } from '@/types/cart';
 import { generateCartItemId } from '@/types/cart';
-import type { Database } from '@/types/database.types';
-
-type Product = Database['public']['Tables']['products']['Row'];
 
 export const useCartStore = create<CartState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       items: [],
       totalItems: 0,
       subtotal: 0,
+      isOpen: false,
 
-      addItem: (product: Product, variant: { size: string; color: string }) => {
+      setIsOpen: (open: boolean) => set({ isOpen: open }),
+
+      addItem: (product: MinimalProduct, variant: { size: string; color: string }, price?: number) => {
+        const itemPrice = price ?? product.price;
         const cartItemId = generateCartItemId(
           product.id,
           variant.size,
@@ -42,7 +43,7 @@ export const useCartStore = create<CartState>()(
               productId: product.id,
               slug: product.slug,
               name: product.name,
-              price: product.price,
+              price: itemPrice,
               imageUrl: product.images[0] || '/images/placeholder.jpg',
               variant,
               quantity: 1,
@@ -120,7 +121,11 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'cart-storage', // localStorage key
-      // Expiration handled by checking timestamp (optional enhancement)
+      partialize: (state) => ({
+        items: state.items,
+        totalItems: state.totalItems,
+        subtotal: state.subtotal,
+      }),
     }
   )
 );

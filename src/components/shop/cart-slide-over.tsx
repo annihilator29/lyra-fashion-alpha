@@ -15,13 +15,8 @@ import { useCartStore } from '@/lib/cart-store';
 import { formatPrice } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
-interface CartSlideOverProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-export function CartSlideOver({ open, onOpenChange }: CartSlideOverProps) {
-  const { items, subtotal, updateQuantity, removeItem } = useCartStore();
+export function CartSlideOver() {
+  const { items, subtotal, updateQuantity, removeItem, isOpen, setIsOpen } = useCartStore();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -44,8 +39,9 @@ export function CartSlideOver({ open, onOpenChange }: CartSlideOverProps) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent
+        showCloseButton={false}
         className={cn(
           'gap-0 p-0',
           isMobile
@@ -59,7 +55,7 @@ export function CartSlideOver({ open, onOpenChange }: CartSlideOverProps) {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => onOpenChange(false)}
+              onClick={() => setIsOpen(false)}
               aria-label="Close cart"
             >
               <X className="h-5 w-5" />
@@ -74,7 +70,7 @@ export function CartSlideOver({ open, onOpenChange }: CartSlideOverProps) {
             <p className="mb-6 text-sm text-muted-foreground">
               Add items to get started
             </p>
-            <Button onClick={() => onOpenChange(false)}>
+            <Button onClick={() => setIsOpen(false)}>
               Continue Shopping
             </Button>
           </div>
@@ -90,7 +86,7 @@ export function CartSlideOver({ open, onOpenChange }: CartSlideOverProps) {
                     <Link
                       href={`/products/${item.slug}`}
                       className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-muted"
-                      onClick={() => onOpenChange(false)}
+                      onClick={() => setIsOpen(false)}
                     >
                       <Image
                         src={item.imageUrl}
@@ -106,7 +102,7 @@ export function CartSlideOver({ open, onOpenChange }: CartSlideOverProps) {
                         <Link
                           href={`/products/${item.slug}`}
                           className="font-medium hover:underline"
-                          onClick={() => onOpenChange(false)}
+                          onClick={() => setIsOpen(false)}
                         >
                           {item.name}
                         </Link>
@@ -181,14 +177,14 @@ export function CartSlideOver({ open, onOpenChange }: CartSlideOverProps) {
                     asChild
                     className="w-full"
                     size="lg"
-                    onClick={() => onOpenChange(false)}
+                    onClick={() => setIsOpen(false)}
                   >
                     <Link href="/checkout">Proceed to Checkout</Link>
                   </Button>
                   <Button
                     variant="outline"
                     className="w-full"
-                    onClick={() => onOpenChange(false)}
+                    onClick={() => setIsOpen(false)}
                   >
                     Continue Shopping
                   </Button>

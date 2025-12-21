@@ -6,14 +6,13 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/cart-store';
 import { checkStock } from '@/lib/supabase/inventory';
-import type { Database } from '@/types/database.types';
-
-type Product = Database['public']['Tables']['products']['Row'];
+import type { MinimalProduct } from '@/types/cart';
 
 interface AddToCartButtonProps {
-  product: Product;
+  product: MinimalProduct;
   selectedSize: string | null;
   selectedColor: string | null;
+  price?: number;
   onCartOpen?: () => void;
 }
 
@@ -21,6 +20,7 @@ export function AddToCartButton({
   product,
   selectedSize,
   selectedColor,
+  price,
   onCartOpen,
 }: AddToCartButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +38,7 @@ export function AddToCartButton({
 
     try {
       // Check stock before adding to cart
-      const { inStock, quantity } = await checkStock(
+      const { inStock } = await checkStock(
         product.id,
         selectedSize,
         selectedColor
@@ -51,7 +51,7 @@ export function AddToCartButton({
       }
 
       // Add to cart
-      addItem(product, { size: selectedSize, color: selectedColor });
+      addItem(product, { size: selectedSize, color: selectedColor }, price);
 
       // Show success toast
       toast.success('Added to cart', {

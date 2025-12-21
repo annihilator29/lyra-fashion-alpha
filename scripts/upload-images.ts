@@ -52,7 +52,7 @@ async function uploadImages() {
 
             console.log(`Uploading ${file}...`);
 
-            const { data, error } = await supabase.storage
+            const { error } = await supabase.storage
                 .from(BUCKET_NAME)
                 .upload(file, fileBuffer, {
                     contentType,
