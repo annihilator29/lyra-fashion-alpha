@@ -27,6 +27,7 @@ export interface CartState {
   items: CartItem[];
   totalItems: number;
   subtotal: number;
+  updatedAt: number;
   isOpen: boolean;
   setIsOpen: (open: boolean) => void;
   addItem: (product: MinimalProduct, variant: { size: string; color: string }, price?: number) => void;

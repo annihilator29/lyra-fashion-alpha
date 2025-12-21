@@ -29,6 +29,7 @@ describe('CartBadge', () => {
       items: [],
       totalItems: 0,
       subtotal: 0,
+      updatedAt: 0,
       isOpen: false,
       setIsOpen: jest.fn(),
       addItem: jest.fn(),

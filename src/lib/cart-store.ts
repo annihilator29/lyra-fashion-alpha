@@ -9,6 +9,7 @@ export const useCartStore = create<CartState>()(
       items: [],
       totalItems: 0,
       subtotal: 0,
+      updatedAt: Date.now(),
       isOpen: false,
 
       setIsOpen: (open: boolean) => set({ isOpen: open }),
@@ -79,7 +80,7 @@ export const useCartStore = create<CartState>()(
               (sum, item) => sum + item.price * item.quantity,
               0
             );
-            return { items: newItems, totalItems, subtotal };
+            return { items: newItems, totalItems, subtotal, updatedAt: Date.now() };
           }
 
           // Update quantity
@@ -116,7 +117,7 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => {
-        set({ items: [], totalItems: 0, subtotal: 0 });
+        set({ items: [], totalItems: 0, subtotal: 0, updatedAt: Date.now() });
       },
     }),
     {
@@ -125,7 +126,23 @@ export const useCartStore = create<CartState>()(
         items: state.items,
         totalItems: state.totalItems,
         subtotal: state.subtotal,
+        updatedAt: state.updatedAt,
       }),
+      onRehydrateStorage: (state) => {
+        return (rehydratedState, error) => {
+          if (error || !rehydratedState) return;
+
+          // Expiration check: 30 days in milliseconds
+          const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
+          const now = Date.now();
+
+          if (now - rehydratedState.updatedAt > THIRTY_DAYS) {
+            // Cart expired, clear it
+            rehydratedState.clearCart();
+            console.log('Cart expired and has been cleared.');
+          }
+        };
+      },
     }
   )
 );

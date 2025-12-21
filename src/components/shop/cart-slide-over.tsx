@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, X, ShoppingBag } from 'lucide-react';
+import { Minus, Plus, X, ShoppingBag, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,10 +14,13 @@ import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/cart-store';
 import { formatPrice } from '@/lib/utils';
 import { cn } from '@/lib/utils';
+import { createClient } from '@/lib/supabase/client';
 
 export function CartSlideOver() {
   const { items, subtotal, updateQuantity, removeItem, isOpen, setIsOpen } = useCartStore();
   const [isMobile, setIsMobile] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, 'deleted' | 'price_changed'>>({});
+  const [validating, setValidating] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -29,6 +32,44 @@ export function CartSlideOver() {
 
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (!isOpen || items.length === 0) return;
+
+    const validateCartItems = async () => {
+      setValidating(true);
+      const supabase = createClient();
+      const newErrors: Record<string, 'deleted' | 'price_changed'> = {};
+
+      const productIds = Array.from(new Set(items.map((item) => item.productId)));
+
+      const { data: dbProducts, error } = await supabase
+        .from('products')
+        .select('id, price')
+        .in('id', productIds);
+
+      if (error) {
+        console.error('Error validating cart products:', error);
+        setValidating(false);
+        return;
+      }
+
+      const dbProductMap = new Map(dbProducts?.map((p) => [p.id, p.price]));
+
+      items.forEach((item) => {
+        if (!dbProductMap.has(item.productId)) {
+          newErrors[item.id] = 'deleted';
+        } else if (dbProductMap.get(item.productId) !== item.price) {
+          newErrors[item.id] = 'price_changed';
+        }
+      });
+
+      setValidationErrors(newErrors);
+      setValidating(false);
+    };
+
+    validateCartItems();
+  }, [isOpen, items]);
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity < 1) {
@@ -112,6 +153,18 @@ export function CartSlideOver() {
                         <p className="mt-1 font-semibold">
                           {formatPrice(item.price)}
                         </p>
+                        {validationErrors[item.id] === 'deleted' && (
+                          <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-destructive">
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            <span>This product is no longer available</span>
+                          </div>
+                        )}
+                        {validationErrors[item.id] === 'price_changed' && (
+                          <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-amber-600">
+                            <AlertTriangle className="h-3.5 w-3.5" />
+                            <span>Price has changed since added to cart</span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center justify-between">
