@@ -27,31 +27,33 @@ export default function CheckoutOrderSummary() {
         {items.length === 0 ? (
           <p className="text-gray-500">No items in cart</p>
         ) : (
-          items.map((item) => (
-            <div key={item.id} className="flex items-center py-3 border-b border-gray-200 last:border-b-0">
-              <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center mr-3">
-               {item.imageUrl ? (
-                 <Image 
-                   src={item.imageUrl} 
-                   alt={item.name} 
-                   width={64}
-                   height={64}
-                   className="w-full h-full object-cover rounded-md"
-                 />
-               ) : (
-                 <span className="text-gray-500 text-xs">No image</span>
-               )}
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between">
-                  <h4 className="font-medium text-sm">{item.name}</h4>
-                  <span className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</span>
-                </div>
-                <p className="text-xs text-gray-500">{item.quantity} × ${item.price.toFixed(2)}</p>
-              </div>
-              <FactoryBadge />
-            </div>
-          ))
+           items.map((item) => (
+             <div key={item.id} className="flex items-center py-3 border-b border-gray-200 last:border-b-0">
+               <div className="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center mr-3">
+                {item.imageUrl ? (
+                  <Image
+                    src={item.imageUrl}
+                    alt={item.name}
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover rounded-md"
+                  />
+                ) : (
+                  <span className="text-gray-500 text-xs">No image</span>
+                )}
+               </div>
+               <div className="flex-1">
+                 <div className="flex justify-between items-start">
+                   <div className="flex items-center gap-2">
+                     <h4 className="font-medium text-sm">{item.name}</h4>
+                     <FactoryBadge />
+                   </div>
+                   <span className="text-sm font-medium">${(item.price * item.quantity).toFixed(2)}</span>
+                 </div>
+                 <p className="text-xs text-gray-500">{item.quantity} × ${item.price.toFixed(2)}</p>
+               </div>
+             </div>
+           ))
         )}
       </div>
 

@@ -8,72 +8,91 @@ interface TransparencyCardProps {
   savings: number;
 }
 
+type SegmentType = 'materials' | 'labor' | 'transport' | 'lyra';
+
 export function TransparencyCard({ factoryPrice, retailPrice, savings }: TransparencyCardProps) {
-  const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
+  const [hoveredSegment, setHoveredSegment] = useState<SegmentType | null>(null);
 
-  // Calculate percentages for the bar chart
-  const fabricPercent = 0.4; // 40% of cost is fabric
-  const laborPercent = 0.3;  // 30% of cost is labor
-  const transportPercent = 0.1; // 10% of cost is transport
+  // Calculate percentages (exact match to design spec)
+  const materialsPercent = 0.4;   // 40%
+  const laborPercent = 0.3;       // 30%
+  const transportPercent = 0.2;     // 20%
+  const lyraPercent = 0.1;          // 10%
 
-  const fabricCost = factoryPrice * fabricPercent;
+  const materialsCost = factoryPrice * materialsPercent;
   const laborCost = factoryPrice * laborPercent;
+  const transportCost = factoryPrice * transportPercent;
+  const lyraCost = factoryPrice * lyraPercent;
+
+  const segments = [
+    { type: 'materials', percent: materialsPercent, cost: materialsCost, color: '#5D6D5B' },
+    { type: 'labor', percent: laborPercent, cost: laborCost, color: '#8B9D89' },
+    { type: 'transport', percent: transportPercent, cost: transportCost, color: '#B8C5B6' },
+    { type: 'lyra', percent: lyraPercent, cost: lyraCost, color: '#D8D6D1' },
+  ];
+
+  const hoveredSegmentData = segments.find(s => s.type === hoveredSegment);
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200">
       <h4 className="font-semibold mb-3">Factory-Direct Pricing</h4>
-      
-      {/* Interactive bar chart */}
-      <div className="relative h-8 bg-gray-200 rounded-full mb-4 overflow-hidden">
-        <div 
-          className={`h-full ${hoveredSegment === 'fabric' ? 'bg-blue-600' : 'bg-blue-400'}`}
-          style={{ width: `${fabricPercent * 100}%` }}
-          onMouseEnter={() => setHoveredSegment('fabric')}
-          onMouseLeave={() => setHoveredSegment(null)}
-        >
-          <span className="sr-only">Fabric: ${fabricCost.toFixed(2)}</span>
-        </div>
-        <div 
-          className={`h-full ${hoveredSegment === 'labor' ? 'bg-green-600' : 'bg-green-400'}`}
-          style={{ width: `${laborPercent * 100}%` }}
-          onMouseEnter={() => setHoveredSegment('labor')}
-          onMouseLeave={() => setHoveredSegment(null)}
-        >
-          <span className="sr-only">Labor: ${laborCost.toFixed(2)}</span>
-        </div>
-        <div 
-          className={`h-full ${hoveredSegment === 'transport' ? 'bg-yellow-600' : 'bg-yellow-400'}`}
-          style={{ width: `${transportPercent * 100}%` }}
-          onMouseEnter={() => setHoveredSegment('transport')}
-          onMouseLeave={() => setHoveredSegment(null)}
-        >
-          <span className="sr-only">Transport: ${(factoryPrice * transportPercent).toFixed(2)}</span>
-        </div>
+
+      {/* Cost Bar - continuous bar matching design spec */}
+      <div className="h-10 bg-gray-200 rounded-lg mb-4 flex overflow-hidden">
+        {segments.map(segment => (
+          <div
+            key={segment.type}
+            className={`h-full transition-all duration-300 cursor-pointer relative ${
+              hoveredSegment === segment.type ? 'transform-gpu' : ''
+            }`}
+            style={{
+              width: `${segment.percent * 100}%`,
+              backgroundColor: segment.color,
+              // 3D effect styles when hovered
+              boxShadow: hoveredSegment === segment.type
+                ? `0 8px 25px rgba(0,0,0,0.3), inset 0 -4px 10px rgba(0,0,0,0.2), inset 0 4px 10px rgba(255,255,255,0.3)`
+                : `0 2px 8px rgba(0,0,0,0.1), inset 0 -2px 6px rgba(0,0,0,0.1), inset 0 2px 6px rgba(255,255,255,0.2)`,
+              transform: hoveredSegment === segment.type
+                ? 'translateY(-2px) scale(1.02)'
+                : 'translateY(0) scale(1)',
+              zIndex: hoveredSegment === segment.type ? '10' : '1',
+            }}
+            onMouseEnter={() => setHoveredSegment(segment.type as SegmentType)}
+            onMouseLeave={() => setHoveredSegment(null)}
+          >
+            {/* Cost Name and Amount - centered in each segment */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span
+                className="text-white text-xs font-medium"
+                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5), 0 0 10px rgba(0,0,0,0.3)' }}
+              >
+                {segment.type.charAt(0).toUpperCase() + segment.type.slice(1)}
+              </span>
+              <span
+                className="text-white text-xs font-bold mt-1"
+                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.5), 0 0 10px rgba(0,0,0,0.3)' }}
+              >
+                ${segment.cost.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Segment labels */}
+      {/* Segment labels with percentages below bar */}
       <div className="flex justify-between text-xs mb-4">
-        <span 
-          className={`cursor-pointer ${hoveredSegment === 'fabric' ? 'font-bold' : ''}`}
-          onMouseEnter={() => setHoveredSegment('fabric')}
-          onMouseLeave={() => setHoveredSegment(null)}
-        >
-          Fabric
-        </span>
-        <span 
-          className={`cursor-pointer ${hoveredSegment === 'labor' ? 'font-bold' : ''}`}
-          onMouseEnter={() => setHoveredSegment('labor')}
-          onMouseLeave={() => setHoveredSegment(null)}
-        >
-          Labor
-        </span>
-        <span 
-          className={`cursor-pointer ${hoveredSegment === 'transport' ? 'font-bold' : ''}`}
-          onMouseEnter={() => setHoveredSegment('transport')}
-          onMouseLeave={() => setHoveredSegment(null)}
-        >
-          Transport
-        </span>
+        {segments.map(segment => (
+          <span
+            key={segment.type}
+            className={`cursor-pointer transition-opacity duration-200 ${
+              hoveredSegment === segment.type ? 'opacity-100' : 'opacity-60'
+            }`}
+            onMouseEnter={() => setHoveredSegment(segment.type as SegmentType)}
+            onMouseLeave={() => setHoveredSegment(null)}
+          >
+            {segment.type.charAt(0).toUpperCase() + segment.type.slice(1)} ({(segment.percent * 100).toFixed(0)}%)
+          </span>
+        ))}
       </div>
 
       {/* Comparison */}
