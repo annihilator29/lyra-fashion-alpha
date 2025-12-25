@@ -6,8 +6,10 @@ import { useCartStore } from '@/lib/cart-store';
 import { useCheckout } from '@/hooks/use-checkout';
 import CheckoutShippingForm from '@/components/shop/checkout-shipping-form';
 import CheckoutOrderSummary from '@/components/shop/checkout-order-summary';
+import CheckoutPaymentForm from '@/components/shop/checkout-payment-step';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 // Define checkout steps
 type CheckoutStep = 'shipping' | 'payment' | 'review';
@@ -46,11 +48,11 @@ export default function CheckoutClient() {
 
   // Classy progress indicator component with elegant circles and progress bar
   const ProgressIndicator = () => {
-    const steps: CheckoutStep[] = ['shipping', 'payment', 'review'];
+    const steps: CheckoutStep[] = ['shipping', 'review', 'payment'];
     const stepLabels = {
       shipping: 'Shipping',
-      payment: 'Payment',
       review: 'Review',
+      payment: 'Payment',
     };
     
     const currentStepIndex = steps.indexOf(currentStep);
@@ -155,17 +157,9 @@ export default function CheckoutClient() {
         >
           Back
         </Button>
-        {currentStep !== 'review' && (
-          <Button
-            onClick={nextStep}
-            disabled={currentStep === 'payment'} // Payment step is disabled in this story
-          >
-            {currentStep === 'shipping' ? 'Continue to Review' : 'Continue to Payment'}
-          </Button>
-        )}
         {currentStep === 'review' && (
-          <Button disabled>
-            Complete Order (Coming Soon)
+          <Button onClick={() => goToStep('payment')}>
+            Continue to Payment
           </Button>
         )}
       </div>
@@ -189,20 +183,48 @@ export default function CheckoutClient() {
           )}
           
           {currentStep === 'payment' && (
-            <div className="bg-gray-100 p-6 rounded-lg">
-              <h3 className="text-lg font-semibold mb-4">Payment Information</h3>
-              <p className="text-gray-600">
-                Payment processing will be available in the next update.
-                Your shipping and order information have been saved.
-              </p>
-              <Button
-                className="mt-4"
-                onClick={() => goToStep('review')}
-                disabled
-              >
-                Continue to Review
-              </Button>
-            </div>
+            <CheckoutPaymentForm
+              checkoutData={{
+                items: items.map(item => ({
+                  id: item.id,
+                  name: item.name,
+                  price: item.price,
+                  quantity: item.quantity,
+                  image: item.imageUrl,
+                })),
+                shippingAddress: {
+                  name: checkoutData?.shipping_name,
+                  line1: checkoutData?.shipping_address,
+                  city: checkoutData?.shipping_city,
+                  postal_code: checkoutData?.shipping_postal_code,
+                  country: checkoutData?.shipping_country,
+                },
+                billingAddress: checkoutData?.same_as_shipping ? {
+                  name: checkoutData?.shipping_name,
+                  line1: checkoutData?.shipping_address,
+                  city: checkoutData?.shipping_city,
+                  postal_code: checkoutData?.shipping_postal_code,
+                  country: checkoutData?.shipping_country,
+                } : {
+                  name: checkoutData?.billing_name,
+                  line1: checkoutData?.billing_address,
+                  city: checkoutData?.billing_city,
+                  postal_code: checkoutData?.billing_postal_code,
+                  country: checkoutData?.billing_country,
+                },
+                subtotal: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                shipping: 0, // Free shipping for now
+                tax: items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.08, // 8% tax
+                total: items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.08,
+              }}
+              onPaymentSuccess={(orderId: string) => {
+                toast.success('Payment successful! Order ID: ' + orderId);
+                // Clear cart after successful payment
+                useCartStore.getState().clearCart();
+                router.push('/checkout/success?order=' + orderId);
+              }}
+              onBack={() => prevStep()}
+            />
           )}
           
           {currentStep === 'review' && (
@@ -253,7 +275,7 @@ export default function CheckoutClient() {
             </div>
           )}
           
-          <NavigationButtons />
+          {currentStep !== 'shipping' && <NavigationButtons />}
         </div>
         
         {/* Order Summary Section */}

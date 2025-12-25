@@ -1,0 +1,3 @@
+ADD COLUMN IF NOT EXISTS idempotency_key TEXT UNIQUE,
+ADD COLUMN IF NOT EXISTS order_number TEXT UNIQUE,
+ADD COLUMN IF NOT EXISTS stripe_payment_intent_id TEXT;

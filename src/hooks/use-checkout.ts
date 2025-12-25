@@ -60,17 +60,19 @@ export const useCheckout = () => {
 
   const nextStep = () => {
     if (currentStep === 'shipping') {
-      setCurrentStep('review'); // Skip payment for now (will be implemented in Story 3.3)
+      setCurrentStep('review'); // Shipping -> Review
     } else if (currentStep === 'review') {
-      // Stay on review step
+      setCurrentStep('payment'); // Review -> Payment
+    } else if (currentStep === 'payment') {
+      // Payment is the final step
     }
   };
 
   const prevStep = () => {
-    if (currentStep === 'review') {
-      setCurrentStep('shipping'); // Go back to shipping from review
-    } else if (currentStep === 'payment') {
-      setCurrentStep('shipping');
+    if (currentStep === 'payment') {
+      setCurrentStep('review'); // Payment -> Review
+    } else if (currentStep === 'review') {
+      setCurrentStep('shipping'); // Review -> Shipping
     }
   };
 
