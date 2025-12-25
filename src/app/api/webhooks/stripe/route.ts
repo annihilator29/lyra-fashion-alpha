@@ -1,22 +1,33 @@
 import { NextRequest } from 'next/server';
+
+export const dynamic = 'force-dynamic';
+
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 
-// Use stable Stripe API version (verified against current docs)
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-12-15.clover',
-});
+const getStripe = () => {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error('STRIPE_SECRET_KEY is not defined');
+  }
+  return new Stripe(key, {
+    apiVersion: '2025-12-15.clover',
+  });
+};
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
+const getSupabase = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase environment variables are not defined');
+  }
+  return createClient(url, key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
-  }
-);
+  });
+};
 
 // Structured logging helper
 function log(level: 'error' | 'warn' | 'info' | 'debug', message: string, context?: Record<string, unknown>) {
@@ -53,6 +64,8 @@ export async function POST(request: NextRequest) {
   }
 
   let event: Stripe.Event;
+  const stripe = getStripe();
+  const supabase = getSupabase();
 
   try {
     // Verify the webhook signature to ensure it's from Stripe
@@ -69,7 +82,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Check if this event has already been processed (idempotency)
-  const { data: existingEvent, error: fetchError } = await supabase
+  const { data: existingEvent, error: fetchError } = await getSupabase()
     .from('processed_webhooks')
     .select('id')
     .eq('event_id', event.id)
@@ -82,7 +95,7 @@ export async function POST(request: NextRequest) {
 
    try {
     // Mark event as processing BEFORE handling (prevents race conditions)
-    const { error: markError } = await supabase
+    const { error: markError } = await getSupabase()
       .from('processed_webhooks')
       .insert({
         event_id: event.id,
@@ -144,7 +157,7 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
     const paymentIntentId = session.payment_intent as string;
 
     // Find the order by payment intent ID
-    const { data: order, error } = await supabase
+    const { data: order, error } = await getSupabase()
       .from('orders')
       .select('*')
       .eq('stripe_payment_intent_id', paymentIntentId)
@@ -156,7 +169,7 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
     }
 
     // Update the order status to 'paid'
-    const { error: updateError } = await supabase
+    const { error: updateError } = await getSupabase()
       .from('orders')
       .update({
         status: 'paid',
@@ -184,7 +197,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
 
   try {
     // Find the order by payment intent ID
-    const { data: order, error } = await supabase
+    const { data: order, error } = await getSupabase()
       .from('orders')
       .select('*')
       .eq('stripe_payment_intent_id', paymentIntent.id)
@@ -196,7 +209,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
     }
 
     // Update the order status to 'paid'
-    const { error: updateError } = await supabase
+    const { error: updateError } = await getSupabase()
       .from('orders')
       .update({ 
         status: 'paid',
@@ -220,7 +233,7 @@ async function handlePaymentIntentFailed(event: Stripe.Event) {
 
   try {
     // Find the order by payment intent ID
-    const { data: order, error } = await supabase
+    const { data: order, error } = await getSupabase()
       .from('orders')
       .select('*')
       .eq('stripe_payment_intent_id', paymentIntent.id)
@@ -232,7 +245,7 @@ async function handlePaymentIntentFailed(event: Stripe.Event) {
     }
 
     // Update the order status to 'failed'
-    const { error: updateError } = await supabase
+    const { error: updateError } = await getSupabase()
       .from('orders')
       .update({ 
         status: 'failed',
@@ -263,7 +276,7 @@ async function handleChargeFailed(event: Stripe.Event) {
       return;
     }
 
-    const { data: order, error } = await supabase
+    const { data: order, error } = await getSupabase()
       .from('orders')
       .select('*')
       .eq('stripe_payment_intent_id', paymentIntentId as string)
@@ -275,7 +288,7 @@ async function handleChargeFailed(event: Stripe.Event) {
     }
 
     // Update the order status to 'failed'
-    const { error: updateError } = await supabase
+    const { error: updateError } = await getSupabase()
       .from('orders')
       .update({ 
         status: 'failed',

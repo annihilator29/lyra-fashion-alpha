@@ -5,20 +5,29 @@ import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'crypto';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  typescript: true,
-});
+const getStripe = () => {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error('STRIPE_SECRET_KEY is not defined');
+  }
+  return new Stripe(key, {
+    typescript: true,
+  });
+};
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
+const getSupabase = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase environment variables are not defined');
+  }
+  return createClient(url, key, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
     },
-  }
-);
+  });
+};
 
 interface CreatePaymentIntentParams {
   amount: number;
@@ -120,7 +129,7 @@ export async function createPaymentIntent(
     const idempotencyKey = providedIdempotencyKey || randomUUID();
 
     // Check if an order with this idempotency key already exists
-    const { data: existingOrder, error: fetchError } = await supabase
+    const { data: existingOrder, error: fetchError } = await getSupabase()
       .from('orders')
       .select('id, stripe_payment_intent_id, total, order_number')
       .eq('idempotency_key', idempotencyKey)
@@ -138,7 +147,7 @@ export async function createPaymentIntent(
 
       // If an order with this idempotency key already exists, return the existing payment intent
       try {
-        const existingPaymentIntent = await stripe.paymentIntents.retrieve(
+        const existingPaymentIntent = await getStripe().paymentIntents.retrieve(
           existingOrder.stripe_payment_intent_id
         );
 
@@ -161,7 +170,7 @@ export async function createPaymentIntent(
     }
 
     // Create payment intent with idempotency key
-    const paymentIntent = await stripe.paymentIntents.create({
+    const paymentIntent = await getStripe().paymentIntents.create({
       amount,
       currency,
       metadata: {
@@ -177,7 +186,7 @@ export async function createPaymentIntent(
 
     // Create a temporary order record in the database with pending status
     // This will be updated by the webhook when payment is confirmed
-    const { data: newOrder, error: orderError } = await supabase
+    const { data: newOrder, error: orderError } = await getSupabase()
       .from('orders')
       .insert({
         customer_id: user_id || null, // Map user_id to customer_id column
@@ -196,7 +205,7 @@ export async function createPaymentIntent(
       console.error('Error creating order:', orderError);
       // If order creation fails, we need to cancel the payment intent
       try {
-        await stripe.paymentIntents.cancel(paymentIntent.id);
+        await getStripe().paymentIntents.cancel(paymentIntent.id);
       } catch (cancelError) {
         console.error('Error cancelling payment intent after order creation failure:', cancelError);
       }
@@ -217,7 +226,7 @@ export async function createPaymentIntent(
         price: item.price,
       }));
 
-      const { error: itemsError } = await supabase
+      const { error: itemsError } = await getSupabase()
         .from('order_items')
         .insert(orderItems);
 
