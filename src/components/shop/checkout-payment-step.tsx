@@ -79,37 +79,7 @@ const PaymentFormInner: React.FC<PaymentFormInnerProps> = ({
     return 'Payment failed. Please try again or contact support if the issue persists.';
   };
 
-  // Retry helper with exponential backoff
-  const retryWithBackoff = async (
-    fn: () => Promise<void>,
-    maxRetries = 3,
-    delays = [1000, 2000, 4000] // 1s, 2s, 4s
-  ): Promise<void> => {
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
-      try {
-        await fn();
-        return;
-      } catch (error) {
-        const isLastAttempt = attempt === maxRetries - 1;
 
-        // Check if error is retryable (network errors, timeouts, processing errors)
-        const errorMessage = error instanceof Error ? error.message.toLowerCase() : '';
-        const isRetryable = errorMessage.includes('network') ||
-                         errorMessage.includes('timeout') ||
-                         errorMessage.includes('processing') ||
-                         errorMessage.includes('rate_limit');
-
-        if (!isRetryable || isLastAttempt) {
-          throw error; // Re-throw non-retryable errors or after max retries
-        }
-
-        // Wait before next retry (exponential backoff)
-        const delay = delays[attempt] || delays[delays.length - 1];
-        await new Promise(resolve => setTimeout(resolve, delay));
-        console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms delay`);
-      }
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,7 +122,7 @@ const PaymentFormInner: React.FC<PaymentFormInnerProps> = ({
     } catch (error: unknown) {
       
       // Check if it's a validation error from Stripe
-      const isValidationError = (error as any)?.type === 'validation_error';
+      const isValidationError = error !== null && typeof error === 'object' && 'type' in error && error.type === 'validation_error';
       
       const message = error instanceof Error ? error.message : 'Payment failed. Please try again.';
       

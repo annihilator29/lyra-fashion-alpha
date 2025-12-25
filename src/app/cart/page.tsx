@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Minus, Plus, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/cart-store';
-import { formatPrice, cn } from '@/lib/utils'; // Assuming cn is in utils
+import { formatPrice } from '@/lib/utils'; // Assuming cn is in utils
 
 export default function CartPage() {
   const { items, subtotal, updateQuantity, removeItem } = useCartStore();
@@ -26,7 +26,7 @@ export default function CartPage() {
         </div>
         <h1 className="text-3xl font-bold mb-4">Your cart is empty</h1>
         <p className="text-muted-foreground mb-8 text-lg max-w-md text-center">
-          Looks like you haven't added anything to your cart yet. Explore our collection to find your next favorite look.
+          Looks like you haven&apos;t added anything to your cart yet. Explore our collection to find your next favorite look.
         </p>
         <Button asChild size="lg">
           <Link href="/products">Start Shopping</Link>

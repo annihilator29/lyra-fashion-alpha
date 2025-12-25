@@ -1,6 +1,6 @@
-
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { useCartStore } from '@/lib/cart-store';
 import CartPage from '../page';
 
 // Mock the cart store
@@ -8,18 +8,24 @@ jest.mock('@/lib/cart-store', () => ({
   useCartStore: jest.fn(),
 }));
 
+const mockUseCartStore = useCartStore as unknown as jest.Mock;
+
 // Mock Next.js Link and Image
 jest.mock('next/link', () => {
-    return ({ children, href }: { children: React.ReactNode; href: string }) => {
+    const MockLink = ({ children, href }: { children: React.ReactNode; href: string }) => {
       return <a href={href}>{children}</a>;
     };
+    MockLink.displayName = 'Link';
+    return MockLink;
 });
 
 jest.mock('next/image', () => {
-    return ({ src, alt }: { src: string; alt: string }) => {
+    const MockImage = ({ src, alt }: { src: string; alt: string }) => {
         // eslint-disable-next-line @next/next/no-img-element
         return <img src={src} alt={alt} />;
     };
+    MockImage.displayName = 'Image';
+    return MockImage;
 });
 
 describe('CartPage', () => {
@@ -31,8 +37,7 @@ describe('CartPage', () => {
   });
 
   it('renders empty state when cart is empty', () => {
-    const { useCartStore } = require('@/lib/cart-store');
-    useCartStore.mockReturnValue({
+    mockUseCartStore.mockReturnValue({
       items: [],
       subtotal: 0,
       updateQuantity: mockUpdateQuantity,
@@ -46,8 +51,7 @@ describe('CartPage', () => {
   });
 
   it('renders cart items and summary', () => {
-    const { useCartStore } = require('@/lib/cart-store');
-    useCartStore.mockReturnValue({
+    mockUseCartStore.mockReturnValue({
       items: [
         {
           id: '1',
@@ -78,8 +82,7 @@ describe('CartPage', () => {
   });
 
   it('calls updateQuantity when quantity buttons are clicked', () => {
-     const { useCartStore } = require('@/lib/cart-store');
-    useCartStore.mockReturnValue({
+    mockUseCartStore.mockReturnValue({
       items: [
         {
           id: '1',
@@ -108,8 +111,7 @@ describe('CartPage', () => {
   });
 
   it('calls removeItem when trash button is clicked', () => {
-     const { useCartStore } = require('@/lib/cart-store');
-    useCartStore.mockReturnValue({
+    mockUseCartStore.mockReturnValue({
       items: [
         {
           id: '1',
