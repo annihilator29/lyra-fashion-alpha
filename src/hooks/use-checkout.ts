@@ -18,6 +18,30 @@ interface CheckoutData {
   billing_country?: string;
 }
 
+/**
+ * Checkout management hook for handling multi-step checkout flow.
+ * Manages checkout data state, step navigation, and session storage persistence.
+ *
+ * @returns Checkout state and actions object
+ *
+ * @example
+ * ```typescript
+ * const {
+ *   currentStep,
+ *   nextStep,
+ *   checkoutData,
+ *   updateCheckoutData,
+ *   clearCheckoutData
+ * } = useCheckout();
+ *
+ * // Navigate through checkout steps
+ * if (currentStep === 'shipping') {
+ *   nextStep(); // shipping → review
+ * }
+ * updateCheckoutData({ email: 'user@example.com' });
+ * ```
+ */
+
 // Helper function to check if there's actual checkout data
 const hasCheckoutData = (data: CheckoutData): boolean => {
   return Object.values(data).some(value => value !== undefined && value !== '');

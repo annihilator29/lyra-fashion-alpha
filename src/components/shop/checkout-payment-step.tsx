@@ -48,6 +48,69 @@ const PaymentFormInner: React.FC<PaymentFormInnerProps> = ({
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
 
+  // Payment error type mapping to user-friendly messages
+  const getPaymentErrorMessage = (error: Error): string => {
+    const lowerMessage = error.message.toLowerCase();
+
+    // Stripe error code patterns
+    if (lowerMessage.includes('card_declined') || lowerMessage.includes('declined')) {
+      return 'Your card was declined. Please try a different payment method.';
+    }
+    if (lowerMessage.includes('insufficient_funds') || lowerMessage.includes('insufficient funds')) {
+      return 'Insufficient funds. Please check your account balance or use a different card.';
+    }
+    if (lowerMessage.includes('expired_card') || lowerMessage.includes('expired')) {
+      return 'Your card has expired. Please use a different payment method.';
+    }
+    if (lowerMessage.includes('incorrect_cvc') || lowerMessage.includes('cvc')) {
+      return 'Your CVC is incorrect. Please check and try again.';
+    }
+    if (lowerMessage.includes('processing_error') || lowerMessage.includes('processing')) {
+      return 'Payment processing failed. Please try again.';
+    }
+    if (lowerMessage.includes('network_error') || lowerMessage.includes('network')) {
+      return 'Network error. Please check your connection and try again.';
+    }
+    if (lowerMessage.includes('rate_limit')) {
+      return 'Too many payment attempts. Please wait a moment and try again.';
+    }
+
+    // Default generic message
+    return 'Payment failed. Please try again or contact support if the issue persists.';
+  };
+
+  // Retry helper with exponential backoff
+  const retryWithBackoff = async (
+    fn: () => Promise<void>,
+    maxRetries = 3,
+    delays = [1000, 2000, 4000] // 1s, 2s, 4s
+  ): Promise<void> => {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        await fn();
+        return;
+      } catch (error) {
+        const isLastAttempt = attempt === maxRetries - 1;
+
+        // Check if error is retryable (network errors, timeouts, processing errors)
+        const errorMessage = error instanceof Error ? error.message.toLowerCase() : '';
+        const isRetryable = errorMessage.includes('network') ||
+                         errorMessage.includes('timeout') ||
+                         errorMessage.includes('processing') ||
+                         errorMessage.includes('rate_limit');
+
+        if (!isRetryable || isLastAttempt) {
+          throw error; // Re-throw non-retryable errors or after max retries
+        }
+
+        // Wait before next retry (exponential backoff)
+        const delay = delays[attempt] || delays[delays.length - 1];
+        await new Promise(resolve => setTimeout(resolve, delay));
+        console.log(`Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms delay`);
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -58,32 +121,38 @@ const PaymentFormInner: React.FC<PaymentFormInnerProps> = ({
 
     setIsLoading(true);
 
-    try {
-      const { error, paymentIntent } = await stripe.confirmPayment({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
-        },
-        redirect: 'if_required',
-      });
+    await retryWithBackoff(async () => {
+      try {
+        const { error, paymentIntent } = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: `${window.location.origin}/checkout/success`,
+          },
+          redirect: 'if_required',
+        });
 
-      if (error) {
-        throw new Error(error.message || 'Payment failed');
-      }
+        if (error) {
+          const userMessage = getPaymentErrorMessage(new Error(error.message || 'Payment failed'));
+          toast.error(userMessage);
+          throw new Error(userMessage);
+        }
 
-      if (paymentIntent && paymentIntent.status === 'succeeded') {
-        toast.success('Your payment has been processed successfully.');
-        onPaymentSuccess(orderId || paymentIntent.id);
-      } else {
-        throw new Error('Payment did not complete successfully');
+        if (paymentIntent && paymentIntent.status === 'succeeded') {
+          toast.success('Your payment has been processed successfully.');
+          onPaymentSuccess(orderId || paymentIntent.id);
+        } else {
+          throw new Error('Payment did not complete successfully');
+        }
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : 'Payment failed. Please try again.';
+        console.error('Payment error:', error);
+        // Toast already shown in retry logic, don't show again if it's a payment error
+        if (!message.includes('declined') && !message.includes('insufficient')) {
+          toast.error(message);
+        }
       }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Payment failed. Please try again.';
-      console.error('Payment error:', error);
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
+    });
+    setIsLoading(false);
   };
 
   return (

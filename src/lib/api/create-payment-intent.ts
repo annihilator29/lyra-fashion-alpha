@@ -46,13 +46,47 @@ interface PaymentIntentResponse {
   };
 }
 
-// Generate order number in LF-{timestamp}-{random} format
+/**
+ * Generates a unique order number in LF-{timestamp}-{random} format.
+ * The timestamp is base-36 encoded and random is a 6-character base-36 string.
+ *
+ * @returns A unique order number string
+ *
+ * @example
+ * ```typescript
+ * generateOrderNumber(); // "LF-M45XY1-A8C3"
+ * ```
+ */
 function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `LF-${timestamp}-${random}`;
 }
 
+/**
+ * Creates a Stripe Payment Intent and initializes order records in Supabase.
+ * Implements idempotency to prevent duplicate charges and validates payment amounts.
+ *
+ * @param params - Payment intent parameters including amount, items, and addresses
+ * @returns Promise resolving to client secret and order info, or error
+ *
+ * @example
+ * ```typescript
+ * const result = await createPaymentIntent({
+ *   amount: 5000, // $50.00 in cents
+ *   currency: 'usd',
+ *   cart_items: [{ id: 'prod-123', price: 2500, quantity: 2 }],
+ *   shipping_address: { }, // details omitted
+ * });
+ *
+ * if (result.error) {
+ *   console.error(result.error.message);
+ * } else {
+ *   const { clientSecret, orderId, orderNumber } = result.data;
+ *   console.log(`Created order ${orderNumber}`);
+ * }
+ * ```
+ */
 export async function createPaymentIntent(
   params: CreatePaymentIntentParams
 ): Promise<PaymentIntentResponse> {
