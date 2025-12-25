@@ -122,45 +122,51 @@ const PaymentFormInner: React.FC<PaymentFormInnerProps> = ({
     setIsLoading(true);
 
     try {
-      await retryWithBackoff(async () => {
-        try {
-          const { error, paymentIntent } = await stripe.confirmPayment({
-            elements,
-            confirmParams: {
-              return_url: `${window.location.origin}/checkout/success`,
-            },
-            redirect: 'if_required',
-          });
+      try {
+        const { error, paymentIntent } = await stripe.confirmPayment({
+          elements,
+          confirmParams: {
+            return_url: `${window.location.origin}/checkout/success`,
+          },
+          redirect: 'if_required',
+        });
 
-          if (error) {
-            // specific handling for validation errors - let Stripe UI show them
-            if (error.type === 'validation_error') {
-               throw error; // re-throw to be caught by outer catch but marked as validation
-            }
-            const userMessage = getPaymentErrorMessage(new Error(error.message || 'Payment failed'));
-            throw new Error(userMessage);
+        if (error) {
+          // specific handling for validation errors - let Stripe UI show them
+          if (error.type === 'validation_error') {
+             throw error; // re-throw to be caught by outer catch but marked as validation
           }
-
-          if (paymentIntent && paymentIntent.status === 'succeeded') {
-            toast.success('Your payment has been processed successfully.');
-            onPaymentSuccess(orderId || paymentIntent.id);
-          } else {
-            throw new Error('Payment did not complete successfully');
-          }
-        } catch (error: unknown) {
-           throw error; // Propagate to the retry logic or the main catch
+          const userMessage = getPaymentErrorMessage(new Error(error.message || 'Payment failed'));
+          throw new Error(userMessage);
         }
-      });
+
+        if (paymentIntent && paymentIntent.status === 'succeeded') {
+          toast.success('Your payment has been processed successfully.');
+          onPaymentSuccess(orderId || paymentIntent.id);
+        } else {
+          throw new Error('Payment did not complete successfully');
+        }
+      } catch (error: unknown) {
+         throw error; // Propagate to the main catch
+      }
     } catch (error: unknown) {
-      // Check if it's a validation error from Stripe (often has type 'validation_error')
-      // If it is, we don't need a toast because the Element UI shows it.
+      
+      // Check if it's a validation error from Stripe
       const isValidationError = (error as any)?.type === 'validation_error';
       
       const message = error instanceof Error ? error.message : 'Payment failed. Please try again.';
+      
+      // Log the full error object for debugging (JSON.stringify hides Error properties)
       console.error('Payment error full details:', error);
       
+      if (isValidationError) {
+        toast.warning('Please check your payment details.');
+        setIsLoading(false); // Explicitly reset loading state
+        return;
+      }
+
       // Toast already shown in retry logic, don't show again if it's a payment error
-      if (!isValidationError && !message.includes('declined') && !message.includes('insufficient')) {
+      if (!message.includes('declined') && !message.includes('insufficient')) {
         toast.error(message);
       }
     } finally {
