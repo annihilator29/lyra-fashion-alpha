@@ -5,11 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Minus, Plus, X, ShoppingBag, AlertTriangle } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { useCartStore } from '@/lib/cart-store';
 import { formatPrice } from '@/lib/utils';
@@ -80,32 +80,24 @@ export function CartSlideOver() {
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent
-        showCloseButton={false}
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
+      <SheetContent
+        side="right"
         className={cn(
-          'gap-0 p-0',
-          isMobile
-            ? 'h-full max-h-screen w-full max-w-full'
-            : 'max-w-md h-[90vh]'
+          'gap-0 p-0 sm:max-w-md w-full',
+          isMobile ? 'w-full' : ''
         )}
       >
-        <DialogHeader className="border-b px-6 py-4">
-          <DialogTitle className="flex items-center justify-between">
+        <SheetHeader className="border-b px-6 py-4">
+          <SheetTitle className="flex items-center justify-between">
             <span>Your Cart ({items.length})</span>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close cart"
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          </DialogTitle>
-        </DialogHeader>
+            {/* SheetContent has a built-in close button, but we can keep this for custom placement if needed, 
+                though typically Sheet's default close is fine. Keeping it for consistency with previous design. */}
+          </SheetTitle>
+        </SheetHeader>
 
         {items.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-12 text-center">
+          <div className="flex flex-col items-center justify-center p-12 text-center h-full">
             <ShoppingBag className="mb-4 h-16 w-16 text-muted-foreground" />
             <h3 className="mb-2 text-lg font-semibold">Your cart is empty</h3>
             <p className="mb-6 text-sm text-muted-foreground">
@@ -213,13 +205,8 @@ export function CartSlideOver() {
               </div>
             </div>
 
-            <div
-              className={cn(
-                'border-t bg-background',
-                isMobile ? 'fixed bottom-0 left-0 right-0' : ''
-              )}
-            >
-              <div className="space-y-4 px-6 py-4">
+            <div className="border-t bg-background pt-4 pb-6 px-6">
+              <div className="space-y-4">
                 <div className="flex items-center justify-between text-lg font-semibold">
                   <span>Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
@@ -235,18 +222,19 @@ export function CartSlideOver() {
                     <Link href="/checkout">Proceed to Checkout</Link>
                   </Button>
                   <Button
+                    asChild
                     variant="outline"
                     className="w-full"
                     onClick={() => setIsOpen(false)}
                   >
-                    Continue Shopping
+                     <Link href="/cart">View Cart</Link>
                   </Button>
                 </div>
               </div>
             </div>
           </>
         )}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 }
