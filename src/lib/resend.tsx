@@ -4,6 +4,7 @@
  */
 
 import { Resend } from 'resend';
+import { render } from '@react-email/components';
 import OrderConfirmationEmail from '@/emails/order-confirmation';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -33,11 +34,14 @@ export async function sendOrderConfirmation(
   }
 
   try {
+    // Render React Email component to HTML
+    const emailHtml = await render(<OrderConfirmationEmail order={order} />);
+
     const { data, error } = await resend.emails.send({
-      from: 'Lyra Fashion <orders@lyrafashion.com>',
+      from: 'Lyra Fashion <onboarding@resend.dev>',
       to: order.customer_email,
       subject: `Order Confirmation - ${(order as Record<string, unknown>).order_number}`,
-      react: OrderConfirmationEmail({ order }),
+      html: emailHtml,
     });
 
     if (error) {

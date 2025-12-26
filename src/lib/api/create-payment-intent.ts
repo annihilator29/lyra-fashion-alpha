@@ -42,6 +42,7 @@ interface CreatePaymentIntentParams {
   }>;
   shipping_address?: Record<string, unknown>;
   billing_address?: Record<string, unknown>;
+  customer_email?: string;
 }
 
 interface PaymentIntentResponse {
@@ -108,7 +109,8 @@ export async function createPaymentIntent(
       user_id,
       cart_items,
       shipping_address,
-      billing_address
+      billing_address,
+      customer_email
     } = params;
 
     // Validate required fields
@@ -197,6 +199,7 @@ export async function createPaymentIntent(
         stripe_payment_intent_id: paymentIntent.id,
         shipping_address: shipping_address || null,
         billing_address: billing_address || null,
+        customer_email: customer_email || null,
       })
       .select()
       .single();

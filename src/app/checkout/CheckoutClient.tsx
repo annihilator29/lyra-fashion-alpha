@@ -198,6 +198,7 @@ export default function CheckoutClient() {
                   city: checkoutData?.shipping_city,
                   postal_code: checkoutData?.shipping_postal_code,
                   country: checkoutData?.shipping_country,
+                  email: checkoutData?.email,
                 },
                 billingAddress: checkoutData?.same_as_shipping ? {
                   name: checkoutData?.shipping_name,
@@ -205,12 +206,14 @@ export default function CheckoutClient() {
                   city: checkoutData?.shipping_city,
                   postal_code: checkoutData?.shipping_postal_code,
                   country: checkoutData?.shipping_country,
+                  email: checkoutData?.email,
                 } : {
                   name: checkoutData?.billing_name,
                   line1: checkoutData?.billing_address,
                   city: checkoutData?.billing_city,
                   postal_code: checkoutData?.billing_postal_code,
                   country: checkoutData?.billing_country,
+                  email: checkoutData?.email,
                 },
                 subtotal: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
                 shipping: 0, // Free shipping for now

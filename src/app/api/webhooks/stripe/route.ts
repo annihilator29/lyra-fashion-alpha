@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { sendOrderConfirmation } from '@/lib/resend';
 
 const getStripe = () => {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -155,10 +156,10 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
     // Get the payment intent ID from session
     const paymentIntentId = session.payment_intent as string;
 
-    // Find the order by payment intent ID
+    // Find the order by payment intent ID, including items
     const { data: order, error } = await getSupabase()
       .from('orders')
-      .select('*')
+      .select('*, order_items(*, product:products(*))')
       .eq('stripe_payment_intent_id', paymentIntentId)
       .single();
 
@@ -167,7 +168,6 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
       return;
     }
 
-    // Update the order status to 'paid'
     const { error: updateError } = await getSupabase()
       .from('orders')
       .update({
@@ -181,11 +181,22 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
       return;
     }
 
-    // Note: Order history integration requires a customer_order_history table or similar structure
-    // For now, orders can be queried by filtering orders table on customer_id
-    // Future enhancement: Add dedicated order_history table or use a user profile order count
-
     log('info', 'Order updated to paid status', { order_id: order.id, order_number: order.order_number, customer_id: order.customer_id });
+
+    // Send order confirmation email
+    if (!order.email_sent) {
+      try {
+        const emailResult = await sendOrderConfirmation(order, getSupabase());
+        if (emailResult) {
+          log('info', 'Order confirmation email sent', { email_id: emailResult.emailId, order_id: order.id });
+        }
+      } catch (emailError) {
+        log('error', 'Failed to send order confirmation email from webhook', { 
+          order_id: order.id, 
+          error: emailError instanceof Error ? emailError.message : 'Unknown error' 
+        });
+      }
+    }
   } catch (error: unknown) {
     log('error', 'Error handling checkout session completed', { error: error instanceof Error ? error.message : 'Unknown error' });
   }
@@ -196,11 +207,17 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
 
   try {
     // Find the order by payment intent ID
+    // Find the order by payment intent ID, including items
     const { data: order, error } = await getSupabase()
       .from('orders')
-      .select('*')
+      .select('*, order_items(*, product:products(*))')
       .eq('stripe_payment_intent_id', paymentIntent.id)
       .single();
+
+    console.log('*** WEBHOOK DEBUG: PaymentIntent Succeeded ***');
+    console.log('Payment Intent ID:', paymentIntent.id);
+    console.log('Order Lookup Result:', order ? `Found Order #${order.order_number}` : 'Order Not Found');
+    if (error) console.log('Order Lookup Error:', error.message);
 
     if (error || !order) {
       log('error', 'Order not found for payment intent', { payment_intent_id: paymentIntent.id });
@@ -222,6 +239,26 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
     }
 
     log('info', 'Order updated to paid status after payment intent succeeded', { order_id: order.id, payment_intent_id: paymentIntent.id });
+
+    // Send order confirmation email
+    console.log('*** WEBHOOK DEBUG: Attempting Email ***');
+    console.log('Order Email Sent Flag:', order.email_sent);
+    
+    if (!order.email_sent) {
+      try {
+        const emailResult = await sendOrderConfirmation(order, getSupabase());
+        console.log('*** WEBHOOK DEBUG: Email Result ***', emailResult);
+        if (emailResult) {
+          log('info', 'Order confirmation email sent', { email_id: emailResult.emailId, order_id: order.id });
+        }
+      } catch (emailError) {
+        console.error('*** WEBHOOK DEBUG: Email Failed ***', emailError);
+        log('error', 'Failed to send order confirmation email from webhook', { 
+          order_id: order.id, 
+          error: emailError instanceof Error ? emailError.message : 'Unknown error' 
+        });
+      }
+    }
   } catch (error: unknown) {
     log('error', 'Error handling payment intent succeeded', { error: error instanceof Error ? error.message : 'Unknown error' });
   }

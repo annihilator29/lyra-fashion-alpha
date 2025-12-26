@@ -4,6 +4,12 @@ import { NextRequest } from 'next/server';
 // Simplified mock approach to avoid TypeScript issues with Stripe constructor
 const mockConstructEvent = jest.fn();
 const mockSupabaseFrom = jest.fn();
+const mockSendOrderConfirmation = jest.fn();
+
+jest.mock('@/lib/resend', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sendOrderConfirmation: (...args: any[]) => mockSendOrderConfirmation(...args),
+}));
 
 jest.mock('stripe', () => {
   return jest.fn().mockImplementation(() => ({
@@ -83,6 +89,59 @@ describe('Stripe Webhook Handler', () => {
     expect(response.status).toBe(200);
   });
 
+  it('should handle checkout.session.completed event and update order status', async () => {
+    mockConstructEvent.mockReturnValue({
+      id: 'evt_checkout_completed',
+      type: 'checkout.session.completed',
+      data: { object: { id: 'cs_123', payment_intent: 'pi_123' } },
+    });
+    
+    let callCount = 0;
+    mockSupabaseFrom.mockImplementation(() => {
+      callCount++;
+      if (callCount === 1) {
+        // 1. Check processed_webhooks
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } }),
+        };
+      } else if (callCount === 2) {
+        // 2. Insert processed_webhooks
+        return {
+          insert: jest.fn().mockReturnThis(),
+          select: jest.fn().mockResolvedValue({ error: null }),
+        };
+      } else if (callCount === 3) {
+        // 3. Find order
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({ data: { id: 'order_123', status: 'pending' }, error: null }),
+        };
+      } else if (callCount === 4) {
+        // 4. Update order status
+        return {
+          update: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockResolvedValue({ error: null }),
+        };
+      } else {
+        // 5. Update email status
+        return {
+          update: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockResolvedValue({ error: null }),
+        };
+      }
+    });
+    
+    const request = createMockRequest('{}', 'test_signature');
+    
+    const response = await POST(request);
+    
+    expect(response.status).toBe(200);
+    expect(mockSendOrderConfirmation).toHaveBeenCalled();
+  });
+
   it('should handle payment_intent.succeeded event and update order status', async () => {
     mockConstructEvent.mockReturnValue({
       id: 'evt_payment_succeeded',
@@ -94,29 +153,36 @@ describe('Stripe Webhook Handler', () => {
     mockSupabaseFrom.mockImplementation(() => {
       callCount++;
       if (callCount === 1) {
-        // First call: check processed_webhooks
+        // 1. Check processed_webhooks
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } }),
         };
       } else if (callCount === 2) {
-        // Second call: orders lookup
+        // 2. Insert processed_webhooks
+        return {
+          insert: jest.fn().mockReturnThis(),
+          select: jest.fn().mockResolvedValue({ error: null }),
+        };
+      } else if (callCount === 3) {
+        // 3. Find order
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({ data: { id: 'order_123', status: 'pending' }, error: null }),
         };
-      } else if (callCount === 3) {
-        // Third call: orders update
+      } else if (callCount === 4) {
+        // 4. Update order status
         return {
           update: jest.fn().mockReturnThis(),
           eq: jest.fn().mockResolvedValue({ error: null }),
         };
       } else {
-        // Fourth call: insert processed_webhooks
+        // 5. Update email status
         return {
-          insert: jest.fn().mockResolvedValue({ error: null }),
+          update: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockResolvedValue({ error: null }),
         };
       }
     });
@@ -126,6 +192,7 @@ describe('Stripe Webhook Handler', () => {
     const response = await POST(request);
     
     expect(response.status).toBe(200);
+    expect(mockSendOrderConfirmation).toHaveBeenCalled();
   });
 
   it('should handle payment_intent.payment_failed event', async () => {
@@ -139,25 +206,30 @@ describe('Stripe Webhook Handler', () => {
     mockSupabaseFrom.mockImplementation(() => {
       callCount++;
       if (callCount === 1) {
+        // 1. Check processed_webhooks
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } }),
         };
       } else if (callCount === 2) {
+        // 2. Insert processed_webhooks
+        return {
+          insert: jest.fn().mockReturnThis(),
+          select: jest.fn().mockResolvedValue({ error: null }),
+        };
+      } else if (callCount === 3) {
+        // 3. Find order
         return {
           select: jest.fn().mockReturnThis(),
           eq: jest.fn().mockReturnThis(),
           single: jest.fn().mockResolvedValue({ data: { id: 'order_123', status: 'pending' }, error: null }),
         };
-      } else if (callCount === 3) {
+      } else {
+        // 4. Update order status
         return {
           update: jest.fn().mockReturnThis(),
           eq: jest.fn().mockResolvedValue({ error: null }),
-        };
-      } else {
-        return {
-          insert: jest.fn().mockResolvedValue({ error: null }),
         };
       }
     });

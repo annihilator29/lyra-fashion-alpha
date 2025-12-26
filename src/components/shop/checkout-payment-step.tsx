@@ -237,7 +237,9 @@ const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
               quantity: item.quantity
             })),
             shipping_address: checkoutData.shippingAddress,
-            billing_address: checkoutData.billingAddress
+            billing_address: checkoutData.billingAddress,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            customer_email: (checkoutData.billingAddress as any).email || (checkoutData.shippingAddress as any).email
           }),
         });
 
