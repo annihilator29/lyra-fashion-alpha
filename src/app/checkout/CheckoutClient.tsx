@@ -109,7 +109,7 @@ export default function CheckoutClient() {
         
         {/* Step labels */}
         <div className="flex justify-between px-1">
-          {steps.map((step, index) => (
+          {steps.map((step) => (
             <div
               key={step}
               className={`text-center transition-all duration-300 cursor-pointer ${

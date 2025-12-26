@@ -65,7 +65,6 @@ export async function POST(request: NextRequest) {
 
   let event: Stripe.Event;
   const stripe = getStripe();
-  const supabase = getSupabase();
 
   try {
     // Verify the webhook signature to ensure it's from Stripe
@@ -82,7 +81,7 @@ export async function POST(request: NextRequest) {
   }
 
   // Check if this event has already been processed (idempotency)
-  const { data: existingEvent, error: fetchError } = await getSupabase()
+  const { data: existingEvent } = await getSupabase()
     .from('processed_webhooks')
     .select('id')
     .eq('event_id', event.id)

@@ -129,7 +129,7 @@ export async function createPaymentIntent(
     const idempotencyKey = providedIdempotencyKey || randomUUID();
 
     // Check if an order with this idempotency key already exists
-    const { data: existingOrder, error: fetchError } = await getSupabase()
+    const { data: existingOrder } = await getSupabase()
       .from('orders')
       .select('id, stripe_payment_intent_id, total, order_number')
       .eq('idempotency_key', idempotencyKey)

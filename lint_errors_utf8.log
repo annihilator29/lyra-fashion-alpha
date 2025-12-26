@@ -1,0 +1,36 @@
+﻿
+> lyra-fashion@0.1.0 lint
+> eslint
+
+
+D:\Coding\Own Code\Lyra Fashion_Alpha\lyra-fashion\jest.setup.ts
+   9:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  21:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  26:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  30:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  42:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:20  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  44:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  47:37  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\Coding\Own Code\Lyra Fashion_Alpha\lyra-fashion\src\components\shop\cart-slide-over.tsx
+   6:23  warning  'X' is defined but never used                    @typescript-eslint/no-unused-vars
+  23:10  warning  'validating' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Coding\Own Code\Lyra Fashion_Alpha\lyra-fashion\src\components\shop\transparency-card.tsx
+  34:9  warning  'hoveredSegmentData' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\Coding\Own Code\Lyra Fashion_Alpha\lyra-fashion\src\lib\__tests__\cart-integration.test.ts
+  3:10  warning  'checkStock' is defined but never used    @typescript-eslint/no-unused-vars
+  4:10  warning  'createClient' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\Coding\Own Code\Lyra Fashion_Alpha\lyra-fashion\src\lib\api\__tests__\create-payment-intent.test.ts
+  3:8  warning  'Stripe' is defined but never used  @typescript-eslint/no-unused-vars
+
+Γ£û 19 problems (13 errors, 6 warnings)
+

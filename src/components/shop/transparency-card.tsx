@@ -31,7 +31,7 @@ export function TransparencyCard({ factoryPrice, retailPrice, savings }: Transpa
     { type: 'lyra', percent: lyraPercent, cost: lyraCost, color: '#D8D6D1' },
   ];
 
-  const hoveredSegmentData = segments.find(s => s.type === hoveredSegment);
+  // const hoveredSegmentData = segments.find(s => s.type === hoveredSegment);
 
   return (
     <div className="bg-white p-4 rounded-lg border border-gray-200">

@@ -128,7 +128,7 @@ export const useCartStore = create<CartState>()(
         subtotal: state.subtotal,
         updatedAt: state.updatedAt,
       }),
-      onRehydrateStorage: (state) => {
+      onRehydrateStorage: () => {
         return (rehydratedState, error) => {
           if (error || !rehydratedState) return;
 

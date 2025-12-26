@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Minus, Plus, X, ShoppingBag, AlertTriangle } from 'lucide-react';
+import { Minus, Plus, ShoppingBag, AlertTriangle } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -20,7 +20,6 @@ export function CartSlideOver() {
   const { items, subtotal, updateQuantity, removeItem, isOpen, setIsOpen } = useCartStore();
   const [isMobile, setIsMobile] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, 'deleted' | 'price_changed'>>({});
-  const [validating, setValidating] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -37,7 +36,6 @@ export function CartSlideOver() {
     if (!isOpen || items.length === 0) return;
 
     const validateCartItems = async () => {
-      setValidating(true);
       const supabase = createClient();
       const newErrors: Record<string, 'deleted' | 'price_changed'> = {};
 
@@ -50,7 +48,6 @@ export function CartSlideOver() {
 
       if (error) {
         console.error('Error validating cart products:', error);
-        setValidating(false);
         return;
       }
 
@@ -65,7 +62,6 @@ export function CartSlideOver() {
       });
 
       setValidationErrors(newErrors);
-      setValidating(false);
     };
 
     validateCartItems();
@@ -83,9 +79,10 @@ export function CartSlideOver() {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetContent
         side="right"
+        data-testid="cart-sheet-content"
         className={cn(
           'gap-0 p-0 sm:max-w-md w-full',
-          isMobile ? 'w-full' : ''
+          isMobile && 'h-full w-full max-w-full'
         )}
       >
         <SheetHeader className="border-b px-6 py-4">

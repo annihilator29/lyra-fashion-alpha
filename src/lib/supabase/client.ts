@@ -1,4 +1,4 @@
-import { createBrowserClient } from '@supabase/ssr';
+import { createBrowserClient as supabaseCreateClient } from '@supabase/ssr';
 import type { Database } from '@/types/database.types';
 
 /**
@@ -9,12 +9,12 @@ import type { Database } from '@/types/database.types';
  * @example
  * ```tsx
  * 'use client';
- * import { createClient } from '@/lib/supabase/client';
+ * import { createBrowserClient } from '@/lib/supabase/client';
  * import { useEffect, useState } from 'react';
  *
  * export function ProductList() {
  *   const [products, setProducts] = useState([]);
- *   const supabase = createClient();
+ *   const supabase = createBrowserClient();
  *
  *   useEffect(() => {
  *     supabase.from('products').select('*').then(({ data }) => {
@@ -27,8 +27,10 @@ import type { Database } from '@/types/database.types';
  * ```
  */
 export function createClient() {
-    return createBrowserClient<Database>(
+    return supabaseCreateClient<Database>(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     );
 }
+
+export const createBrowserClient = createClient;

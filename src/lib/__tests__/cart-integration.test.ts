@@ -1,7 +1,5 @@
 import { renderHook, act } from '@testing-library/react';
 import { useCartStore } from '../cart-store';
-import { checkStock } from '../supabase/inventory';
-import { createClient } from '../supabase/client';
 
 // Mock dependencies
 jest.mock('../supabase/inventory');

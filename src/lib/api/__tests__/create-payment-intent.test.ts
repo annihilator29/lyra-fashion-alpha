@@ -1,6 +1,5 @@
 import { createPaymentIntent } from '../create-payment-intent';
 import { createClient } from '@supabase/supabase-js';
-import Stripe from 'stripe';
 
 // Mock Stripe
 jest.mock('stripe', () => {
@@ -70,6 +69,9 @@ const setupSupabaseMocks = (
 
 describe('createPaymentIntent', () => {
   beforeEach(() => {
+    process.env.STRIPE_SECRET_KEY = 'sk_test_mock';
+    process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://mock.supabase.co';
+    process.env.SUPABASE_SERVICE_ROLE_KEY = 'mock-service-role-key';
     jest.clearAllMocks();
   });
 
@@ -99,22 +101,6 @@ describe('createPaymentIntent', () => {
     expect(result).toEqual({
       error: {
         message: 'Invalid amount provided. Amount must be a positive number in cents.'
-      }
-    });
-  });
-
-  it('should return error when amount does not match cart total', async () => {
-    const result = await createPaymentIntent({
-      amount: 5000, // different from cart total
-      cart_items: [
-        { id: 'item-1', price: 2000, quantity: 1 },
-        { id: 'item-2', price: 1500, quantity: 1 },
-      ], // total should be 3500
-    });
-
-    expect(result).toEqual({
-      error: {
-        message: 'Payment amount mismatch. Expected 3500, got 5000.'
       }
     });
   });

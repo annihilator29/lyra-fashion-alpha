@@ -1,0 +1,162 @@
+﻿
+> lyra-fashion@0.1.0 build
+> next build
+
+   Γû▓ Next.js 15.5.7
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+node.exe :  ΓÜá Compiled with warnings in 1642ms
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: ( ΓÜá Compile 
+   d with warnings in 1642ms:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+
+./src/components/shop/cart-slide-over.tsx
+Attempted import error: 'createClient' is not exported 
+from '@/lib/supabase/client' (imported as 'createClient').
+
+Import trace for requested module:
+./src/components/shop/cart-slide-over.tsx
+./src/components/layout/header.tsx
+
+./src/lib/supabase/inventory.ts
+Attempted import error: 'createClient' is not exported 
+from '@/lib/supabase/client' (imported as 'createClient').
+
+Import trace for requested module:
+./src/lib/supabase/inventory.ts
+./src/components/shop/add-to-cart-button.tsx
+./src/app/products/[category]/[slug]/product-detail-client
+.tsx
+
+ ΓÜá Compiled with warnings in 729ms
+
+./src/components/shop/cart-slide-over.tsx
+Attempted import error: 'createClient' is not exported 
+from '@/lib/supabase/client' (imported as 'createClient').
+
+Import trace for requested module:
+./src/components/shop/cart-slide-over.tsx
+./src/components/layout/header.tsx
+
+./src/lib/supabase/inventory.ts
+Attempted import error: 'createClient' is not exported 
+from '@/lib/supabase/client' (imported as 'createClient').
+
+Import trace for requested module:
+./src/lib/supabase/inventory.ts
+./src/components/shop/add-to-cart-button.tsx
+./src/app/products/[category]/[slug]/product-detail-client
+.tsx
+
+ Γ£ô Compiled successfully in 2.5s
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./src/app/api/send-order-confirmation/route.ts
+88:52  Error: Unexpected any. Specify a different type.  
+@typescript-eslint/no-explicit-any
+
+./src/app/api/webhooks/stripe/route.ts
+68:9  Warning: 'supabase' is assigned a value but never 
+used.  @typescript-eslint/no-unused-vars
+85:39  Warning: 'fetchError' is assigned a value but 
+never used.  @typescript-eslint/no-unused-vars
+
+./src/app/checkout/CheckoutClient.tsx
+112:29  Warning: 'index' is defined but never used.  
+@typescript-eslint/no-unused-vars
+
+./src/app/orders/[orderId]/confirmation/order-confirmation
+-content.tsx
+18:10  Error: Unexpected any. Specify a different type.  
+@typescript-eslint/no-explicit-any
+143:46  Error: Unexpected any. Specify a different type.  
+@typescript-eslint/no-explicit-any
+217:28  Error: `'` can be escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, `&rsquo;`.  
+react/no-unescaped-entities
+264:62  Error: `'` can be escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, `&rsquo;`.  
+react/no-unescaped-entities
+
+./src/app/orders/[orderId]/confirmation/page.tsx
+9:8  Warning: 'Image' is defined but never used.  
+@typescript-eslint/no-unused-vars
+10:8  Warning: 'Link' is defined but never used.  
+@typescript-eslint/no-unused-vars
+11:10  Warning: 'Button' is defined but never used.  
+@typescript-eslint/no-unused-vars
+12:10  Warning: 'Card' is defined but never used.  
+@typescript-eslint/no-unused-vars
+12:16  Warning: 'CardContent' is defined but never used.  
+@typescript-eslint/no-unused-vars
+12:29  Warning: 'CardHeader' is defined but never used.  
+@typescript-eslint/no-unused-vars
+12:41  Warning: 'CardTitle' is defined but never used.  
+@typescript-eslint/no-unused-vars
+23:3  Warning: 'params' is defined but never used.  
+@typescript-eslint/no-unused-vars
+
+./src/components/shop/cart-slide-over.tsx
+6:23  Warning: 'X' is defined but never used.  
+@typescript-eslint/no-unused-vars
+23:10  Warning: 'validating' is assigned a value but 
+never used.  @typescript-eslint/no-unused-vars
+
+./src/components/shop/transparency-card.tsx
+34:9  Warning: 'hoveredSegmentData' is assigned a value 
+but never used.  @typescript-eslint/no-unused-vars
+
+./src/emails/order-confirmation.tsx
+16:3  Warning: 'Link' is defined but never used.  
+@typescript-eslint/no-unused-vars
+24:10  Error: Unexpected any. Specify a different type.  
+@typescript-eslint/no-explicit-any
+68:43  Error: Unexpected any. Specify a different type.  
+@typescript-eslint/no-explicit-any
+162:49  Error: `'` can be escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, `&rsquo;`.  
+react/no-unescaped-entities
+171:20  Error: `'` can be escaped with `&apos;`, 
+`&lsquo;`, `&#39;`, `&rsquo;`.  
+react/no-unescaped-entities
+
+./src/lib/api/create-payment-intent.ts
+132:41  Warning: 'fetchError' is assigned a value but 
+never used.  @typescript-eslint/no-unused-vars
+
+./src/lib/api/__tests__/create-payment-intent.test.ts
+3:8  Warning: 'Stripe' is defined but never used.  
+@typescript-eslint/no-unused-vars
+
+./src/lib/cart-store.ts
+131:28  Warning: 'state' is defined but never used.  
+@typescript-eslint/no-unused-vars
+
+./src/lib/resend.test.ts
+26:34  Error: Unexpected any. Specify a different type.  
+@typescript-eslint/no-explicit-any
+27:39  Error: Unexpected any. Specify a different type.  
+@typescript-eslint/no-explicit-any
+
+./src/lib/resend.ts
+19:13  Error: Unexpected any. Specify a different type.  
+@typescript-eslint/no-explicit-any
+
+./src/lib/__tests__/cart-integration.test.ts
+3:10  Warning: 'checkStock' is defined but never used.  
+@typescript-eslint/no-unused-vars
+4:10  Warning: 'createClient' is defined but never used.  
+@typescript-eslint/no-unused-vars
+
+info  - Need to disable some ESLint rules? Learn more 
+here: https://nextjs.org/docs/app/api-reference/config/esl
+int#disabling-rules

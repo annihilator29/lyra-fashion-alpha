@@ -22,6 +22,15 @@ jest.mock('next/link', () => {
     default: MockLink,
   };
 });
+jest.mock('@/lib/supabase/client', () => ({
+  createClient: jest.fn(() => ({
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        in: jest.fn().mockResolvedValue({ data: [], error: null }),
+      })),
+    })),
+  })),
+}));
 
 const mockUseCartStore = useCartStore as jest.MockedFunction<
   typeof useCartStore
@@ -206,8 +215,8 @@ describe('CartSlideOver', () => {
   it('should close cart when continue shopping clicked', async () => {
     const user = userEvent.setup();
     mockUseCartStore.mockReturnValue({
-      items: [mockCartItem],
-      subtotal: 24000,
+      items: [],
+      subtotal: 0,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,

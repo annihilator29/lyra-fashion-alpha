@@ -154,30 +154,42 @@ export interface Database {
                 Row: {
                     id: string;
                     customer_id: string | null;
+                    customer_email: string | null;
                     status: string;
                     total: number;
                     shipping_address: Json;
                     billing_address: Json | null;
+                    email_sent: boolean;
+                    email_sent_at: string | null;
+                    email_error: string | null;
                     created_at: string;
                     updated_at: string;
                 };
                 Insert: {
                     id?: string;
                     customer_id?: string | null;
+                    customer_email?: string | null;
                     status?: string;
                     total: number;
                     shipping_address: Json;
                     billing_address?: Json | null;
+                    email_sent?: boolean;
+                    email_sent_at?: string | null;
+                    email_error?: string | null;
                     created_at?: string;
                     updated_at?: string;
                 };
                 Update: {
                     id?: string;
                     customer_id?: string | null;
+                    customer_email?: string | null;
                     status?: string;
                     total?: number;
                     shipping_address?: Json;
                     billing_address?: Json | null;
+                    email_sent?: boolean;
+                    email_sent_at?: string | null;
+                    email_error?: string | null;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -187,6 +199,50 @@ export interface Database {
                         columns: ['customer_id'];
                         isOneToOne: false;
                         referencedRelation: 'customers';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            email_logs: {
+                Row: {
+                    id: string;
+                    order_id: string;
+                    email_type: string;
+                    resend_id: string | null;
+                    recipient_email: string;
+                    status: string;
+                    sent_at: string;
+                    error_message: string | null;
+                    created_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    order_id: string;
+                    email_type: string;
+                    resend_id?: string | null;
+                    recipient_email: string;
+                    status?: string;
+                    sent_at?: string;
+                    error_message?: string | null;
+                    created_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    order_id?: string;
+                    email_type?: string;
+                    resend_id?: string | null;
+                    recipient_email?: string;
+                    status?: string;
+                    sent_at?: string;
+                    error_message?: string | null;
+                    created_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'email_logs_order_id_fkey';
+                        columns: ['order_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'orders';
                         referencedColumns: ['id'];
                     },
                 ];
@@ -291,6 +347,7 @@ export type Customer = Tables<'customers'>;
 export type Order = Tables<'orders'>;
 export type OrderItem = Tables<'order_items'>;
 export type Inventory = Tables<'inventory'>;
+export type EmailLog = Tables<'email_logs'>;
 
 // Insert types
 export type ProductInsert = InsertTables<'products'>;
@@ -298,6 +355,7 @@ export type CustomerInsert = InsertTables<'customers'>;
 export type OrderInsert = InsertTables<'orders'>;
 export type OrderItemInsert = InsertTables<'order_items'>;
 export type InventoryInsert = InsertTables<'inventory'>;
+export type EmailLogInsert = InsertTables<'email_logs'>;
 
 // Update types
 export type ProductUpdate = UpdateTables<'products'>;
@@ -305,3 +363,11 @@ export type CustomerUpdate = UpdateTables<'customers'>;
 export type OrderUpdate = UpdateTables<'orders'>;
 export type OrderItemUpdate = UpdateTables<'order_items'>;
 export type InventoryUpdate = UpdateTables<'inventory'>;
+export type EmailLogUpdate = UpdateTables<'email_logs'>;
+
+// Helper types for common queries
+export type OrderWithItems = Order & {
+  order_items: (OrderItem & {
+    products: Product;
+  })[];
+};
