@@ -38,7 +38,7 @@ export async function sendOrderConfirmation(
     const emailHtml = await render(<OrderConfirmationEmail order={order} />);
 
     const { data, error } = await resend.emails.send({
-      from: 'Lyra Fashion <onboarding@resend.dev>',
+      from: 'Lyra Fashion <orders@lyrafashion.com.np>',
       to: order.customer_email,
       subject: `Order Confirmation - ${(order as Record<string, unknown>).order_number}`,
       html: emailHtml,
