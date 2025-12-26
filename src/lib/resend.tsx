@@ -7,7 +7,14 @@ import { Resend } from 'resend';
 import { render } from '@react-email/components';
 import OrderConfirmationEmail from '@/emails/order-confirmation';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialize Resend client to avoid build-time env var access
+function getResendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY environment variable is not set');
+  }
+  return new Resend(apiKey);
+}
 
 /**
  * Send order confirmation email
@@ -34,6 +41,9 @@ export async function sendOrderConfirmation(
   }
 
   try {
+    // Get Resend client (lazy initialization)
+    const resend = getResendClient();
+
     // Render React Email component to HTML
     const emailHtml = await render(<OrderConfirmationEmail order={order} />);
 
