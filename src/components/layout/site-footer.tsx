@@ -8,12 +8,12 @@ export function SiteFooter() {
   return (
     <footer
       role="contentinfo"
-      className="bg-[#3A3531] text-[#F5F3F0] py-12 px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"
+      className="bg-[#3A3531] text-[#F5F3F0] py-6 px-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
     >
       {/* Social Media & Newsletter Section */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-playfair font-semibold">Follow Us</h3>
-        <div className="flex gap-4">
+      <div className="space-y-2">
+        <h3 className="text-sm font-playfair font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-[#5A5651]">Follow Us</h3>
+        <div className="flex gap-2">
           <a
             href="https://instagram.com/lyrafashion"
             target="_blank"
@@ -21,7 +21,7 @@ export function SiteFooter() {
             aria-label="Follow us on Instagram"
             className="text-[#F5F3F0] hover:text-[#C9B89E] transition-colors"
           >
-            <Instagram className="w-6 h-6" />
+            <Instagram className="w-4 h-4" />
           </a>
           <a
             href="https://facebook.com/lyrafashion"
@@ -30,7 +30,7 @@ export function SiteFooter() {
             aria-label="Follow us on Facebook"
             className="text-[#F5F3F0] hover:text-[#C9B89E] transition-colors"
           >
-            <Facebook className="w-6 h-6" />
+            <Facebook className="w-4 h-4" />
           </a>
           <a
             href="https://twitter.com/lyrafashion"
@@ -39,20 +39,20 @@ export function SiteFooter() {
             aria-label="Follow us on Twitter"
             className="text-[#F5F3F0] hover:text-[#C9B89E] transition-colors"
           >
-            <Twitter className="w-6 h-6" />
+            <Twitter className="w-4 h-4" />
           </a>
         </div>
 
-        <div className="mt-8">
-          <h3 className="text-lg font-playfair font-semibold mb-4">Newsletter</h3>
+        <div className="mt-4">
+          <h3 className="text-sm font-playfair font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-[#5A5651]">Newsletter</h3>
           <NewsletterForm />
         </div>
       </div>
 
       {/* Company Section */}
       <div>
-        <h3 className="text-lg font-playfair font-semibold mb-4">Company</h3>
-        <ul className="space-y-2">
+        <h3 className="text-sm font-playfair font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-[#5A5651]">Company</h3>
+        <ul className="space-y-1">
           <li>
             <Link
               href="/about"
@@ -82,8 +82,8 @@ export function SiteFooter() {
 
       {/* Customer Service Section */}
       <div>
-        <h3 className="text-lg font-playfair font-semibold mb-4">Customer Service</h3>
-        <ul className="space-y-2">
+        <h3 className="text-sm font-playfair font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-[#5A5651]">Customer Service</h3>
+        <ul className="space-y-1">
           <li>
             <Link
               href="/contact"
@@ -113,8 +113,8 @@ export function SiteFooter() {
 
       {/* Legal Section */}
       <div>
-        <h3 className="text-lg font-playfair font-semibold mb-4">Legal</h3>
-        <ul className="space-y-2">
+        <h3 className="text-sm font-playfair font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-[#5A5651]">Legal</h3>
+        <ul className="space-y-1">
           <li>
             <Link
               href="/privacy-policy"
@@ -133,8 +133,8 @@ export function SiteFooter() {
           </li>
         </ul>
 
-        <div className="mt-8 pt-8 border-t border-[#5A5651]">
-          <p className="text-sm text-[#F5F3F0]">
+        <div className="mt-4 pt-4 border-t border-[#5A5651]">
+          <p className="text-xs text-[#F5F3F0]">
             © {currentYear} Lyra Fashion. All rights reserved.
           </p>
         </div>
