@@ -247,6 +247,22 @@ export interface Database {
                     },
                 ];
             };
+            newsletter_subscriptions: {
+                Row: {
+                    id: string;
+                    email: string;
+                    subscribed_at: string;
+                    status: string;
+                    created_at: string;
+                };
+                Insert: {
+                    email: string;
+                };
+                Update: {
+                    email?: string;
+                };
+                Relationships: [];
+            };
             order_items: {
                 Row: {
                     id: string;
@@ -356,6 +372,9 @@ export type OrderInsert = InsertTables<'orders'>;
 export type OrderItemInsert = InsertTables<'order_items'>;
 export type InventoryInsert = InsertTables<'inventory'>;
 export type EmailLogInsert = InsertTables<'email_logs'>;
+export type NewsletterSubscription = Tables<'newsletter_subscriptions'>;
+export type NewsletterSubscriptionInsert = InsertTables<'newsletter_subscriptions'>;
+export type NewsletterSubscriptionUpdate = UpdateTables<'newsletter_subscriptions'>;
 
 // Update types
 export type ProductUpdate = UpdateTables<'products'>;
