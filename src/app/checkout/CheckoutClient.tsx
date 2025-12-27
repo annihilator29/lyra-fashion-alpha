@@ -186,8 +186,8 @@ export default function CheckoutClient() {
             <CheckoutPaymentForm
               checkoutData={{
                 items: items.map(item => ({
-                  id: item.id, // Cart item ID (composite)
-                  productId: item.productId, // Product UUID
+                  id: item.id,
+                  productId: item.productId,
                   name: item.name,
                   price: item.price,
                   quantity: item.quantity,
@@ -217,9 +217,9 @@ export default function CheckoutClient() {
                   email: checkoutData?.email,
                 },
                 subtotal: items.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-                shipping: 0, // Free shipping for now
-                tax: items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.08, // 8% tax
-                total: items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.08,
+                shipping: 10,
+                tax: items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.10,
+                total: items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.10 + 10,
               }}
               onPaymentSuccess={(orderId: string) => {
                 toast.success('Payment successful! Order ID: ' + orderId);
