@@ -56,14 +56,14 @@ describe('CartPage', () => {
         {
           id: '1',
           name: 'Test Product',
-          price: 10000,
+          price: 100,
           quantity: 2,
           imageUrl: '/test.jpg',
           variant: { size: 'M', color: 'Red' },
           slug: 'test-product',
         },
       ],
-      subtotal: 20000,
+      subtotal: 200,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
     });
@@ -75,7 +75,7 @@ describe('CartPage', () => {
     const prices = screen.getAllByText('$200.00');
     expect(prices).toHaveLength(3); // Item total, Subtotal, Grand Total
     expect(screen.getByText('M / Red')).toBeInTheDocument();
-    
+
     // Summary
     expect(screen.getByText('Order Summary')).toBeInTheDocument();
     expect(screen.getByText('Proceed to Checkout')).toBeInTheDocument();
@@ -87,14 +87,14 @@ describe('CartPage', () => {
         {
           id: '1',
           name: 'Test Product',
-          price: 10000,
+          price: 100,
           quantity: 2,
           imageUrl: '/test.jpg',
           variant: { size: 'M', color: 'Red' },
           slug: 'test-product',
         },
       ],
-      subtotal: 20000,
+      subtotal: 200,
       updateQuantity: mockUpdateQuantity,
       removeItem: mockRemoveItem,
     });

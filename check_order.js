@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const { createClient } = require('@supabase/supabase-js');
 
 require('dotenv').config({ path: '.env.local' });
@@ -14,12 +15,12 @@ async function main() {
     .order('created_at', { ascending: false })
     .limit(1)
     .single();
-  
+
   if (error) {
     console.error('Error fetching order:', error.message);
     return;
   }
-  
+
   console.log('Most recent order:');
   console.log(JSON.stringify(order, null, 2));
 }

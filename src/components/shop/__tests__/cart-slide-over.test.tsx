@@ -41,7 +41,7 @@ const mockCartItem: CartItem = {
   productId: 'prod-123',
   slug: 'organic-cotton-dress',
   name: 'Organic Cotton Dress',
-  price: 12000,
+  price: 120,
   imageUrl: '/images/dress.jpg',
   variant: { size: 'Medium', color: 'Blue' },
   quantity: 2,
@@ -85,7 +85,7 @@ describe('CartSlideOver', () => {
   it('should display cart items when cart has items', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
-      subtotal: 24000,
+      subtotal: 240,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
@@ -104,7 +104,7 @@ describe('CartSlideOver', () => {
   it('should display correct subtotal', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
-      subtotal: 24000,
+      subtotal: 240,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
@@ -122,7 +122,7 @@ describe('CartSlideOver', () => {
     const user = userEvent.setup();
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
-      subtotal: 24000,
+      subtotal: 240,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
@@ -147,7 +147,7 @@ describe('CartSlideOver', () => {
     const user = userEvent.setup();
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
-      subtotal: 24000,
+      subtotal: 240,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
@@ -174,7 +174,7 @@ describe('CartSlideOver', () => {
 
     mockUseCartStore.mockReturnValue({
       items: [itemWithQuantityOne],
-      subtotal: 12000,
+      subtotal: 120,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
@@ -196,7 +196,7 @@ describe('CartSlideOver', () => {
     const user = userEvent.setup();
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
-      subtotal: 24000,
+      subtotal: 240,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
@@ -237,7 +237,7 @@ describe('CartSlideOver', () => {
   it('should display checkout link', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem],
-      subtotal: 24000,
+      subtotal: 240,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,
@@ -256,7 +256,7 @@ describe('CartSlideOver', () => {
   it('should display cart item count in title', () => {
     mockUseCartStore.mockReturnValue({
       items: [mockCartItem, { ...mockCartItem, id: 'different-id' }],
-      subtotal: 48000,
+      subtotal: 480,
       isOpen: true,
       setIsOpen: mockOnOpenChange,
       updateQuantity: mockUpdateQuantity,

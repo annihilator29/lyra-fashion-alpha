@@ -116,7 +116,7 @@ describe('CheckoutPaymentForm', () => {
     });
 
     expect(screen.getByText('Order Summary')).toBeInTheDocument();
-    expect(screen.getByText('Test Product (x1)')).toBeInTheDocument();
+    expect(screen.getAllByText('Test Product (x1)')).toHaveLength(2); // Two items with same name
     expect(screen.getAllByText('$29.99')[0]).toBeInTheDocument();
     expect(screen.getByText('Total')).toBeInTheDocument();
     expect(screen.getByText('$37.49')).toBeInTheDocument();
