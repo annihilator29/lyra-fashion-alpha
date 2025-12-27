@@ -76,9 +76,9 @@ describe('SiteFooter', () => {
     // Company links
     expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /factory story/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument();
 
     // Customer Service links
-    expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /contact/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /shipping.*returns/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /faq/i })).toBeInTheDocument();
