@@ -186,7 +186,8 @@ export default function CheckoutClient() {
             <CheckoutPaymentForm
               checkoutData={{
                 items: items.map(item => ({
-                  id: item.id,
+                  id: item.id, // Cart item ID (composite)
+                  productId: item.productId, // Product UUID
                   name: item.name,
                   price: item.price,
                   quantity: item.quantity,

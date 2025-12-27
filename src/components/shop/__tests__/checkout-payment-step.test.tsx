@@ -48,6 +48,15 @@ describe('CheckoutPaymentForm', () => {
     items: [
       {
         id: 'item-1',
+        productId: 'prod-uuid-1',
+        name: 'Test Product',
+        price: 29.99,
+        quantity: 1,
+        image: 'https://example.com/image.jpg',
+      },
+      {
+        id: 'item-2',
+        productId: 'prod-uuid-2',
         name: 'Test Product',
         price: 29.99,
         quantity: 1,
@@ -159,7 +168,7 @@ describe('CheckoutPaymentForm', () => {
   });
 
   it('resets loading state after payment failure', async () => {
-      render(
+    render(
       <CheckoutPaymentForm
         checkoutData={mockCheckoutData}
         onPaymentSuccess={() => {}}
@@ -176,12 +185,12 @@ describe('CheckoutPaymentForm', () => {
     
     // Expect loading state first (button disabled text changes)
     await waitFor(() => {
-        expect(screen.getByText('Processing...')).toBeInTheDocument();
+      expect(screen.getByText('Processing...')).toBeInTheDocument();
     });
-
+    
     // Mock failure in stripe.confirmPayment via the mock we set up
     // The current mock just returns a promise, let's ensure it can reject or return error
-    // In the top-level mock: confirmPayment: jest.fn(),
+    // In a top-level mock: confirmPayment: jest.fn(),
   });
 
   it('validates required checkout data', () => {

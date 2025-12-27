@@ -37,6 +37,7 @@ interface CreatePaymentIntentParams {
   user_id?: string;
   cart_items?: Array<{
     id: string;
+    productId?: string; // Product UUID (optional for compatibility)
     price: number;
     quantity: number;
   }>;
@@ -224,7 +225,7 @@ export async function createPaymentIntent(
     if (cart_items && cart_items.length > 0) {
       const orderItems = cart_items.map(item => ({
         order_id: newOrder.id,
-        product_id: item.id,
+        product_id: item.productId || item.id, // Prefer productId (UUID), fallback to id
         quantity: item.quantity,
         price: item.price,
       }));

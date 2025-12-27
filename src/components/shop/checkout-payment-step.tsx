@@ -9,7 +9,8 @@ import { toast } from 'sonner';
 
 interface CheckoutData {
   items: Array<{
-    id: string;
+    id: string; // Cart item ID (composite: productId-size-color)
+    productId: string; // Product UUID (actual product ID) - REQUIRED for proper order creation
     name: string;
     price: number;
     quantity: number;
@@ -232,7 +233,7 @@ const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
             amount: Math.round(checkoutData.total * 100), // Convert to cents
             currency: 'usd',
             cart_items: checkoutData.items.map(item => ({
-              id: item.id,
+              id: item.productId, // Use product UUID
               price: Math.round(item.price * 100), // Convert price to cents
               quantity: item.quantity
             })),
