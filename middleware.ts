@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { rateLimiter } from './src/lib/rate-limiter'
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -8,7 +9,48 @@ export async function middleware(request: NextRequest) {
     },
   })
 
-  // 1. Create Supabase client to refresh session
+  // 1. Rate limiting for auth endpoints (NOT including OAuth callback)
+  const isAuthEndpoint = request.nextUrl.pathname.startsWith('/login') ||
+                          request.nextUrl.pathname.startsWith('/register') ||
+                          request.nextUrl.pathname.startsWith('/reset-password')
+
+  if (isAuthEndpoint) {
+    // Get client IP address (considering proxy headers)
+    const forwarded = request.headers.get('x-forwarded-for')
+    const ip = forwarded ? forwarded.split(',')[0] : request.headers.get('x-real-ip') || 'unknown'
+
+    // Check rate limit (5 attempts per 15 minutes)
+    const rateLimitResult = rateLimiter.check(ip, 5, 15 * 60 * 1000)
+
+    // Add rate limit headers to all responses
+    response.headers.set('X-RateLimit-Limit', '5')
+    response.headers.set('X-RateLimit-Remaining', rateLimitResult.remaining.toString())
+    response.headers.set('X-RateLimit-Reset', new Date(rateLimitResult.resetTime).toISOString())
+
+    if (rateLimitResult.isLimited) {
+      // Rate limit exceeded - return 429 status
+      const errorResponse = new NextResponse(
+        JSON.stringify({
+          error: 'Too many requests. Please try again later.',
+          retryAfter: rateLimitResult.retryAfter
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime).toISOString(),
+            'Retry-After': rateLimitResult.retryAfter!.toString()
+          }
+        }
+      )
+
+      return errorResponse
+    }
+  }
+
+  // 2. Create Supabase client to refresh session
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -18,7 +60,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => {
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value)
           })
           response = NextResponse.next({
@@ -32,12 +74,12 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // 2. Refresh session
+  // 3. Refresh session
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // 3. Protected Route Logic
+  // 4. Protected Route Logic
   const isAuthRoute = request.nextUrl.pathname.startsWith('/account') ||
                       request.nextUrl.pathname.startsWith('/orders') ||
                       request.nextUrl.pathname.startsWith('/wishlist') ||
@@ -54,8 +96,9 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
                      request.nextUrl.pathname.startsWith('/register')
 
+  // Redirect to account dashboard if user is logged in and accessing auth pages
   if (isAuthPage && user) {
-     return NextResponse.redirect(new URL('/account', request.url))
+     return NextResponse.redirect(new URL('/account/dashboard', request.url))
   }
 
   return response

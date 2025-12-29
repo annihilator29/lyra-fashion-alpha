@@ -1,8 +1,19 @@
+'use client'
+
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { AuthForm } from '@/components/auth/AuthForm'
 import { SocialLoginButton } from '@/components/auth/SocialLoginButton'
+import { AlertCircle, X } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { useState } from 'react'
 
 export default function LoginPage() {
+  const searchParams = useSearchParams()
+  const [showError, setShowError] = useState(true)
+  const error = searchParams.get('error')
+  const errorMessage = searchParams.get('message')
+
   return (
     <div className="bg-white p-8 shadow-lg sm:rounded-lg">
       <div className="mb-6 text-center">
@@ -13,6 +24,27 @@ export default function LoginPage() {
           Sign in to your account to continue
         </p>
       </div>
+
+      {error && errorMessage && showError && (
+        <div className="mb-4 rounded-lg bg-red-50 p-4 text-sm text-red-800">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
+            <div className="flex-1">
+              <p className="font-medium">Authentication Error</p>
+              <p className="mt-1 text-red-700">{errorMessage}</p>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 w-6 p-0"
+              onClick={() => setShowError(false)}
+            >
+              <X className="h-4 w-4" />
+              <span className="sr-only">Dismiss</span>
+            </Button>
+          </div>
+        </div>
+      )}
 
       <AuthForm type="login" />
 
