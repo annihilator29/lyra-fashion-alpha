@@ -618,3 +618,88 @@ export async function getShippingAddresses() {
 
   return { error: null, data }
 }
+
+// ==========================
+// Order Reorder Actions
+// ==========================
+
+export async function reorderItems(orderId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated', data: null }
+  }
+
+  try {
+    // Fetch order items with products
+    const { data: orderItems, error } = await supabase
+      .from('order_items')
+      .select('*, products(*)')
+      .eq('order_id', orderId)
+      .eq('orders.customer_id', user.id)
+
+    if (error || !orderItems) {
+      return { error: error?.message || 'Order not found', data: null }
+    }
+
+    let addedCount = 0
+
+    // Add each item to cart if still available
+    for (const item of orderItems) {
+      if (!item.products) continue
+
+      // Check if product still has inventory
+      const { data: inventory } = await supabase
+        .from('inventory')
+        .select('quantity, reserved')
+        .eq('product_id', item.product_id)
+        .single()
+
+      const availableQuantity = (inventory?.quantity || 0) - (inventory?.reserved || 0)
+
+      if (availableQuantity > 0) {
+        // Add to cart - assuming cart is stored in database
+        // This would need to integrate with existing cart system from Story 3.1
+        // For now, we'll use a simple approach
+        const quantityToAdd = Math.min(item.quantity, availableQuantity)
+
+        // Check if item already in cart
+        const { data: existingCartItem } = await supabase
+          .from('cart_items')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('product_id', item.product_id)
+          .maybeSingle()
+
+        if (existingCartItem) {
+          // Update existing cart item
+          await supabase
+            .from('cart_items')
+            .update({
+              quantity: existingCartItem.quantity + quantityToAdd,
+            })
+            .eq('id', existingCartItem.id)
+        } else {
+          // Add new cart item
+          await supabase
+            .from('cart_items')
+            .insert({
+              user_id: user.id,
+              product_id: item.product_id,
+              quantity: quantityToAdd,
+            })
+        }
+
+        addedCount++
+      }
+    }
+
+    revalidatePath('/cart')
+
+    return { error: null, data: { itemCount: addedCount } }
+  } catch (err) {
+    console.error('Error reordering items:', err)
+    return { error: 'Failed to reorder items', data: null }
+  }
+}

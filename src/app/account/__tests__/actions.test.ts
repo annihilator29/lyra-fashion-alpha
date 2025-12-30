@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { 
-  updateProfile, 
+import {
+  updateProfile,
   updatePreferences,
   changePassword,
   uploadAvatar,
@@ -8,7 +8,8 @@ import {
   createShippingAddress,
   updateShippingAddress,
   deleteShippingAddress,
-  setDefaultShippingAddress 
+  setDefaultShippingAddress,
+  reorderItems,
 } from '../actions'
 
 // Mock Supabase client
@@ -189,11 +190,79 @@ describe('Account Server Actions', () => {
     })
   })
 
-  describe('setDefaultShippingAddress', () => {
-    it('sets address as default', async () => {
-      const result = await setDefaultShippingAddress('addr-123')
+   describe('setDefaultShippingAddress', () => {
+     it('sets address as default', async () => {
+       const result = await setDefaultShippingAddress('addr-123')
+
+       expect(result.error).toBeNull()
+     })
+   })
+
+  describe('reorderItems', () => {
+    it('returns error if user is not authenticated', async () => {
+      const { createClient } = await import('@/lib/supabase/server')
+      jest.mocked(createClient).mockReturnValueOnce({
+        auth: {
+          getUser: jest.fn(() => Promise.resolve({ data: { user: null }, error: null })),
+        },
+      } as any)
+
+      const result = await reorderItems('order-123')
+
+      expect(result).toEqual({
+        error: 'Not authenticated',
+        data: null,
+      })
+    })
+
+    it('returns error if order not found', async () => {
+      const { createClient } = await import('@/lib/supabase/server')
+      const mockSupabase = {
+        auth: {
+          getUser: jest.fn(() => Promise.resolve({ data: { user: { id: 'user-123' } }, error: null })),
+        },
+        from: jest.fn(() => ({
+          select: jest.fn(() => ({
+            eq: jest.fn(() => ({
+              maybeSingle: jest.fn(() => Promise.resolve({ data: null, error: { message: 'Order not found' } })),
+            })),
+          })),
+        })),
+      }
+      jest.mocked(createClient).mockReturnValueOnce(mockSupabase as any)
+
+      const result = await reorderItems('order-123')
+
+      expect(result.error).toBe('Order not found')
+      expect(result.data).toBeNull()
+    })
+
+    it('adds items to cart when products are available', async () => {
+      const { createClient } = await import('@/lib/supabase/server')
+      const mockSupabase = {
+        auth: {
+          getUser: jest.fn(() => Promise.resolve({ data: { user: { id: 'user-123' } }, error: null })),
+        },
+        from: jest.fn(() => ({
+          select: jest.fn(() => ({
+            eq: jest.fn(() => ({
+              maybeSingle: jest.fn(() => Promise.resolve({
+                data: [{ id: 'item-1' }],
+                error: null,
+              })),
+            })),
+          })),
+          insert: jest.fn(() => Promise.resolve({ error: null, data: { id: 'cart-item-1' } })),
+          update: jest.fn(() => Promise.resolve({ error: null })),
+        })),
+      }
+      jest.mocked(createClient).mockReturnValueOnce(mockSupabase as any)
+
+       const result = await reorderItems('order-123')
 
       expect(result.error).toBeNull()
+      expect(result.data?.itemCount).toBeGreaterThan(0)
     })
   })
 })
+
