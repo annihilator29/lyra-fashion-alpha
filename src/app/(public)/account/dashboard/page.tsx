@@ -2,15 +2,42 @@
 
 import { useAuth } from '@/hooks/use-auth'
 import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { LogOut, ShoppingBag, Package } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import Image from 'next/image'
+import type { Customer } from '@/types/database.types'
 
 export default function AccountDashboard() {
   const { user, loading, signOut } = useAuth()
   const router = useRouter()
+  const [customer, setCustomer] = useState<Customer | null>(null)
+  const [avatarLoading, setAvatarLoading] = useState(true)
 
-  if (loading) {
+  // Fetch customer data including avatar
+  useEffect(() => {
+    async function fetchCustomerData() {
+      if (user) {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('id', user.id)
+          .single()
+        
+        if (data) {
+          setCustomer(data)
+        }
+        setAvatarLoading(false)
+      }
+    }
+    
+    fetchCustomerData()
+  }, [user])
+
+  if (loading || avatarLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -55,8 +82,21 @@ export default function AccountDashboard() {
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow p-6">
               <div className="flex flex-col items-center text-center">
-                <div className="h-24 w-24 rounded-full bg-primary flex items-center justify-center text-4xl font-bold text-white mb-4">
-                  {user.email?.charAt(0)?.toUpperCase()}
+                <div className="relative h-24 w-24 mb-4">
+                  {customer?.avatar_url ? (
+                    <Image
+                      src={customer.avatar_url}
+                      alt="Profile avatar"
+                      fill
+                      className="object-cover border-2 border-gray-200 rounded-lg"
+                      sizes="96px"
+                      onLoad={() => setAvatarLoading(false)}
+                    />
+                  ) : (
+                    <div className="h-full w-full bg-primary flex items-center justify-center text-4xl font-bold text-white rounded-lg">
+                      {user.email?.charAt(0)?.toUpperCase()}
+                    </div>
+                  )}
                 </div>
                 <h2 className="text-xl font-semibold text-gray-900 mb-1">{user.email}</h2>
                 <p className="text-sm text-muted-foreground mb-4">Welcome back!</p>

@@ -17,7 +17,7 @@ export default function AccountSidebar() {
 
   return (
     <aside className="hidden md:block w-64 bg-white border-r border-gray-200 h-screen sticky top-0 overflow-y-auto">
-      <div className="p-6">
+      <div className="p-6 pt-8">
         <h1 className="text-2xl font-bold mb-6">My Account</h1>
         <nav className="space-y-2">
           {navItems.map((item) => {

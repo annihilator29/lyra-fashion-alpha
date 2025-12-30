@@ -66,16 +66,16 @@ export default function AvatarUpload({ currentAvatarUrl }: AvatarUploadProps) {
   }
 
   return (
-    <div className="flex items-center gap-6">
+     <div className="flex items-center gap-6">
       <div className="relative group">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={avatarUrl || '/default-avatar.png'}
           alt="Profile avatar"
-          className="h-24 w-24 rounded-full object-cover border-2 border-gray-200"
+          className="h-24 w-24 object-cover border-2 border-gray-200 rounded-lg"
         />
         {uploading && (
-          <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
             <Loader2 className="h-8 w-8 text-white animate-spin" />
           </div>
         )}

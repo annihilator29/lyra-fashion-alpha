@@ -11,9 +11,9 @@ import { z } from 'zod'
 // ==========================
 
 const updateProfileSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  phone_number: z.string().optional().transform((value, ctx) => {
+  name: z.string().min(2, 'Name must be at least 2 characters').nullable().transform((value) => value ?? undefined),
+  email: z.string().email('Invalid email address').nullable().transform((value) => value ?? undefined),
+  phone_number: z.string().optional().nullable().transform((value, ctx) => {
     if (!value) return undefined
 
     try {
@@ -35,7 +35,7 @@ const updateProfileSchema = z.object({
       return z.NEVER
     }
   }),
-  avatar_url: z.string().url().optional(),
+  avatar_url: z.string().url().optional().nullable().transform((value) => value ?? undefined),
 })
 
 const updatePreferencesSchema = z.object({

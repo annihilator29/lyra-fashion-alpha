@@ -12,9 +12,9 @@ export default function AccountLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex">
       <AccountSidebar />
-      <main className="flex-1 p-6 md:p-8">
+      <main className="flex-1 p-6 md:p-8 overflow-y-auto">
         <div className="max-w-4xl mx-auto">{children}</div>
       </main>
     </div>
