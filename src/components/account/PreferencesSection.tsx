@@ -1,7 +1,7 @@
 'use client'
 
 import { useTransition } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, Controller } from 'react-hook-form'
 import { toast } from 'sonner'
 import { updatePreferences } from '@/app/account/actions'
 import { Button } from '@/components/ui/button'
@@ -29,14 +29,15 @@ export default function PreferencesSection({ customer }: PreferencesSectionProps
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      email_marketing: emailPrefs.marketing ?? false,
-      order_updates: emailPrefs.order_updates ?? true,
-      new_products: emailPrefs.new_products ?? false,
-      favorite_categories: stylePrefs.favorite_categories || [],
-      size_profile: stylePrefs.size_profile || undefined,
+      email_marketing: (emailPrefs.marketing as boolean) ?? false,
+      order_updates: (emailPrefs.order_updates as boolean) ?? true,
+      new_products: (emailPrefs.new_products as boolean) ?? false,
+      favorite_categories: (stylePrefs.favorite_categories as string[]) || [],
+      size_profile: (stylePrefs.size_profile as string) || undefined,
     },
   })
 
@@ -48,7 +49,8 @@ export default function PreferencesSection({ customer }: PreferencesSectionProps
       formData.append('order_updates', String(formDataData.order_updates))
       formData.append('new_products', String(formDataData.new_products))
       formData.append('favorite_categories', JSON.stringify(formDataData.favorite_categories))
-      formData.append('size_profile', String(formDataData.size_profile || ''))
+      const sizeProfile = formDataData.size_profile === 'none' ? '' : (formDataData.size_profile || '')
+      formData.append('size_profile', String(sizeProfile))
 
       const result = await updatePreferences(formData)
 
@@ -65,10 +67,17 @@ export default function PreferencesSection({ customer }: PreferencesSectionProps
       <h2 className="text-xl font-semibold mb-4">Email Preferences</h2>
       <div className="space-y-4">
         <div className="flex items-center space-x-3">
-          <Checkbox
-            id="order_updates"
-            {...register('order_updates')}
-            disabled={isPending}
+          <Controller
+            name="order_updates"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="order_updates"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={isPending}
+              />
+            )}
           />
           <Label htmlFor="order_updates" className="cursor-pointer">
             Order updates (confirmations, shipping, delivery)
@@ -76,10 +85,17 @@ export default function PreferencesSection({ customer }: PreferencesSectionProps
         </div>
 
         <div className="flex items-center space-x-3">
-          <Checkbox
-            id="email_marketing"
-            {...register('email_marketing')}
-            disabled={isPending}
+          <Controller
+            name="email_marketing"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="email_marketing"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={isPending}
+              />
+            )}
           />
           <Label htmlFor="email_marketing" className="cursor-pointer">
             Marketing newsletter (promotions, sales, events)
@@ -87,10 +103,17 @@ export default function PreferencesSection({ customer }: PreferencesSectionProps
         </div>
 
         <div className="flex items-center space-x-3">
-          <Checkbox
-            id="new_products"
-            {...register('new_products')}
-            disabled={isPending}
+          <Controller
+            name="new_products"
+            control={control}
+            render={({ field }) => (
+              <Checkbox
+                id="new_products"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={isPending}
+              />
+            )}
           />
           <Label htmlFor="new_products" className="cursor-pointer">
             New arrivals (based on your favorite categories)
@@ -105,55 +128,71 @@ export default function PreferencesSection({ customer }: PreferencesSectionProps
           <p className="text-sm text-gray-600 mb-3">
             Select clothing categories you&apos;re most interested in
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-            {CATEGORIES.map((category) => {
-              const isChecked = Array.isArray(stylePrefs.favorite_categories) &&
-                stylePrefs.favorite_categories.includes(category)
-
-              return (
-                <div key={category} className="flex items-center space-x-2">
-                  <Checkbox
-                    id={`cat-${category}`}
-                    value={category}
-                    {...register('favorite_categories')}
-                    disabled={isPending}
-                    checked={isChecked}
-                  />
-                  <Label htmlFor={`cat-${category}`} className="cursor-pointer capitalize">
-                    {category}
-                  </Label>
-                </div>
-              )
-            })}
-          </div>
+          <div className="grid grid-cols-2 gap-4">
+          <Controller
+            name="favorite_categories"
+            control={control}
+            render={({ field }) => (
+              <>
+                {CATEGORIES.map((category) => {
+                  const isChecked = field.value?.includes(category)
+                  return (
+                    <div key={category} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`cat-${category}`}
+                        checked={isChecked}
+                        onCheckedChange={(checked) => {
+                          const updated = checked
+                            ? [...(field.value || []), category]
+                            : (field.value || []).filter((c: string) => c !== category)
+                          field.onChange(updated)
+                        }}
+                        disabled={isPending}
+                      />
+                      <Label htmlFor={`cat-${category}`} className="cursor-pointer capitalize">
+                        {category}
+                      </Label>
+                    </div>
+                  )
+                })}
+              </>
+            )}
+          />
         </div>
+      </div>
 
-        <div>
-          <Label htmlFor="size_profile">Size Profile</Label>
-          <p className="text-sm text-gray-600 mb-2">
-            Your preferred size for recommendations
-          </p>
-          <Select
-            {...register('size_profile')}
-            disabled={isPending}
-            defaultValue={(stylePrefs.size_profile as string | undefined) || undefined}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Select your size" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="">No preference</SelectItem>
-              {SIZE_OPTIONS.map((size) => (
-                <SelectItem key={size} value={size}>
-                  {size}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.favorite_categories && (
-            <p className="text-red-500 text-sm mt-1">{errors.favorite_categories.message as string}</p>
+      <div>
+        <Label htmlFor="size_profile">Size Profile</Label>
+        <p className="text-sm text-gray-600 mb-2">
+          Your preferred size for recommendations
+        </p>
+        <Controller
+          name="size_profile"
+          control={control}
+          render={({ field }) => (
+            <Select
+              disabled={isPending}
+              onValueChange={field.onChange}
+              value={field.value || undefined}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select your size" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">No preference</SelectItem>
+                {SIZE_OPTIONS.map((size) => (
+                  <SelectItem key={size} value={size}>
+                    {size}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           )}
-        </div>
+        />
+        {errors.favorite_categories && (
+          <p className="text-red-500 text-sm mt-1">{errors.favorite_categories.message as string}</p>
+        )}
+      </div>
       </div>
 
       <Button type="submit" disabled={isPending} className="w-full md:w-auto">

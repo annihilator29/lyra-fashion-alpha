@@ -9,11 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Loader2 } from 'lucide-react'
 
-interface PasswordChangeFormProps {
-  email: string
-}
-
-export default function PasswordChangeForm({ }: PasswordChangeFormProps) {
+export default function PasswordChangeForm() {
   const [isPending, startTransition] = useTransition()
 
   const {

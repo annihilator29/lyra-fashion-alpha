@@ -60,7 +60,7 @@ export default async function ProfilePage() {
       {/* Password Change */}
       <div className="bg-white rounded-lg shadow-sm p-6 border">
         <h2 className="text-xl font-semibold mb-4">Password</h2>
-        <PasswordChangeForm email={user.email || ''} />
+        <PasswordChangeForm />
       </div>
 
       {/* Account Deletion */}

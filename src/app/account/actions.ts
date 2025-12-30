@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
 import { parsePhoneNumber, CountryCode } from 'libphonenumber-js'
 import { z } from 'zod'
@@ -94,15 +95,23 @@ const shippingAddressSchema = z.object({
 // Postal code validation by country
 const postalCodePatterns: Record<string, RegExp> = {
   US: /^\d{5}(-\d{4})?$/,
-  GB: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z\d]? ?\d{2}$/,
-  CA: /^[A-Z]\d[A-Z]\d ?\d{4}$/,
+  GB: /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i, // Case-insensitive for user input
+  CA: /^[A-Z]\d[A-Z] ?\d[A-Z]\d$/i, // Corrected pattern: A1A 1A1
   AU: /^\d{4}$/,
   // Add more countries as needed
 }
 
 function validatePostalCode(postalCode: string, country: string): boolean {
-  const pattern = postalCodePatterns[country] || /^\d{3,10}$/
-  return pattern.test(postalCode)
+  // Normalize input: trim whitespace and convert to uppercase
+  const normalized = postalCode.trim().toUpperCase()
+  const pattern = postalCodePatterns[country]
+  
+  // If no pattern for country, use stricter fallback (4-10 digits)
+  if (!pattern) {
+    return /^\d{4,10}$/.test(normalized)
+  }
+  
+  return pattern.test(normalized)
 }
 
 // ==========================
@@ -260,19 +269,34 @@ export async function deleteAccount(formData: FormData) {
       return { error: 'Invalid confirmation', data: null }
     }
 
-    // Note: For full account deletion, you need to use the service role key
-    // This is a placeholder - you'll need to implement an API route with service role
-    // to actually delete the user via adminDeleteUser
-
-    // For now, we'll implement soft delete by updating the customer record
-    const { error } = await supabase
+    // GDPR Compliance: Hard delete user and all associated data
+    // This requires the service role key to access auth.admin
+    const supabaseAdmin = createAdminClient()
+    
+    // First delete from customers table (custom data) - though cascade should handle this if configured at DB level
+    // We do it explicitly to ensure our custom data is gone even if cascade fails or isn't set up on auth.users
+    const { error: dbError } = await supabaseAdmin
       .from('customers')
-      .update({ deleted_at: new Date().toISOString() })
+      .delete()
       .eq('id', user.id)
 
-    if (error) {
-      return { error: error.message, data: null }
+    if (dbError) {
+      console.error('Failed to delete customer data:', dbError)
+      return { error: 'Failed to delete account data', data: null }
     }
+
+    // Then delete from Supabase Auth
+    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(user.id)
+
+    if (authError) {
+      console.error('Failed to delete auth user:', authError)
+      // Note: Data might be partially deleted at this point, but auth user remains.
+      // In a production system, this should probably be a transaction or queued job.
+      return { error: 'Failed to delete authentication record', data: null }
+    }
+
+
+
 
     // Sign out user
     await supabase.auth.signOut()
