@@ -120,7 +120,10 @@ export interface Database {
                     id: string;
                     email: string;
                     name: string | null;
+                    phone_number: string | null;
+                    avatar_url: string | null;
                     preferences: Json | null;
+                    email_preferences: Json | null;
                     created_at: string;
                     updated_at: string;
                 };
@@ -128,7 +131,10 @@ export interface Database {
                     id: string; // Must match auth.users.id
                     email: string;
                     name?: string | null;
+                    phone_number?: string | null;
+                    avatar_url?: string | null;
                     preferences?: Json | null;
+                    email_preferences?: Json | null;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -136,7 +142,10 @@ export interface Database {
                     id?: string;
                     email?: string;
                     name?: string | null;
+                    phone_number?: string | null;
+                    avatar_url?: string | null;
                     preferences?: Json | null;
+                    email_preferences?: Json | null;
                     created_at?: string;
                     updated_at?: string;
                 };
@@ -146,6 +155,62 @@ export interface Database {
                         columns: ['id'];
                         isOneToOne: true;
                         referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            shipping_addresses: {
+                Row: {
+                    id: string;
+                    customer_id: string;
+                    name: string;
+                    address_line1: string;
+                    address_line2: string | null;
+                    city: string;
+                    state: string | null;
+                    postal_code: string;
+                    country: string;
+                    phone: string | null;
+                    is_default: boolean;
+                    created_at: string;
+                    updated_at: string;
+                };
+                Insert: {
+                    id?: string;
+                    customer_id: string;
+                    name: string;
+                    address_line1: string;
+                    address_line2?: string | null;
+                    city: string;
+                    state?: string | null;
+                    postal_code: string;
+                    country?: string;
+                    phone?: string | null;
+                    is_default?: boolean;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Update: {
+                    id?: string;
+                    customer_id?: string;
+                    name?: string;
+                    address_line1?: string;
+                    address_line2?: string | null;
+                    city?: string;
+                    state?: string | null;
+                    postal_code?: string;
+                    country?: string;
+                    phone?: string | null;
+                    is_default?: boolean;
+                    created_at?: string;
+                    updated_at?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'shipping_addresses_customer_id_fkey';
+                        columns: ['customer_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'customers';
                         referencedColumns: ['id'];
                     },
                 ];
@@ -360,6 +425,7 @@ export type UpdateTables<T extends keyof Database['public']['Tables']> =
 export type Product = Tables<'products'>;
 export type ProductVariant = Tables<'product_variants'>;
 export type Customer = Tables<'customers'>;
+export type ShippingAddress = Tables<'shipping_addresses'>;
 export type Order = Tables<'orders'>;
 export type OrderItem = Tables<'order_items'>;
 export type Inventory = Tables<'inventory'>;
