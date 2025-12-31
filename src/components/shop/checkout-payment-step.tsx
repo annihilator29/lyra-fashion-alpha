@@ -25,10 +25,18 @@ interface CheckoutData {
   total: number;
 }
 
+interface SavedPaymentState {
+  clientSecret?: string;
+  orderId?: string;
+  amount?: number;
+}
+
 interface CheckoutPaymentStepProps {
   checkoutData: CheckoutData;
   onPaymentSuccess: (orderId: string) => void;
   onBack: () => void;
+  savedPaymentState?: SavedPaymentState;
+  onSavePaymentState?: (state: Required<SavedPaymentState>) => void;
 }
 
 // Inner component that uses Stripe hooks - must be wrapped by Elements
@@ -216,19 +224,44 @@ const PaymentFormInner: React.FC<PaymentFormInnerProps> = ({
 const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
   checkoutData, 
   onPaymentSuccess, 
-  onBack 
+  onBack,
+  savedPaymentState,
+  onSavePaymentState
 }) => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const orderIdRef = useRef<string | null>(null);
+  const initializingRef = useRef(false);
 
   // Create payment intent when component mounts
   useEffect(() => {
     const createPaymentIntent = async () => {
+      // Check if we can reuse saved state
+      const currentAmountCents = Math.round(checkoutData.total * 100);
+      const savedAmountCents = savedPaymentState?.amount ? Math.round(savedPaymentState.amount * 100) : null;
+
+      // Logic to reuse existing payment intent if amount matches
+      if (savedPaymentState?.clientSecret && 
+          savedPaymentState?.orderId && 
+          savedAmountCents === currentAmountCents) {
+          
+          console.log('Reusing existing payment intent', savedPaymentState.orderId);
+          setClientSecret(savedPaymentState.clientSecret);
+          orderIdRef.current = savedPaymentState.orderId;
+          return;
+      }
+      
+      // Prevent double initialization
+      if (initializingRef.current) return;
+      initializingRef.current = true;
+
       try {
         // Get authenticated user ID
         const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         const userId = user?.id || null;
+
+        // Generate a new idempotency key for this attempt
+        const idempotencyKey = crypto.randomUUID();
 
         const response = await fetch('/api/create-payment-intent', {
           method: 'POST',
@@ -236,12 +269,14 @@ const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            amount: Math.round(checkoutData.total * 100), // Convert to cents
+            amount: currentAmountCents,
             currency: 'usd',
             user_id: userId, // Pass authenticated user ID
+            idempotency_key: idempotencyKey,
             cart_items: checkoutData.items.map(item => ({
-              id: item.productId, // Use product UUID
-              price: Math.round(item.price * 100), // Convert price to cents
+              id: item.productId,
+              productId: item.productId,
+              price: item.price, // Pass price in dollars (database expects DECIMAL(10,2))
               quantity: item.quantity
             })),
             shipping_address: checkoutData.shippingAddress,
@@ -259,16 +294,26 @@ const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
         
         setClientSecret(data.data.clientSecret);
         orderIdRef.current = data.data.orderId;
+
+        // Save state to parent/storage
+        if (onSavePaymentState) {
+            onSavePaymentState({
+                clientSecret: data.data.clientSecret,
+                orderId: data.data.orderId,
+                amount: checkoutData.total
+            });
+        }
       } catch (error: unknown) {
         const message = error instanceof Error ? error.message : 'Failed to initialize payment. Please try again.';
         console.error('Error creating payment intent:', error);
         toast.error(message);
+        initializingRef.current = false; // Allow retry on error
       }
     };
 
     createPaymentIntent();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checkoutData.total, checkoutData.items.length]);
+  }, [checkoutData.total, checkoutData.items.length]); // Re-run if total or items change
 
   if (!clientSecret) {
     return (

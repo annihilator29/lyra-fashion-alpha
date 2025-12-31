@@ -182,7 +182,7 @@ export default function CheckoutClient() {
             />
           )}
           
-          {currentStep === 'payment' && (
+              {currentStep === 'payment' && (
             <CheckoutPaymentForm
               checkoutData={{
                 items: items.map(item => ({
@@ -221,6 +221,18 @@ export default function CheckoutClient() {
                 tax: items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 0.10,
                 total: items.reduce((sum, item) => sum + (item.price * item.quantity), 0) * 1.10 + 10,
               }}
+              savedPaymentState={{
+                clientSecret: checkoutData.paymentClientSecret,
+                orderId: checkoutData.paymentOrderId,
+                amount: checkoutData.paymentAmount
+              }}
+              onSavePaymentState={(state) => {
+                updateCheckoutData({
+                  paymentClientSecret: state.clientSecret,
+                  paymentOrderId: state.orderId,
+                  paymentAmount: state.amount
+                });
+              }}
               onPaymentSuccess={(orderId: string) => {
                 toast.success('Payment successful! Order ID: ' + orderId);
                 // Clear cart after successful payment
@@ -230,6 +242,7 @@ export default function CheckoutClient() {
               onBack={() => prevStep()}
             />
           )}
+
           
           {currentStep === 'review' && (
             <div className="bg-gray-100 p-6 rounded-lg">

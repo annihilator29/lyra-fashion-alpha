@@ -48,9 +48,10 @@ export default function CartPage() {
                 <div key={item.id} className="flex flex-col sm:flex-row gap-6 py-6 border-b last:border-0 last:pb-0 first:pt-0">
                   {/* Product Image */}
                   <div className="relative h-24 w-24 sm:h-32 sm:w-32 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
-                      <Link href={`/products/${item.category}/${item.slug}`}>
+                      <Link href={`/products/${(item.category && item.category !== 'undefined') ? item.category : 'products'}/${item.slug}`}>
                           <Image
                               src={item.imageUrl}
+
                               alt={item.name}
                               fill
                               className="object-cover"
@@ -64,7 +65,7 @@ export default function CartPage() {
                       <div className="flex justify-between items-start gap-4">
                           <div>
                               <h3 className="font-semibold text-lg">
-                                  <Link href={`/products/${item.category}/${item.slug}`} className="hover:underline">
+                                  <Link href={`/products/${(item.category && item.category !== 'undefined') ? item.category : 'products'}/${item.slug}`} className="hover:underline">
                                       {item.name}
                                   </Link>
                               </h3>

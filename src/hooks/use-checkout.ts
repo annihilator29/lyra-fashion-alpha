@@ -16,6 +16,10 @@ interface CheckoutData {
   billing_city?: string;
   billing_postal_code?: string;
   billing_country?: string;
+  // Payment state persistence
+  paymentClientSecret?: string;
+  paymentOrderId?: string;
+  paymentAmount?: number;
 }
 
 /**

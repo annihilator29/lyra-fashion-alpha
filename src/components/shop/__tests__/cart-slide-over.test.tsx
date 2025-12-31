@@ -40,6 +40,7 @@ const mockCartItem: CartItem = {
   id: 'prod-123-medium-blue',
   productId: 'prod-123',
   slug: 'organic-cotton-dress',
+  category: 'dresses',
   name: 'Organic Cotton Dress',
   price: 120,
   imageUrl: '/images/dress.jpg',

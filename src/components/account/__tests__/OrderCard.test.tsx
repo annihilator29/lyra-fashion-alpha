@@ -56,6 +56,7 @@ const mockOrder: OrderWithItems = {
         slug: 'silk-blazer',
         images: ['/images/silk-blazer.jpg'],
         price: 6450,
+        category: 'outerwear',
       },
     },
   ],

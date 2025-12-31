@@ -178,6 +178,7 @@ export async function createPaymentIntent(
 
     if (cart_items && cart_items.length > 0) {
       const orderItems = cart_items.map((item, index) => {
+        // Convert price from dollars to cents for Stripe (database stores dollars)
         const priceInCents = Math.round(item.price * 100);
         console.log(`Mapping item ${index + 1} (${item.productId || item.id}):`, {
           productId: item.productId || item.id,
@@ -190,7 +191,7 @@ export async function createPaymentIntent(
           order_id: newOrder.id,
           product_id: item.productId || item.id,
           quantity: item.quantity,
-          price: priceInCents,
+          price: item.price, // Store in dollars as expected by database schema (DECIMAL(10,2))
         };
       });
 

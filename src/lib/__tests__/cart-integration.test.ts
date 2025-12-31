@@ -9,6 +9,7 @@ const mockProduct = {
   id: 'prod-123',
   name: 'Organic Cotton Dress',
   slug: 'organic-cotton-dress',
+  category: 'dresses',
   price: 12000,
   images: ['/images/dress.jpg'],
 };

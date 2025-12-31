@@ -11,6 +11,7 @@ const mockCartItem: CartItem = {
   id: 'prod-123-m-blue',
   productId: 'prod-123',
   slug: 'cotton-dress',
+  category: 'dresses',
   name: 'Cotton Dress',
   price: 12000,
   imageUrl: '/dress.jpg',

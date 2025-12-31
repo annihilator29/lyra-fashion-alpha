@@ -110,19 +110,20 @@ export async function POST(request: NextRequest) {
       // Continue processing even if mark failed (to ensure order is updated)
     }
 
-    // Handle the event
+    // Handle event
     switch (event.type) {
-      case 'checkout.session.completed':
-        // This event is fired when a checkout session is completed
-        // This includes successful payments
-        await handleCheckoutSessionCompleted(event);
+      // Note: Payment Element flow uses payment_intent.succeeded, not checkout.session.completed
+      // Checkout Session flow would use checkout.session.completed
+      case 'payment_intent.succeeded':
+        // This event is fired when a payment intent is successful (Payment Element flow)
+        await handlePaymentIntentSucceeded(event);
         break;
 
-      // DISABLED: payment_intent.succeeded event is also firing, causing duplicate orders
-      // checkout.session.completed is sufficient and already updates the order
-      // case 'payment_intent.succeeded':
-      //   // This event is fired when a payment intent is successful
-      //   await handlePaymentIntentSucceeded(event);
+      // Commented out since we're using Payment Element, not Checkout Sessions
+      // case 'checkout.session.completed':
+      //   // This event is fired when a checkout session is completed
+      //   // This includes successful payments
+      //   await handleCheckoutSessionCompleted(event);
       //   break;
 
       case 'payment_intent.payment_failed':
@@ -144,94 +145,19 @@ export async function POST(request: NextRequest) {
    } catch (error) {
      console.error('Error processing webhook event:', error);
      // Don't return an error here as Stripe will retry the webhook
-     // Instead, log the error and return success
+     // Instead, log error and return success
    }
 
   // Return a 200 response to acknowledge receipt of event
   return new Response('Success', { status: 200, headers: WEBHOOK_HEADERS });
 }
 
-async function handleCheckoutSessionCompleted(event: Stripe.Event) {
-  const session = event.data.object as Stripe.Checkout.Session;
-
-  try {
-    // Get payment intent ID from session
-    const paymentIntentId = session.payment_intent as string;
-
-    console.log('*** WEBHOOK DEBUG: Checkout Session Completed ***');
-    console.log('Payment Intent ID:', paymentIntentId);
-
-    // Find order by payment intent ID, including items
-    const { data: order, error } = await getSupabase()
-      .from('orders')
-      .select('*, order_items(*, product:products(*))')
-      .eq('stripe_payment_intent_id', paymentIntentId)
-      .single();
-
-    if (error) {
-      log('error', 'Order not found for payment intent', { payment_intent_id: paymentIntentId, error: error.message });
-      return;
-    }
-
-    if (!order) {
-      log('error', 'Order not found for payment intent', { payment_intent_id: paymentIntentId });
-      return;
-    }
-
-    // Check if order is already paid (prevents duplicate updates)
-    if (order.status === 'paid') {
-      console.log('*** WEBHOOK DEBUG: Order already paid, skipping update ***');
-      log('info', 'Order already marked as paid', { order_id: order.id, order_number: order.order_number });
-      return;
-    }
-
-    const updateData = {
-      status: 'paid',
-      ordered_at: new Date().toISOString(), // Set ordered_at when payment is confirmed
-      updated_at: new Date().toISOString()
-    };
-
-    console.log('*** WEBHOOK DEBUG: Updating order ***', { order_id: order.id, update_data: updateData });
-
-    const { error: updateError } = await getSupabase()
-      .from('orders')
-      .update(updateData)
-      .eq('id', order.id);
-
-    if (updateError) {
-      console.error('Error updating order status:', updateError);
-      log('error', 'Failed to update order', { order_id: order.id, error: updateError.message });
-      return;
-    }
-
-    console.log('*** WEBHOOK DEBUG: Order updated successfully ***', { order_id: order.id, ordered_at: updateData.ordered_at });
-    log('info', 'Order updated to paid status', { order_id: order.id, order_number: order.order_number, customer_id: order.customer_id, ordered_at: updateData.ordered_at });
-
-    // Send order confirmation email
-    if (!order.email_sent) {
-      try {
-        const emailResult = await sendOrderConfirmation(order, getSupabase());
-        if (emailResult) {
-          log('info', 'Order confirmation email sent', { email_id: emailResult.emailId, order_id: order.id });
-        }
-      } catch (emailError) {
-        log('error', 'Failed to send order confirmation email from webhook', { 
-          order_id: order.id, 
-          error: emailError instanceof Error ? emailError.message : 'Unknown error' 
-        });
-      }
-    }
-  } catch (error: unknown) {
-    log('error', 'Error handling checkout session completed', { error: error instanceof Error ? error.message : 'Unknown error' });
-  }
-}
-
 async function handlePaymentIntentSucceeded(event: Stripe.Event) {
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
   try {
-    // Find the order by payment intent ID
-    // Find the order by payment intent ID, including items
+    // Find order by payment intent ID
+    // Find order by payment intent ID, including items
     const { data: order, error } = await getSupabase()
       .from('orders')
       .select('*, order_items(*, product:products(*))')
@@ -248,7 +174,19 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
       return;
     }
 
-    // Update the order status to 'paid'
+    // Check if order is already paid (prevents duplicate updates)
+    if (order.status === 'paid') {
+      console.log('*** WEBHOOK DEBUG: Order already paid, skipping update ***');
+      log('info', 'Order already marked as paid', { order_id: order.id, order_number: order.order_number });
+      return;
+    }
+
+    console.log('*** WEBHOOK DEBUG: Updating order to paid status ***');
+    console.log('Order ID:', order.id);
+    console.log('Current Status:', order.status);
+    console.log('New Status:', 'paid');
+
+    // Update order status to 'paid'
     const { error: updateError } = await getSupabase()
       .from('orders')
       .update({
@@ -259,10 +197,12 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
       .eq('id', order.id);
     
     if (updateError) {
+      console.error('*** WEBHOOK ERROR: Failed to update order ***', updateError);
       log('error', 'Error updating order status', { error: updateError.message });
       return;
     }
 
+    console.log('*** WEBHOOK DEBUG: Order updated successfully ***');
     log('info', 'Order updated to paid status after payment intent succeeded', { order_id: order.id, payment_intent_id: paymentIntent.id });
 
     // Send order confirmation email
@@ -285,6 +225,7 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
       }
     }
   } catch (error: unknown) {
+    console.error('*** WEBHOOK ERROR: Exception in handlePaymentIntentSucceeded ***', error);
     log('error', 'Error handling payment intent succeeded', { error: error instanceof Error ? error.message : 'Unknown error' });
   }
 }
@@ -293,7 +234,7 @@ async function handlePaymentIntentFailed(event: Stripe.Event) {
   const paymentIntent = event.data.object as Stripe.PaymentIntent;
 
   try {
-    // Find the order by payment intent ID
+    // Find order by payment intent ID
     const { data: order, error } = await getSupabase()
       .from('orders')
       .select('*')
@@ -305,7 +246,7 @@ async function handlePaymentIntentFailed(event: Stripe.Event) {
       return;
     }
 
-    // Update the order status to 'failed'
+    // Update order status to 'failed'
     const { error: updateError } = await getSupabase()
       .from('orders')
       .update({ 
@@ -329,7 +270,7 @@ async function handleChargeFailed(event: Stripe.Event) {
   const charge = event.data.object as Stripe.Charge;
 
   try {
-    // Find the order by payment intent ID (charge object has payment_intent as a string)
+    // Find order by payment intent ID (charge object has payment_intent as a string)
     const paymentIntentId = typeof charge.payment_intent === 'string' ? charge.payment_intent : charge.payment_intent?.id;
 
     if (!paymentIntentId) {
@@ -348,7 +289,7 @@ async function handleChargeFailed(event: Stripe.Event) {
       return;
     }
 
-    // Update the order status to 'failed'
+    // Update order status to 'failed'
     const { error: updateError } = await getSupabase()
       .from('orders')
       .update({ 
