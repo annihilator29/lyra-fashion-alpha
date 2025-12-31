@@ -16,6 +16,10 @@ interface CheckoutData {
     price: number;
     quantity: number;
     image?: string;
+    variant?: {
+      size: string;
+      color: string;
+    };
   }>;
   shippingAddress: Record<string, unknown>;
   billingAddress: Record<string, unknown>;
@@ -277,7 +281,8 @@ const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
               id: item.productId,
               productId: item.productId,
               price: item.price, // Pass price in dollars (database expects DECIMAL(10,2))
-              quantity: item.quantity
+              quantity: item.quantity,
+              variant: item.variant
             })),
             shipping_address: checkoutData.shippingAddress,
             billing_address: checkoutData.billingAddress,

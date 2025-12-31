@@ -192,6 +192,7 @@ export default function CheckoutClient() {
                   price: item.price,
                   quantity: item.quantity,
                   image: item.imageUrl,
+                  variant: item.variant
                 })),
                 shippingAddress: {
                   name: checkoutData?.shipping_name,

@@ -46,9 +46,12 @@ export default function OrderDetailClient({ order }: OrderDetailClientProps) {
           images: product.images || [],
         };
 
-        const variant = {
-          size: item.variant?.size || 'M',
-          color: item.variant?.color || 'Natural',
+        const variant = item.variant ? {
+          size: item.variant.size || 'M',
+          color: item.variant.color || 'Natural',
+        } : {
+          size: 'M',
+          color: 'Natural',
         };
 
         // Add item to cart with specified quantity

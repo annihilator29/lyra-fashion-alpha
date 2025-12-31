@@ -114,10 +114,11 @@ export function CartSlideOver() {
                     className="flex gap-4 border-b pb-4 last:border-0"
                   >
                     <Link
-                      href={`/products/${item.slug}`}
+                      href={`/products/${(item.category && item.category !== 'undefined') ? item.category : 'products'}/${item.slug}`}
                       className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-lg bg-muted"
                       onClick={() => setIsOpen(false)}
                     >
+
                       <Image
                         src={item.imageUrl}
                         alt={item.name}
@@ -130,12 +131,13 @@ export function CartSlideOver() {
                     <div className="flex flex-1 flex-col justify-between">
                       <div>
                         <Link
-                          href={`/products/${item.slug}`}
+                          href={`/products/${(item.category && item.category !== 'undefined') ? item.category : 'products'}/${item.slug}`}
                           className="font-medium hover:underline"
                           onClick={() => setIsOpen(false)}
                         >
                           {item.name}
                         </Link>
+
                         <p className="text-sm text-muted-foreground">
                           {item.variant.size} / {item.variant.color}
                         </p>

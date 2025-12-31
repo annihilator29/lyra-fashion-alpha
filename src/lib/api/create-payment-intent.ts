@@ -40,6 +40,10 @@ interface CreatePaymentIntentParams {
     productId?: string;
     price: number;
     quantity: number;
+    variant?: {
+      size: string;
+      color: string;
+    };
   }>;
   shipping_address?: Record<string, unknown>;
   billing_address?: Record<string, unknown>;
@@ -192,6 +196,7 @@ export async function createPaymentIntent(
           product_id: item.productId || item.id,
           quantity: item.quantity,
           price: item.price, // Store in dollars as expected by database schema (DECIMAL(10,2))
+          variant: item.variant || null,
         };
       });
 
