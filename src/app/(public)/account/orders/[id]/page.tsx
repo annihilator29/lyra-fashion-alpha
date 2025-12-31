@@ -2,29 +2,28 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import OrderDetailHeader from '@/components/account/OrderDetailHeader';
+import OrderStatusTimeline from '@/components/account/OrderStatusTimeline';
 import OrderItemsList from '@/components/account/OrderItemsList';
 import ShippingAddressDisplay from '@/components/account/ShippingAddressDisplay';
-import OrderStatusTimeline from '@/components/account/OrderStatusTimeline';
 import TrackingLink from '@/components/account/TrackingLink';
+import OrderDetailClient from '@/components/account/OrderDetailClient';
 import type { OrderWithItems } from '@/types/order';
-import { reorderItems } from '@/app/account/actions';
 
-interface OrderDetailPageProps {
+interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function OrderDetailPage({ params }: OrderDetailPageProps) {
-  const { id } = await params;
+export default async function OrderDetailPage({ params }: PageProps) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     redirect('/login');
   }
 
-  // Fetch single order with all associated data
+  const { id } = await params;
+
+  // Fetch single order with items and products
   const { data: order, error } = await supabase
     .from('orders')
     .select(`
@@ -39,18 +38,19 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     .single();
 
   if (error || !order) {
+    console.error('Error fetching order:', error);
     return (
       <div className="max-w-4xl mx-auto p-6">
         <div className="rounded-lg border border-red-200 bg-red-50 p-8 text-center">
           <h2 className="text-xl font-semibold text-red-900 mb-2">
-            Order not found
+            Order Not Found
           </h2>
-          <p className="text-red-700 mb-6">
-            The order you&apos;re looking for doesn&apos;t exist or you don&apos;t have permission to view it.
+          <p className="text-red-700">
+            We couldn&apos;t find the order you&apos;re looking for. Please check your order history or contact support if the problem persists.
           </p>
           <Link
             href="/account/orders"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+            className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground hover:bg-primary/90 mt-4"
           >
             Back to Orders
           </Link>
@@ -59,90 +59,48 @@ export default async function OrderDetailPage({ params }: OrderDetailPageProps) 
     );
   }
 
-  return <OrderDetailContent order={order as OrderWithItems} />;
-}
-
-function OrderDetailContent({ order }: { order: OrderWithItems }) {
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Back Link */}
-      <div className="mb-6">
-        <Link
-          href="/account/orders"
-          className="inline-flex items-center text-sm text-blue-600 hover:text-blue-700 hover:underline"
-        >
-          ← Back to Orders
-        </Link>
-      </div>
+      <OrderDetailHeader order={order as OrderWithItems} />
 
-      {/* Header */}
-      <OrderDetailHeader order={order} />
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
-        <div className="lg:col-span-2 space-y-6">
-          {/* Order Items */}
-          <section>
-            <h2 className="text-lg font-semibold mb-4">Order Items</h2>
-            <OrderItemsList order={order} />
-          </section>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
+        {/* Status Timeline */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Order Status</h2>
+          <OrderStatusTimeline order={order as OrderWithItems} />
         </div>
 
+        {/* Order Details */}
         <div className="space-y-6">
-          {/* Status Timeline */}
-          <section>
-            <h2 className="text-lg font-semibold mb-4">Order Status</h2>
-            <OrderStatusTimeline order={order} />
-          </section>
-
           {/* Shipping Address */}
-          <section>
-            <h2 className="text-lg font-semibold mb-4">Shipping Address</h2>
-            <ShippingAddressDisplay address={order.shipping_address} />
-          </section>
+          {order.shipping_address && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Shipping Address</h2>
+              <ShippingAddressDisplay address={order.shipping_address} />
+            </div>
+          )}
+
+          {/* Order Items */}
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Order Items</h2>
+            <OrderItemsList order={order as OrderWithItems} />
+          </div>
 
           {/* Tracking Information */}
-          {order.tracking_number && (
-            <section>
-              <h2 className="text-lg font-semibold mb-4">Tracking Information</h2>
+          {(order.status === 'shipped' || order.status === 'delivered') && order.tracking_number && (
+            <div>
+              <h2 className="text-xl font-semibold mb-4">Track Your Package</h2>
               <TrackingLink
-                trackingNumber={order.tracking_number}
+                trackingNumber={order.tracking_number!}
                 carrier={order.carrier || undefined}
               />
-            </section>
+            </div>
           )}
+
+          {/* Actions */}
+          <OrderDetailClient order={order as OrderWithItems} />
         </div>
       </div>
-
-      {/* Reorder Section */}
-      <section className="mt-8 pt-8 border-t">
-        <ReorderForm orderId={order.id} />
-      </section>
-    </div>
-  );
-}
-
-async function ReorderForm({ orderId }: { orderId: string }) {
-  const result = await reorderItems(orderId);
-
-  if (result.error) {
-    return (
-      <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-        <p className="text-sm text-yellow-900">{result.error}</p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="rounded-lg border border-green-200 bg-green-50 p-4">
-      <p className="text-sm text-green-900">
-        Successfully added {result.data?.itemCount || 0} items to your cart!
-      </p>
-      <Link
-        href="/cart"
-        className="inline-flex items-center justify-center rounded-md bg-primary mt-3 px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-      >
-        View Cart
-      </Link>
     </div>
   );
 }

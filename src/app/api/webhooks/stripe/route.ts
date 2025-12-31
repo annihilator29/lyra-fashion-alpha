@@ -118,10 +118,12 @@ export async function POST(request: NextRequest) {
         await handleCheckoutSessionCompleted(event);
         break;
 
-      case 'payment_intent.succeeded':
-        // This event is fired when a payment intent is successful
-        await handlePaymentIntentSucceeded(event);
-        break;
+      // DISABLED: payment_intent.succeeded event is also firing, causing duplicate orders
+      // checkout.session.completed is sufficient and already updates the order
+      // case 'payment_intent.succeeded':
+      //   // This event is fired when a payment intent is successful
+      //   await handlePaymentIntentSucceeded(event);
+      //   break;
 
       case 'payment_intent.payment_failed':
         // This event is fired when a payment intent fails
@@ -153,35 +155,57 @@ async function handleCheckoutSessionCompleted(event: Stripe.Event) {
   const session = event.data.object as Stripe.Checkout.Session;
 
   try {
-    // Get the payment intent ID from session
+    // Get payment intent ID from session
     const paymentIntentId = session.payment_intent as string;
 
-    // Find the order by payment intent ID, including items
+    console.log('*** WEBHOOK DEBUG: Checkout Session Completed ***');
+    console.log('Payment Intent ID:', paymentIntentId);
+
+    // Find order by payment intent ID, including items
     const { data: order, error } = await getSupabase()
       .from('orders')
       .select('*, order_items(*, product:products(*))')
       .eq('stripe_payment_intent_id', paymentIntentId)
       .single();
 
-    if (error || !order) {
+    if (error) {
+      log('error', 'Order not found for payment intent', { payment_intent_id: paymentIntentId, error: error.message });
+      return;
+    }
+
+    if (!order) {
       log('error', 'Order not found for payment intent', { payment_intent_id: paymentIntentId });
       return;
     }
 
+    // Check if order is already paid (prevents duplicate updates)
+    if (order.status === 'paid') {
+      console.log('*** WEBHOOK DEBUG: Order already paid, skipping update ***');
+      log('info', 'Order already marked as paid', { order_id: order.id, order_number: order.order_number });
+      return;
+    }
+
+    const updateData = {
+      status: 'paid',
+      ordered_at: new Date().toISOString(), // Set ordered_at when payment is confirmed
+      updated_at: new Date().toISOString()
+    };
+
+    console.log('*** WEBHOOK DEBUG: Updating order ***', { order_id: order.id, update_data: updateData });
+
     const { error: updateError } = await getSupabase()
       .from('orders')
-      .update({
-        status: 'paid',
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', order.id);
 
     if (updateError) {
       console.error('Error updating order status:', updateError);
+      log('error', 'Failed to update order', { order_id: order.id, error: updateError.message });
       return;
     }
 
-    log('info', 'Order updated to paid status', { order_id: order.id, order_number: order.order_number, customer_id: order.customer_id });
+    console.log('*** WEBHOOK DEBUG: Order updated successfully ***', { order_id: order.id, ordered_at: updateData.ordered_at });
+    log('info', 'Order updated to paid status', { order_id: order.id, order_number: order.order_number, customer_id: order.customer_id, ordered_at: updateData.ordered_at });
 
     // Send order confirmation email
     if (!order.email_sent) {
@@ -227,8 +251,9 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
     // Update the order status to 'paid'
     const { error: updateError } = await getSupabase()
       .from('orders')
-      .update({ 
+      .update({
         status: 'paid',
+        ordered_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       })
       .eq('id', order.id);

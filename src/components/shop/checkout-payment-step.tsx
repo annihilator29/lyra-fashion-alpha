@@ -6,6 +6,7 @@ import { getStripe } from '@/lib/stripe';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { createClient } from '@/lib/supabase/client';
 
 interface CheckoutData {
   items: Array<{
@@ -212,7 +213,7 @@ const PaymentFormInner: React.FC<PaymentFormInnerProps> = ({
 };
 
 // Outer component - handles payment intent creation and Elements wrapper
-const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({ 
+const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
   checkoutData, 
   onPaymentSuccess, 
   onBack 
@@ -224,6 +225,11 @@ const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
   useEffect(() => {
     const createPaymentIntent = async () => {
       try {
+        // Get authenticated user ID
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const userId = user?.id || null;
+
         const response = await fetch('/api/create-payment-intent', {
           method: 'POST',
           headers: {
@@ -232,6 +238,7 @@ const CheckoutPaymentForm: React.FC<CheckoutPaymentStepProps> = ({
           body: JSON.stringify({
             amount: Math.round(checkoutData.total * 100), // Convert to cents
             currency: 'usd',
+            user_id: userId, // Pass authenticated user ID
             cart_items: checkoutData.items.map(item => ({
               id: item.productId, // Use product UUID
               price: Math.round(item.price * 100), // Convert price to cents

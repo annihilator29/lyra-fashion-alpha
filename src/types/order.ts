@@ -67,6 +67,7 @@ export interface OrderWithItems {
       id: string;
       name: string;
       slug: string;
+      category: string;
       images: string[];
       price: number;
     };

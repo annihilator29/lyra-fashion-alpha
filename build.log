@@ -1,0 +1,100 @@
+
+> lyra-fashion@0.1.0 build
+> next build
+
+   ▲ Next.js 15.5.7
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 3.3s
+   Linting and checking validity of types ...
+
+./src/app/(public)/account/orders/[id]/__tests__/page.test.tsx
+2:26  Warning: 'waitFor' is defined but never used.  @typescript-eslint/no-unused-vars
+174:13  Warning: 'container' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+261:13  Warning: 'container' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+313:13  Warning: 'container' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+365:13  Warning: 'container' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+378:13  Warning: 'toast' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+405:13  Warning: 'container' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+489:13  Warning: 'container' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+540:13  Warning: 'container' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/account/__tests__/actions.test.ts
+4:3  Warning: 'updatePreferences' is defined but never used.  @typescript-eslint/no-unused-vars
+7:3  Warning: 'deleteAvatar' is defined but never used.  @typescript-eslint/no-unused-vars
+9:3  Warning: 'updateShippingAddress' is defined but never used.  @typescript-eslint/no-unused-vars
+10:3  Warning: 'deleteShippingAddress' is defined but never used.  @typescript-eslint/no-unused-vars
+66:30  Warning: 'value' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/app/account/__tests__/orders-page.test.tsx
+1:10  Warning: 'render' is defined but never used.  @typescript-eslint/no-unused-vars
+40:11  Warning: 'mockOrders' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/account/OrderStatusTimeline.tsx
+4:10  Warning: 'ORDER_STATUS_CONFIG' is defined but never used.  @typescript-eslint/no-unused-vars
+53:25  Warning: 'index' is defined but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/account/PreferencesSection.tsx
+30:5  Warning: 'register' is assigned a value but never used.  @typescript-eslint/no-unused-vars
+
+./src/components/account/__tests__/AvatarUpload.test.tsx
+1:1  Warning: Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-explicit-any').
+
+./src/components/account/__tests__/ProfileForm.test.tsx
+1:1  Warning: Unused eslint-disable directive (no problems were reported from '@typescript-eslint/no-unused-vars').
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/app/api-reference/config/eslint#disabling-rules
+   Collecting page data ...
+   Generating static pages (0/32) ...
+   Generating static pages (8/32) 
+   Generating static pages (16/32) 
+   Generating static pages (24/32) 
+ ✓ Generating static pages (32/32)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ƒ /                                    1.33 kB         120 kB
+├ ○ /_not-found                             1 kB         103 kB
+├ ○ /account                               159 B         102 kB
+├ ○ /account/addresses                   4.49 kB         141 kB
+├ ○ /account/dashboard                   4.18 kB         183 kB
+├ ƒ /account/orders                        165 B         106 kB
+├ ƒ /account/orders/[id]                 2.13 kB         119 kB
+├ ƒ /account/profile                     7.39 kB         175 kB
+├ ○ /account/wishlist                      159 B         102 kB
+├ ƒ /api/create-payment-intent             159 B         102 kB
+├ ƒ /api/search                            159 B         102 kB
+├ ƒ /api/send-order-confirmation           159 B         102 kB
+├ ƒ /api/webhooks/stripe                   159 B         102 kB
+├ ƒ /auth-callback                         159 B         102 kB
+├ ○ /cart                                3.63 kB         125 kB
+├ ○ /checkout                            16.2 kB         180 kB
+├ ○ /checkout/success                    2.78 kB         119 kB
+├ ○ /design-system                       7.51 kB         162 kB
+├ ○ /login                               1.23 kB         233 kB
+├ ƒ /orders/[orderId]/confirmation        6.6 kB         135 kB
+├ ○ /products                              159 B         102 kB
+├ ● /products/[category]                 7.85 kB         164 kB
+├   ├ /products/dresses
+├   ├ /products/tops
+├   ├ /products/bottoms
+├   └ [+2 more paths]
+├ ƒ /products/[category]/[slug]          17.5 kB         219 kB
+├ ○ /register                              208 B         232 kB
+├ ○ /reset-password                      2.98 kB         225 kB
+├ ƒ /search                              1.33 kB         120 kB
+├ ƒ /test-db                               164 B         106 kB
+├ ○ /test-route                            159 B         102 kB
+└ ○ /update-password                     3.35 kB         222 kB
++ First Load JS shared by all             102 kB
+  ├ chunks/1255-404bb8de49c90395.js      45.8 kB
+  ├ chunks/4bd1b696-f785427dddbba9fb.js  54.2 kB
+  └ other shared chunks (total)          2.01 kB
+
+
+○  (Static)   prerendered as static content
+●  (SSG)      prerendered as static HTML (uses generateStaticParams)
+ƒ  (Dynamic)  server-rendered on demand
+

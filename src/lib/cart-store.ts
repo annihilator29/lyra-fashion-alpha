@@ -43,6 +43,7 @@ export const useCartStore = create<CartState>()(
               id: cartItemId,
               productId: product.id,
               slug: product.slug,
+              category: product.category,
               name: product.name,
               price: itemPrice,
               imageUrl: product.images[0] || '/images/placeholder.jpg',

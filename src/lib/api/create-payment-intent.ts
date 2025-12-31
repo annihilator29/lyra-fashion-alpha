@@ -1,4 +1,4 @@
-// This file contains the API logic for creating payment intents
+// This file contains API logic for creating payment intents
 // It's separated from the route handler for testability and reusability
 
 import Stripe from 'stripe';
@@ -11,7 +11,7 @@ const getStripe = () => {
     throw new Error('STRIPE_SECRET_KEY is not defined');
   }
   return new Stripe(key, {
-    typescript: true,
+    apiVersion: '2025-12-15.clover',
   });
 };
 
@@ -37,7 +37,7 @@ interface CreatePaymentIntentParams {
   user_id?: string;
   cart_items?: Array<{
     id: string;
-    productId?: string; // Product UUID (optional for compatibility)
+    productId?: string;
     price: number;
     quantity: number;
   }>;
@@ -57,47 +57,12 @@ interface PaymentIntentResponse {
   };
 }
 
-/**
- * Generates a unique order number in LF-{timestamp}-{random} format.
- * The timestamp is base-36 encoded and random is a 6-character base-36 string.
- *
- * @returns A unique order number string
- *
- * @example
- * ```typescript
- * generateOrderNumber(); // "LF-M45XY1-A8C3"
- * ```
- */
 function generateOrderNumber(): string {
   const timestamp = Date.now().toString(36).toUpperCase();
   const random = Math.random().toString(36).substring(2, 6).toUpperCase();
   return `LF-${timestamp}-${random}`;
 }
 
-/**
- * Creates a Stripe Payment Intent and initializes order records in Supabase.
- * Implements idempotency to prevent duplicate charges and validates payment amounts.
- *
- * @param params - Payment intent parameters including amount, items, and addresses
- * @returns Promise resolving to client secret and order info, or error
- *
- * @example
- * ```typescript
- * const result = await createPaymentIntent({
- *   amount: 5000, // $50.00 in cents
- *   currency: 'usd',
- *   cart_items: [{ id: 'prod-123', price: 2500, quantity: 2 }],
- *   shipping_address: { }, // details omitted
- * });
- *
- * if (result.error) {
- *   console.error(result.error.message);
- * } else {
- *   const { clientSecret, orderId, orderNumber } = result.data;
- *   console.log(`Created order ${orderNumber}`);
- * }
- * ```
- */
 export async function createPaymentIntent(
   params: CreatePaymentIntentParams
 ): Promise<PaymentIntentResponse> {
@@ -114,7 +79,11 @@ export async function createPaymentIntent(
       customer_email
     } = params;
 
-    // Validate required fields
+    console.log('*** PAYMENT INTENT DEBUG: Creating payment intent ***');
+    console.log('Amount (cents):', amount);
+    console.log('User ID:', user_id);
+    console.log('Cart items count:', cart_items?.length);
+
     if (!amount || typeof amount !== 'number' || amount <= 0) {
       return {
         error: {
@@ -123,56 +92,39 @@ export async function createPaymentIntent(
       };
     }
 
-    // Note: We don't validate cart_items total against amount because
-    // amount includes tax and shipping which aren't part of cart_items.
-    // The cart_items are used for creating order_items records.
-    // Future enhancement: send subtotal/tax/shipping separately for validation
-
-    // Generate idempotency key if not provided
     const idempotencyKey = providedIdempotencyKey || randomUUID();
+    const orderNumber = generateOrderNumber();
+    const totalInDollars = amount / 100;
 
-    // Check if an order with this idempotency key already exists
+    console.log('Generated order number:', orderNumber);
+    console.log('Idempotency key:', idempotencyKey);
+
     const { data: existingOrder } = await getSupabase()
       .from('orders')
-      .select('id, stripe_payment_intent_id, total, order_number')
+      .select('id, order_number, stripe_payment_intent_id, status')
       .eq('idempotency_key', idempotencyKey)
-      .single();
+      .maybeSingle();
 
     if (existingOrder) {
-      // Verify that the amount matches the existing order to prevent fraud
-      if (existingOrder.total !== amount) {
-        return {
-          error: {
-            message: 'Amount mismatch for existing idempotency key. This may indicate a security issue.'
-          }
-        };
-      }
+      console.log('*** PAYMENT INTENT DEBUG: Order already exists with this idempotency key ***');
+      console.log('Existing order ID:', existingOrder.id);
+      console.log('Existing order number:', existingOrder.order_number);
+      console.log('Existing payment intent ID:', existingOrder.stripe_payment_intent_id);
+      console.log('Existing status:', existingOrder.status);
 
-      // If an order with this idempotency key already exists, return the existing payment intent
-      try {
-        const existingPaymentIntent = await getStripe().paymentIntents.retrieve(
-          existingOrder.stripe_payment_intent_id
-        );
-
-        return {
-          data: {
-            clientSecret: existingPaymentIntent.client_secret!,
-            orderId: existingOrder.id,
-            orderNumber: existingOrder.order_number,
-          },
-        };
-      } catch (retrieveError) {
-        // If the payment intent doesn't exist in Stripe anymore, return an error
-        console.error('Existing payment intent not found in Stripe:', retrieveError);
-        return {
-          error: {
-            message: 'Existing payment intent not found. Please try again.'
-          }
-        };
-      }
+      return {
+        data: {
+          clientSecret: 'REUSED_ORDER',
+          orderId: existingOrder.id,
+          orderNumber: existingOrder.order_number!,
+        },
+      };
     }
 
-    // Create payment intent with idempotency key
+    console.log('*** PAYMENT INTENT DEBUG: Creating new order ***');
+    console.log('Total (cents):', amount);
+    console.log('Total (dollars):', totalInDollars);
+
     const paymentIntent = await getStripe().paymentIntents.create({
       amount,
       currency,
@@ -181,20 +133,18 @@ export async function createPaymentIntent(
         order_id: order_id || 'pending',
       },
     }, {
-      idempotencyKey: idempotencyKey,
+      idempotencyKey,
     });
 
-    // Generate order number
-    const orderNumber = generateOrderNumber();
+    console.log('*** PAYMENT INTENT DEBUG: Payment intent created ***');
+    console.log('Payment Intent ID:', paymentIntent.id);
 
-    // Create a temporary order record in the database with pending status
-    // This will be updated by the webhook when payment is confirmed
     const { data: newOrder, error: orderError } = await getSupabase()
       .from('orders')
       .insert({
-        customer_id: user_id || null, // Map user_id to customer_id column
+        customer_id: user_id || null,
         order_number: orderNumber,
-        total: amount,
+        total: totalInDollars,
         status: 'pending',
         idempotency_key: idempotencyKey,
         stripe_payment_intent_id: paymentIntent.id,
@@ -205,9 +155,12 @@ export async function createPaymentIntent(
       .select()
       .single();
 
+    console.log('*** PAYMENT INTENT DEBUG: Order created ***');
+    console.log('Order ID:', newOrder?.id);
+    console.log('Order number:', newOrder?.order_number);
+
     if (orderError) {
       console.error('Error creating order:', orderError);
-      // If order creation fails, we need to cancel the payment intent
       try {
         await getStripe().paymentIntents.cancel(paymentIntent.id);
       } catch (cancelError) {
@@ -221,14 +174,25 @@ export async function createPaymentIntent(
       };
     }
 
-    // Create order_items records for each cart item
+    console.log('*** PAYMENT INTENT DEBUG: Creating order items ***');
+
     if (cart_items && cart_items.length > 0) {
-      const orderItems = cart_items.map(item => ({
-        order_id: newOrder.id,
-        product_id: item.productId || item.id, // Prefer productId (UUID), fallback to id
-        quantity: item.quantity,
-        price: item.price,
-      }));
+      const orderItems = cart_items.map((item, index) => {
+        const priceInCents = Math.round(item.price * 100);
+        console.log(`Mapping item ${index + 1} (${item.productId || item.id}):`, {
+          productId: item.productId || item.id,
+          priceDollars: item.price,
+          priceCents: priceInCents,
+          quantity: item.quantity
+        });
+
+        return {
+          order_id: newOrder.id,
+          product_id: item.productId || item.id,
+          quantity: item.quantity,
+          price: priceInCents,
+        };
+      });
 
       const { error: itemsError } = await getSupabase()
         .from('order_items')
@@ -236,19 +200,26 @@ export async function createPaymentIntent(
 
       if (itemsError) {
         console.error('Error creating order items:', itemsError);
-        // Note: We don't cancel the order here as the order itself was created successfully
-        // The items can be recovered from cart data in session storage if needed
       }
+
+      console.log('*** PAYMENT INTENT DEBUG: Order items created ***');
+      console.log('Items created:', orderItems.length);
     }
 
-    // Return the client secret and order info for the frontend
-    return {
+    const response = {
       data: {
         clientSecret: paymentIntent.client_secret!,
         orderId: newOrder.id,
         orderNumber: orderNumber,
       },
     };
+
+    console.log('*** PAYMENT INTENT DEBUG: Returning response ***');
+    console.log('Client Secret:', response.data.clientSecret);
+    console.log('Order ID:', response.data.orderId);
+    console.log('Order Number:', response.data.orderNumber);
+
+    return response;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('Error creating payment intent:', error);

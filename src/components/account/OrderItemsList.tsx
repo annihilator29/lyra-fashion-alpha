@@ -52,14 +52,14 @@ export default function OrderItemsList({ order }: OrderItemsListProps) {
             )}
 
             <div className="flex items-center justify-between mt-2">
-              <div className="flex items-center gap-4 text-sm text-gray-600">
-                <span>Qty: {item.quantity}</span>
-                <span className="text-gray-400">•</span>
-                <span>{formatPrice(item.price)}</span>
-              </div>
-              <span className="font-semibold">
-                {formatPrice(item.price * item.quantity)}
-              </span>
+               <div className="flex items-center gap-4 text-sm text-gray-600">
+                 <span>Qty: {item.quantity}</span>
+                 <span className="text-gray-400">•</span>
+                 <span>{formatPrice(item.price)}</span>
+               </div>
+               <span className="font-semibold">
+                 {formatPrice(item.price * item.quantity)}
+               </span>
             </div>
           </div>
         </div>

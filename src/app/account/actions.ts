@@ -632,10 +632,10 @@ export async function reorderItems(orderId: string) {
   }
 
   try {
-    // Fetch order items with products
+    // Fetch order items with products and orders to verify ownership
     const { data: orderItems, error } = await supabase
       .from('order_items')
-      .select('*, products(*)')
+      .select('*, products(*), orders(customer_id)')
       .eq('order_id', orderId)
       .eq('orders.customer_id', user.id)
 
@@ -659,9 +659,7 @@ export async function reorderItems(orderId: string) {
       const availableQuantity = (inventory?.quantity || 0) - (inventory?.reserved || 0)
 
       if (availableQuantity > 0) {
-        // Add to cart - assuming cart is stored in database
-        // This would need to integrate with existing cart system from Story 3.1
-        // For now, we'll use a simple approach
+        // Add to cart - cart items stored in database (Story 3.1)
         const quantityToAdd = Math.min(item.quantity, availableQuantity)
 
         // Check if item already in cart

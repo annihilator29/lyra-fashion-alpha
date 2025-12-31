@@ -48,26 +48,26 @@ export default function CartPage() {
                 <div key={item.id} className="flex flex-col sm:flex-row gap-6 py-6 border-b last:border-0 last:pb-0 first:pt-0">
                   {/* Product Image */}
                   <div className="relative h-24 w-24 sm:h-32 sm:w-32 flex-shrink-0 overflow-hidden rounded-md border bg-muted">
-                    <Link href={`/products/${item.slug}`}>
-                        <Image
-                          src={item.imageUrl}
-                          alt={item.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                    </Link>
+                      <Link href={`/products/${item.category}/${item.slug}`}>
+                          <Image
+                              src={item.imageUrl}
+                              alt={item.name}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                      </Link>
                   </div>
 
                   {/* Product Details */}
                   <div className="flex flex-1 flex-col justify-between">
-                    <div className="flex justify-between items-start gap-4">
-                      <div>
-                        <h3 className="font-semibold text-lg">
-                          <Link href={`/products/${item.slug}`} className="hover:underline">
-                            {item.name}
-                          </Link>
-                        </h3>
+                      <div className="flex justify-between items-start gap-4">
+                          <div>
+                              <h3 className="font-semibold text-lg">
+                                  <Link href={`/products/${item.category}/${item.slug}`} className="hover:underline">
+                                      {item.name}
+                                  </Link>
+                              </h3>
                         <p className="text-sm text-muted-foreground mt-1">
                             {item.variant.size} / {item.variant.color}
                         </p>

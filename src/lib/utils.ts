@@ -6,8 +6,8 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Format a price in cents to a currency string
- * @param amount - Price in cents
+ * Format a price to a currency string
+ * @param amount - Price in dollars
  * @param currency - ISO currency code (default: USD)
  * @returns Formatted price string (e.g., "$19.99")
  */
@@ -16,4 +16,26 @@ export function formatPrice(amount: number, currency = 'USD'): string {
     style: 'currency',
     currency,
   }).format(amount);
+}
+
+/**
+ * Format a price in cents to a currency string
+ * @param amount - Price in cents
+ * @param currency - ISO currency code (default: USD)
+ * @returns Formatted price string (e.g., "$19.99")
+ */
+export function formatPriceCents(amount: number, currency = 'USD'): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+  }).format(amount / 100);
+}
+
+/**
+ * Convert price from cents to dollars
+ * @param amount - Price in cents
+ * @returns Price in dollars
+ */
+export function centsToDollars(amount: number): number {
+  return amount / 100;
 }
