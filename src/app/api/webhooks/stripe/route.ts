@@ -176,7 +176,26 @@ async function handlePaymentIntentSucceeded(event: Stripe.Event) {
 
     // Check if order is already paid (prevents duplicate updates)
     if (order.status === 'paid') {
-      console.log('*** WEBHOOK DEBUG: Order already paid, skipping update ***');
+      console.log('*** WEBHOOK DEBUG: Order already paid ***');
+      
+      // Safety check: ensure ordered_at is set even if status is paid
+      if (!order.ordered_at) {
+         console.log('*** WEBHOOK DEBUG: Order is paid but ordered_at is missing. Fixing... ***');
+         const { error: fixError } = await getSupabase()
+           .from('orders')
+           .update({ 
+             ordered_at: order.updated_at || new Date().toISOString(),
+             updated_at: new Date().toISOString() 
+           })
+           .eq('id', order.id);
+           
+         if (fixError) {
+            log('error', 'Failed to fix missing ordered_at', { error: fixError.message });
+         } else {
+            log('info', 'Fixed missing ordered_at for paid order', { order_id: order.id });
+         }
+      }
+
       log('info', 'Order already marked as paid', { order_id: order.id, order_number: order.order_number });
       return;
     }
