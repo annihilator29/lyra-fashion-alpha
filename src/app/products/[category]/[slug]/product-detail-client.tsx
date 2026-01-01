@@ -6,7 +6,11 @@ import { VariantSelector } from '@/components/shop/variant-selector';
 import { SizeGuideModal } from '@/components/shop/size-guide-modal';
 import { CraftsmanshipSection } from '@/components/transparency/craftsmanship-section';
 import { AddToCartButton } from '@/components/shop/add-to-cart-button';
+import { Heart } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { useCartStore } from '@/lib/cart-store';
+import { toast } from 'sonner';
+import { isInGuestWishlist, addToGuestWishlist, removeFromGuestWishlist } from '@/lib/wishlist-utils';
 import type { ProductWithVariants, ProductVariantRow, CraftsmanshipContent } from '@/types/product';
 
 interface ProductDetailClientProps {
@@ -28,6 +32,7 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product, craftsmanship }: ProductDetailClientProps) {
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantRow | null>(null);
     const [currentImages, setCurrentImages] = useState<string[]>(product.images || []);
+    const [isFavorited, setIsFavorited] = useState(() => isInGuestWishlist(product.id));
     const setCartOpen = useCartStore((state) => state.setIsOpen);
 
     // Handle variant-specific image changes
@@ -53,6 +58,25 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
 
     // Check if we can add to cart
     const canAddToCart = selectedVariant && selectedVariant.stock_quantity > 0;
+
+    // Handle favorite toggle with optimistic UI
+    const handleFavoriteClick = async () => {
+        const newFavoritedState = !isFavorited;
+        setIsFavorited(newFavoritedState);
+
+        try {
+            if (newFavoritedState) {
+                addToGuestWishlist(product.id);
+                toast.success('Added to wishlist');
+            } else {
+                removeFromGuestWishlist(product.id);
+                toast.success('Removed from wishlist');
+            }
+        } catch (error) {
+            setIsFavorited(isFavorited);
+            toast.error('Failed to update wishlist');
+        }
+    };
 
     return (
         <>
@@ -124,13 +148,34 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
                     )}
 
                     <div className="pt-2">
-                        <AddToCartButton
-                            product={product}
-                            selectedSize={selectedVariant?.size || null}
-                            selectedColor={selectedVariant?.color || null}
-                            price={displayPrice}
-                            onCartOpen={() => setCartOpen(true)}
-                        />
+                        <div className="flex gap-3">
+                            <AddToCartButton
+                                product={product}
+                                selectedSize={selectedVariant?.size || null}
+                                selectedColor={selectedVariant?.color || null}
+                                price={displayPrice}
+                                onCartOpen={() => setCartOpen(true)}
+                            />
+                            <button
+                                onClick={handleFavoriteClick}
+                                className={cn(
+                                    'flex h-14 flex-1 items-center justify-center rounded-lg',
+                                    'border border-input bg-background',
+                                    'hover:bg-accent hover:text-accent-foreground',
+                                    'transition-colors duration-200',
+                                    'focus:outline-none focus:ring-2 focus:ring-primary'
+                                )}
+                                aria-label={isFavorited ? 'Remove from wishlist' : 'Add to wishlist'}
+                            >
+                                <Heart
+                                    className={cn(
+                                        'h-6 w-6',
+                                        isFavorited ? 'fill-red-500 text-red-500' : 'text-gray-600'
+                                    )}
+                                    strokeWidth={isFavorited ? 0 : 2}
+                                />
+                            </button>
+                        </div>
                     </div>
 
                     {!canAddToCart && selectedVariant && (

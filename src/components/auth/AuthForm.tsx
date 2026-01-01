@@ -19,6 +19,8 @@ import { PasswordInput } from '@/components/auth/PasswordInput';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { migrateGuestWishlistItems } from '@/app/account/actions';
+import { getGuestWishlist, clearGuestWishlist } from '@/lib/wishlist-utils';
 
 const authSchema = z.object({
   email: z.string().email(),
@@ -116,6 +118,24 @@ export function AuthForm({ type }: AuthFormProps) {
         if (error) throw error;
 
         toast.success('Logged in successfully!');
+
+        // Migrate guest wishlist if exists
+        const guestWishlist = getGuestWishlist();
+        if (guestWishlist && guestWishlist.items.length > 0) {
+          try {
+            const result = await migrateGuestWishlistItems(guestWishlist.items);
+
+            if (result.error) {
+              console.error('Failed to migrate wishlist:', result.error);
+            } else if (result.data?.migratedCount && result.data.migratedCount > 0) {
+              toast.success(`${result.data.migratedCount} items added to your wishlist`);
+              clearGuestWishlist();
+            }
+          } catch (error) {
+            console.error('Wishlist migration error:', error);
+          }
+        }
+
         router.push('/account/dashboard');
         router.refresh();
 

@@ -701,3 +701,124 @@ export async function reorderItems(orderId: string) {
     return { error: 'Failed to reorder items', data: null }
   }
 }
+
+// ==========================
+// Wishlist Actions (Story4.4)
+// ==========================
+
+/**
+ * Add product to authenticated user's wishlist
+ * @param productId - Product ID to add
+ * @returns Result with success/error status
+ */
+export async function addToWishlist(productId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated', data: null }
+  }
+
+  try {
+    const { error } = await supabase
+      .from('wishlist_items')
+      .insert({
+        user_id: user.id,
+        product_id: productId,
+      })
+
+    if (error) {
+      // Check if it's a duplicate error (UNIQUE constraint)
+      if (error.message.includes('duplicate') || error.code === '23505') {
+        return { error: 'Item already in wishlist', data: null }
+      }
+      throw error
+    }
+
+    revalidatePath('/account/wishlist')
+
+    return { error: null, data: { success: true } }
+  } catch (err) {
+    console.error('Error adding to wishlist:', err)
+    return { error: 'Failed to add to wishlist', data: null }
+  }
+}
+
+/**
+ * Remove product from authenticated user's wishlist
+ * @param productId - Product ID to remove
+ * @returns Result with success/error status
+ */
+export async function removeFromWishlist(productId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated', data: null }
+  }
+
+  try {
+    const { error } = await supabase
+      .from('wishlist_items')
+      .delete()
+      .eq('user_id', user.id)
+      .eq('product_id', productId)
+
+    if (error) {
+      throw error
+    }
+
+    revalidatePath('/account/wishlist')
+
+    return { error: null, data: { success: true } }
+  } catch (err) {
+    console.error('Error removing from wishlist:', err)
+    return { error: 'Failed to remove from wishlist', data: null }
+  }
+}
+
+/**
+ * Migrate guest wishlist from client-side localStorage to database
+ * Called by AuthForm after successful login
+ * @param items - Array of product IDs from localStorage
+ * @returns Migration result
+ */
+export async function migrateGuestWishlistItems(items: string[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated', data: null }
+  }
+
+  if (!items || items.length === 0) {
+    return { error: null, data: { migratedCount: 0 } }
+  }
+
+  try {
+    let migratedCount = 0
+
+    for (const productId of items) {
+      const { error } = await supabase
+        .from('wishlist_items')
+        .insert({
+          user_id: user.id,
+          product_id: productId,
+        })
+
+      if (!error) {
+        migratedCount++
+      }
+      // If error due to UNIQUE constraint (already in wishlist), skip
+      // This can happen if user logged in, had some items, went to guest mode, then logged in again
+    }
+
+    revalidatePath('/account/wishlist')
+
+    return { error: null, data: { migratedCount } }
+  } catch (err) {
+    console.error('Error migrating guest wishlist:', err)
+    return { error: 'Failed to migrate wishlist', data: null }
+  }
+}
+

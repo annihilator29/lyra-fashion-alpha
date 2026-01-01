@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Menu, Search, User, LogOut } from 'lucide-react';
+import { Menu, Search, User, LogOut, Heart } from 'lucide-react';
 import { SearchAutocomplete } from '@/components/search/search-autocomplete';
 import { CartBadge } from '@/components/shop/cart-badge';
 import { CartSlideOver } from '@/components/shop/cart-slide-over';
@@ -149,6 +149,13 @@ export function Header({ className }: HeaderProps) {
                             >
                                 {customer?.name || 'Account'}
                             </Link>
+                            <Link
+                                href="/account/wishlist"
+                                className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
+                                aria-label="Go to wishlist"
+                            >
+                                <Heart className="h-5 w-5" />
+                            </Link>
                             <Button
                                 variant="ghost"
                                 size="icon"
@@ -269,6 +276,14 @@ export function Header({ className }: HeaderProps) {
                                                 <p className="text-xs text-muted-foreground">
                                                     {user.email}
                                                 </p>
+                                                <Link
+                                                    href="/account/wishlist"
+                                                    onClick={() => setIsMobileMenuOpen(false)}
+                                                    className="text-sm font-medium text-foreground"
+                                                    aria-label="Go to wishlist"
+                                                >
+                                                    Wishlist
+                                                </Link>
                                             </div>
                                         </div>
                                         <Button
