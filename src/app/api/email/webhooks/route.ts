@@ -122,6 +122,7 @@ async function processWebhookEvent(event: ResendWebhookEvent): Promise<boolean> 
   const supabase = await createClient();
 
   // Update sent_emails table based on event type
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const updates: any = {};
 
   switch (event.type) {
