@@ -6,6 +6,14 @@ import { revalidatePath } from 'next/cache'
 import { parsePhoneNumber, CountryCode } from 'libphonenumber-js'
 import { z } from 'zod'
 
+// Email preferences type for Story 4.5
+export interface EmailPreferences {
+  order_updates: boolean
+  new_products: boolean
+  sales: boolean
+  blog: boolean
+}
+
 // ==========================
 // Validation Schemas
 // ==========================
@@ -699,6 +707,71 @@ export async function reorderItems(orderId: string) {
   } catch (err) {
     console.error('Error reordering items:', err)
     return { error: 'Failed to reorder items', data: null }
+  }
+}
+
+// ==========================
+// Email Preferences Actions (Story4.5)
+// ==========================
+
+/**
+ * Update email marketing preferences (Story 4.5)
+ * @param preferences - Email preference flags
+ * @returns Result with success/error status
+ */
+export async function updateEmailPreferences(
+  preferences: EmailPreferences
+) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { error: 'Not authenticated', data: null }
+  }
+
+  try {
+    // Fetch current preferences
+    const { data: currentCustomer } = await supabase
+      .from('customers')
+      .select('email_preferences')
+      .eq('id', user.id)
+      .single()
+
+    if (!currentCustomer) {
+      return { error: 'Customer not found', data: null }
+    }
+
+    // Merge with existing preferences (only update provided keys)
+    const existingPreferences = (currentCustomer.email_preferences as Record<string, boolean>) || {
+      order_updates: true,
+      new_products: false,
+      sales: false,
+      blog: false,
+    }
+
+    const updatedPreferences = {
+      ...existingPreferences,
+      ...preferences,
+    }
+
+    // Update email_preferences column
+    const { error } = await supabase
+      .from('customers')
+      .update({ email_preferences: updatedPreferences })
+      .eq('id', user.id)
+      .select()
+      .single()
+
+    if (error) {
+      return { error: error.message, data: null }
+    }
+
+    revalidatePath('/account/email-preferences')
+
+    return { error: null, data: updatedPreferences }
+  } catch (err) {
+    console.error('Failed to update email preferences:', err)
+    return { error: 'Failed to update email preferences', data: null }
   }
 }
 

@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { User, Package, Heart, MapPin } from 'lucide-react'
+import { User, Package, Heart, MapPin, Mail } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { name: 'Orders', href: '/account/orders', icon: Package },
   { name: 'Wishlist', href: '/account/wishlist', icon: Heart },
   { name: 'Addresses', href: '/account/addresses', icon: MapPin },
+  { name: 'Email Preferences', href: '/account/email-preferences', icon: Mail },
 ]
 
 export default function AccountSidebar() {
