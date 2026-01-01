@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { ImageGallery } from '@/components/shop/image-gallery';
 import { VariantSelector } from '@/components/shop/variant-selector';
 import { SizeGuideModal } from '@/components/shop/size-guide-modal';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { useCartStore } from '@/lib/cart-store';
 import { toast } from 'sonner';
 import { isInGuestWishlist, addToGuestWishlist, removeFromGuestWishlist } from '@/lib/wishlist-utils';
+import { createClient } from '@/lib/supabase/client';
 import type { ProductWithVariants, ProductVariantRow, CraftsmanshipContent } from '@/types/product';
 
 interface ProductDetailClientProps {
@@ -32,8 +34,9 @@ interface ProductDetailClientProps {
 export function ProductDetailClient({ product, craftsmanship }: ProductDetailClientProps) {
     const [selectedVariant, setSelectedVariant] = useState<ProductVariantRow | null>(null);
     const [currentImages, setCurrentImages] = useState<string[]>(product.images || []);
-    const [isFavorited, setIsFavorited] = useState(() => isInGuestWishlist(product.id));
+    const [isFavorited, setIsFavorited] = useState(false);
     const setCartOpen = useCartStore((state) => state.setIsOpen);
+    const router = useRouter();
 
     // Handle variant-specific image changes
     const handleImageChange = useCallback((imageUrl: string | null) => {
@@ -61,22 +64,94 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
 
     // Handle favorite toggle with optimistic UI
     const handleFavoriteClick = async () => {
+        // Check authentication
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            toast.error('Please login first to manage your wishlist');
+            router.push('/login');
+            return;
+        }
+
         const newFavoritedState = !isFavorited;
         setIsFavorited(newFavoritedState);
 
+        // Guest user - use localStorage utilities
+        if (!user) {
+            try {
+                if (newFavoritedState) {
+                    addToGuestWishlist(product.id);
+                    toast.success('Added to wishlist');
+                } else {
+                    removeFromGuestWishlist(product.id);
+                    toast.success('Removed from wishlist');
+                }
+            } catch (error) {
+                setIsFavorited(isFavorited);
+                toast.error('Failed to update wishlist');
+            }
+            return;
+        }
+
+        // Authenticated user - call server action
         try {
+            const { addToWishlist, removeFromWishlist } = await import('@/app/account/actions');
+
             if (newFavoritedState) {
-                addToGuestWishlist(product.id);
-                toast.success('Added to wishlist');
+                const result = await addToWishlist(product.id);
+                if (result.error) {
+                    setIsFavorited(isFavorited);
+                    toast.error(result.error);
+                } else {
+                    toast.success('Added to wishlist');
+                }
             } else {
-                removeFromGuestWishlist(product.id);
-                toast.success('Removed from wishlist');
+                const result = await removeFromWishlist(product.id);
+                if (result.error) {
+                    setIsFavorited(isFavorited);
+                    toast.error(result.error);
+                } else {
+                    toast.success('Removed from wishlist');
+                }
             }
         } catch (error) {
             setIsFavorited(isFavorited);
             toast.error('Failed to update wishlist');
         }
     };
+
+    // Check actual wishlist status when component mounts
+    useEffect(() => {
+        const checkWishlistStatus = async () => {
+            try {
+                const supabase = createClient();
+                const { data: { user } } = await supabase.auth.getUser();
+
+                // Guest users: check localStorage
+                if (!user) {
+                    const inGuestWishlist = isInGuestWishlist(product.id);
+                    setIsFavorited(inGuestWishlist);
+                    return;
+                }
+
+                // Authenticated users: check database
+                const { data } = await supabase
+                    .from('wishlist_items')
+                    .select('id')
+                    .eq('user_id', user.id)
+                    .eq('product_id', product.id)
+                    .single();
+
+                setIsFavorited(!!data);
+            } catch (error) {
+                console.error('Error checking wishlist status:', error);
+                setIsFavorited(false);
+            }
+        };
+
+        checkWishlistStatus();
+    }, [product.id]);
 
     return (
         <>
@@ -160,7 +235,7 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
                                 onClick={handleFavoriteClick}
                                 className={cn(
                                     'flex h-14 flex-1 items-center justify-center rounded-lg',
-                                    'border border-input bg-background',
+                                    'bg-background',
                                     'hover:bg-accent hover:text-accent-foreground',
                                     'transition-colors duration-200',
                                     'focus:outline-none focus:ring-2 focus:ring-primary'

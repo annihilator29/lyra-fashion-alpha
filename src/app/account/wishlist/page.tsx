@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { WishlistGrid } from '@/components/account/wishlist-grid';
+import { WishlistPageClient } from './wishlist-page-client';
 import { EmptyWishlist } from '@/components/account/empty-wishlist';
 import type { Product } from '@/types/database.types';
 
@@ -72,7 +72,7 @@ export default async function WishlistPage() {
         {products.length === 0 ? (
           <EmptyWishlist />
         ) : (
-          <WishlistGrid products={products} />
+          <WishlistPageClient products={products} />
         )}
       </div>
     </div>

@@ -1,6 +1,8 @@
 'use client';
 
 import { Heart, Trash2, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useState } from 'react';
@@ -36,6 +38,9 @@ export function WishlistItem({
   className,
 }: WishlistItemProps) {
   const [isFavorited, setIsFavorited] = useState(() => isInGuestWishlist(product.id));
+
+  // Get product image URL
+  const imageUrl = product.images?.[0] || '/placeholder-product.jpg';
 
   // Price change detection
   const priceChanged = originalPrice !== undefined && originalPrice !== product.price;
@@ -105,10 +110,14 @@ export function WishlistItem({
       <div className="flex gap-3 sm:items-start sm:gap-4">
         {/* Product Image - Mobile/Tablet */}
         <div className="flex h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted sm:h-24 sm:w-24 md:hidden lg:flex lg:h-32 lg:w-32">
-          {/* TODO: Add Image component when wishlist items are implemented */}
-          <div className="flex h-full w-full items-center justify-center text-muted-foreground text-sm">
-            {product.name}
-          </div>
+          <Image
+            src={imageUrl}
+            alt={product.name}
+            fill
+            sizes="(max-width: 640px) 80px, (max-width: 1024px) 96px, 128px"
+            className="object-cover"
+            loading="lazy"
+          />
         </div>
 
         {/* Product Info */}
@@ -118,9 +127,12 @@ export function WishlistItem({
             <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               {product.category}
             </span>
-            <h3 className="font-serif text-base font-medium leading-tight text-foreground line-clamp-1">
+            <Link
+              href={`/products/${product.category}/${product.slug}`}
+              className="font-serif text-base font-medium leading-tight text-foreground line-clamp-1 hover:text-primary hover:underline transition-colors"
+            >
               {product.name}
-            </h3>
+            </Link>
           </div>
 
           {/* Price with Change Indicator */}

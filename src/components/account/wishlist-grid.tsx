@@ -5,10 +5,12 @@
 
 import { cn } from '@/lib/utils';
 import type { Product } from '@/types/database.types';
+import { WishlistCard } from './wishlist-card';
 
 interface WishlistGridProps {
   products: Product[];
   isLoading?: boolean;
+  onRemoved?: () => void; // Callback when an item is removed to refresh the page
   className?: string;
 }
 
@@ -20,15 +22,15 @@ interface WishlistGridProps {
  *
  * @example
  * ```tsx
- * <WishlistGrid products={products} />
+ * <WishlistGrid products={products} onRemoved={refresh} />
  * ```
  */
-export function WishlistGrid({ products, isLoading = false, className }: WishlistGridProps) {
+export function WishlistGrid({ products, isLoading = false, onRemoved, className }: WishlistGridProps) {
   return (
     <div
       className={cn(
         // Responsive grid layout from task requirements
-        'grid gap-6',
+        'grid gap-4',
         // Mobile: <640px - 1 column
         'grid-cols-1',
         // Tablet: 640-1024px - 2 columns
@@ -43,12 +45,18 @@ export function WishlistGrid({ products, isLoading = false, className }: Wishlis
         Array.from({ length: 4 }).map((_, i) => (
           <div
             key={i}
-            className="flex flex-col gap-4 p-4 rounded-lg bg-card border"
+            className="flex flex-col gap-3 p-4 rounded-lg bg-card border"
           >
             <div className="aspect-[3/4] w-full animate-pulse bg-muted rounded-md" />
-            <div className="h-6 w-3/4 animate-pulse bg-muted rounded-md" />
-            <div className="h-4 w-1/2 animate-pulse bg-muted rounded-md" />
-            <div className="mt-auto h-8 w-1/3 animate-pulse bg-muted rounded-md" />
+            <div className="space-y-1">
+              <div className="h-4 w-1/3 animate-pulse bg-muted rounded-md" />
+              <div className="h-6 w-3/4 animate-pulse bg-muted rounded-md" />
+              <div className="mt-2 h-8 w-1/2 animate-pulse bg-muted rounded-md" />
+            </div>
+            <div className="mt-auto flex gap-2">
+              <div className="h-10 flex-1 animate-pulse bg-muted rounded-md" />
+              <div className="h-10 flex-1 animate-pulse bg-muted rounded-md" />
+            </div>
           </div>
         ))
       ) : products.length === 0 ? (
@@ -56,36 +64,12 @@ export function WishlistGrid({ products, isLoading = false, className }: Wishlis
         null
       ) : (
         products.map((product) => (
-          <div
+          <WishlistCard
             key={product.id}
-            className="flex flex-col gap-4 p-4 rounded-lg bg-card border"
-          >
-            {/* Product Image */}
-            <div className="relative aspect-[3/4] w-full overflow-hidden rounded-md bg-muted">
-              {/* TODO: Add Image component when wishlist items are implemented */}
-              <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                Product Image
-              </div>
-            </div>
-
-            {/* Product Info */}
-            <div className="flex flex-1 flex-col gap-1">
-              {/* Category */}
-              <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                {product.category}
-              </span>
-
-              {/* Name */}
-              <h3 className="font-serif text-lg font-medium leading-tight text-foreground line-clamp-2">
-                {product.name}
-              </h3>
-
-              {/* Price */}
-              <p className="mt-auto pt-2 text-base font-semibold text-foreground">
-                ${product.price.toFixed(2)}
-              </p>
-            </div>
-          </div>
+            product={product}
+            isOutOfStock={false} // TODO: Check stock status when product variants are implemented
+            onRemoved={onRemoved}
+          />
         ))
       )}
     </div>
