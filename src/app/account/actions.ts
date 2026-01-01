@@ -46,12 +46,14 @@ const updateProfileSchema = z.object({
   avatar_url: z.string().url().optional().nullable().transform((value) => value ?? undefined),
 })
 
-const updatePreferencesSchema = z.object({
-  email_marketing: z.boolean(),
+ const updatePreferencesSchema = z.object({
+  // Email preferences (Story 4.5 - Granular controls)
   order_updates: z.boolean(),
   new_products: z.boolean(),
-  favorite_categories: z.array(z.string()),
-  size_profile: z.string().optional(),
+  sales: z.boolean(),
+  blog: z.boolean(),
+  favorite_categories: z.string(),
+  size_profile: z.string(),
 })
 
 const passwordChangeSchema = z.object({
@@ -176,9 +178,10 @@ export async function updatePreferences(formData: FormData) {
 
   try {
     const validatedData = updatePreferencesSchema.parse({
-      email_marketing: formData.get('email_marketing') === 'true',
       order_updates: formData.get('order_updates') === 'true',
       new_products: formData.get('new_products') === 'true',
+      sales: formData.get('sales') === 'true',
+      blog: formData.get('blog') === 'true',
       favorite_categories: JSON.parse(formData.get('favorite_categories') as string || '[]'),
       size_profile: formData.get('size_profile') || undefined,
     })
@@ -186,8 +189,9 @@ export async function updatePreferences(formData: FormData) {
     const preferences = {
       email: {
         order_updates: validatedData.order_updates,
-        marketing: validatedData.email_marketing,
         new_products: validatedData.new_products,
+        sales: validatedData.sales,
+        blog: validatedData.blog,
       },
       style: {
         favorite_categories: validatedData.favorite_categories,
