@@ -45,7 +45,7 @@ describe('ShippingAddressList', () => {
 
   beforeEach(() => {
     // Reset confirm mock before each test
-    global.confirm = jest.fn() as any
+    global.confirm = jest.fn() as jest.MockedFunction<typeof confirm>
   })
 
   afterEach(() => {

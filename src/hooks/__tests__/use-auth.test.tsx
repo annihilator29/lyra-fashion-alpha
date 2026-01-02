@@ -25,7 +25,7 @@ describe('useAuth', () => {
   let mockSupabase: MockSupabaseClient
   let mockAuthStateChange: jest.Mock
   let mockUnsubscribe: jest.Mock
-  let storedCallback: any = null
+  let storedCallback: ((event: string, session: { user?: { id: string; email: string; aud?: string; user_metadata?: Record<string, unknown> }; access_token?: string; expires_in?: number } | null) => void) | null = null
 
   beforeEach(() => {
     storedCallback = null
