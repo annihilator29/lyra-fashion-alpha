@@ -48,7 +48,7 @@ describe('PasswordChangeForm', () => {
     
     // Weak password
     fireEvent.change(newPasswordInput, { target: { value: 'weak' } })
-    expect(screen.getByText(/✗/)).toBeInTheDocument()
+    expect(screen.getAllByText(/✗/).length).toBeGreaterThan(0)
     
     // Strong password
     fireEvent.change(newPasswordInput, { target: { value: 'Strong123!' } })

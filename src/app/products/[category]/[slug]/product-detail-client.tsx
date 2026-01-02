@@ -87,7 +87,7 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
                     removeFromGuestWishlist(product.id);
                     toast.success('Removed from wishlist');
                 }
-            } catch (error) {
+            } catch {
                 setIsFavorited(isFavorited);
                 toast.error('Failed to update wishlist');
             }
@@ -115,7 +115,7 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
                     toast.success('Removed from wishlist');
                 }
             }
-        } catch (error) {
+        } catch {
             setIsFavorited(isFavorited);
             toast.error('Failed to update wishlist');
         }

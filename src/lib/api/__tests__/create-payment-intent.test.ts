@@ -47,6 +47,7 @@ const setupSupabaseMocks = (
   mockFrom.mockReturnValueOnce({
     select: jest.fn().mockReturnThis(),
     eq: jest.fn().mockReturnThis(),
+    maybeSingle: jest.fn().mockResolvedValue({ data: existingOrder, error: null }),
     single: jest.fn().mockResolvedValue({ data: existingOrder, error: existingOrder ? null : { code: 'PGRST116' } }),
   });
   

@@ -100,12 +100,12 @@ describe('OrderCard', () => {
   it('handles empty order items array', () => {
     const orderWithoutItems = { ...mockOrder, order_items: [] };
     render(<OrderCard order={orderWithoutItems} />);
-    expect(screen.getByText(/0/)).toBeInTheDocument();
+    expect(screen.getAllByText(/0/)[0]).toBeInTheDocument();
   });
 
   it('handles null order items', () => {
     const orderWithoutItems = { ...mockOrder, order_items: undefined };
     render(<OrderCard order={orderWithoutItems} />);
-    expect(screen.getByText(/0/)).toBeInTheDocument();
+    expect(screen.getAllByText(/0/)[0]).toBeInTheDocument();
   });
 });

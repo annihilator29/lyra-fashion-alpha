@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   updateProfile,
-  updatePreferences,
   changePassword,
   uploadAvatar,
-  deleteAvatar,
   createShippingAddress,
-  updateShippingAddress,
-  deleteShippingAddress,
   setDefaultShippingAddress,
   reorderItems,
 } from '../actions'
@@ -41,9 +37,9 @@ jest.mock('@/lib/supabase/server', () => ({
         eq: jest.fn(() => Promise.resolve({ error: null })),
       })),
       select: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          single: jest.fn(() => Promise.resolve({ data: {}, error: null })),
-        })),
+        eq: jest.fn().mockReturnThis(),
+        single: jest.fn(() => Promise.resolve({ data: {}, error: null })),
+        maybeSingle: jest.fn(() => Promise.resolve({ data: {}, error: null })),
       })),
     })),
     storage: {
@@ -63,7 +59,7 @@ jest.mock('next/cache', () => ({
 
 // Mock phone number validation
 jest.mock('libphonenumber-js', () => ({
-  parsePhoneNumber: jest.fn((value: string) => ({
+  parsePhoneNumber: jest.fn(() => ({
     isValid: () => true,
     format: () => '+15555551234',
   })),

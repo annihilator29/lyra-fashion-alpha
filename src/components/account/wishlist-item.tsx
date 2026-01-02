@@ -73,7 +73,7 @@ export function WishlistItem({
         removeFromGuestWishlist(product.id);
         toast.success('Removed from wishlist');
       }
-    } catch (error) {
+    } catch {
       setIsFavorited(isFavorited);
       toast.error('Failed to update wishlist');
     }
@@ -84,7 +84,7 @@ export function WishlistItem({
       removeFromGuestWishlist(product.id);
       toast.success('Removed from wishlist');
       onRemove?.(product.id);
-    } catch (error) {
+    } catch {
       toast.error('Failed to remove item');
     }
   };

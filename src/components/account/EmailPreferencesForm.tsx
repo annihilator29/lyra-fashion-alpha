@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, Check, Mail, AlertCircle } from 'lucide-react'
+import { Check, Mail, AlertCircle } from 'lucide-react'
 import { updateEmailPreferences, type EmailPreferences } from '@/app/account/actions'
 
 interface EmailPreferencesFormProps {

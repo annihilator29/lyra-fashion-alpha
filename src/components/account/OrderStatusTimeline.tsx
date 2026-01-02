@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckCircle2, Package, FileCheck, Truck } from 'lucide-react';
-import { ORDER_STATUS_CONFIG, type OrderStatus } from '@/types/order';
+import { type OrderStatus } from '@/types/order';
 
 interface OrderStatusTimelineProps {
   order: {
@@ -50,7 +50,7 @@ export default function OrderStatusTimeline({ order }: OrderStatusTimelineProps)
 
   return (
     <div className="space-y-4">
-      {steps.map((step, index) => (
+      {steps.map((step) => (
         <div key={step.label} className="flex items-start gap-4">
           <div
             className={`

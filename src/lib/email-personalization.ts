@@ -230,7 +230,7 @@ export async function getPersonalizedRecommendations(
   return recommendations
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
-    .map(({ categoryScore, subcategoryScore, score, price, ...rec }) => ({
+    .map(({ price, ...rec }) => ({
       id: rec.id,
       name: rec.name,
       imageUrl: rec.imageUrl,

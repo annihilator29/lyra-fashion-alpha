@@ -27,7 +27,6 @@ export default function PreferencesSection({ customer }: PreferencesSectionProps
   const stylePrefs = (preferences.style as Record<string, unknown>) || {}
 
   const {
-    register,
     handleSubmit,
     control,
     formState: { errors },

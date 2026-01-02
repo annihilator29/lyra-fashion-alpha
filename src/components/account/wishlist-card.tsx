@@ -1,6 +1,6 @@
 'use client';
 
-import { Trash2, ShoppingBag, ExternalLink } from 'lucide-react';
+import { Trash2, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
@@ -69,17 +69,6 @@ export function WishlistCard({
       console.error('Failed to remove item:', error);
       toast.error('Failed to remove item');
     }
-  };
-
-  const handleAddToCart = () => {
-    if (isOutOfStock) {
-      toast.error('This item is out of stock');
-      return;
-    }
-
-    // Redirect to product page instead of adding to cart directly
-    // User needs to select variants (size, color) before adding to cart
-    window.location.href = `/products/${product.category}/${product.slug}`;
   };
 
   return (

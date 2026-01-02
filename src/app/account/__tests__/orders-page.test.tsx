@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react/pure';
+import { screen } from '@testing-library/react/pure';
 import { redirect } from 'next/navigation';
 import OrdersPage from '../../(public)/account/orders/page';
 
@@ -11,6 +11,16 @@ jest.mock('@/lib/supabase/server', () => ({
     auth: {
       getUser: jest.fn(),
     },
+    from: jest.fn(() => ({
+      select: jest.fn(() => ({
+        eq: jest.fn(() => ({
+          order: jest.fn(() => ({
+            data: [],
+            error: null,
+          })),
+        })),
+      })),
+    })),
   })),
 }));
 
@@ -29,6 +39,13 @@ describe('OrdersPage', () => {
           data: { user: null },
         }),
       },
+      from: jest.fn(() => ({
+        select: jest.fn(() => ({
+          eq: jest.fn(() => ({
+            order: jest.fn().mockResolvedValue({ data: [], error: null }),
+          })),
+        })),
+      })),
     });
 
     await OrdersPage();
@@ -54,6 +71,13 @@ describe('OrdersPage', () => {
           data: { user: { id: 'user-123' } },
         }),
       },
+      from: jest.fn(() => ({
+        select: jest.fn(() => ({
+          eq: jest.fn(() => ({
+            order: jest.fn().mockResolvedValue({ data: mockOrders, error: null }),
+          })),
+        })),
+      })),
     });
 
     await OrdersPage();
@@ -69,6 +93,13 @@ describe('OrdersPage', () => {
           data: { user: { id: 'user-123' } },
         }),
       },
+      from: jest.fn(() => ({
+        select: jest.fn(() => ({
+          eq: jest.fn(() => ({
+            order: jest.fn().mockResolvedValue({ data: [], error: null }),
+          })),
+        })),
+      })),
     });
 
     await OrdersPage();

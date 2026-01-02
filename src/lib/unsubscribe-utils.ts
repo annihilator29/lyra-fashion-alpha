@@ -5,7 +5,6 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
-import type { UnsubscribeTokenType } from '@/types/email';
 
 /**
  * Generate unique unsubscribe token

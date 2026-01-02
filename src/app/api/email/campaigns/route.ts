@@ -6,8 +6,6 @@
 import { NextResponse } from 'next/server';
 import {
   createScheduledCampaign,
-  launchCampaign,
-  cancelCampaign,
   getScheduledCampaigns,
 } from '@/lib/email-scheduler';
 

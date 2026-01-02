@@ -26,7 +26,7 @@ interface ShipmentNotificationEmailProps {
 }
 
 export default function ShipmentNotificationEmail({
-  customerName = 'Customer',
+  // customerName = 'Customer',
   orderNumber,
   trackingNumber,
   carrier,

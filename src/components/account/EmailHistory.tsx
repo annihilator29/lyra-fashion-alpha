@@ -26,38 +26,38 @@ export default function EmailHistory() {
   const supabase = createClient()
 
   useEffect(() => {
-    fetchEmailHistory()
-  }, [])
+    async function fetchEmailHistory() {
+      try {
+        setLoading(true)
 
-  async function fetchEmailHistory() {
-    try {
-      setLoading(true)
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          toast.error('Please log in to view email history')
+          return
+        }
 
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
-        toast.error('Please log in to view email history')
-        return
+        const { data, error } = await supabase
+          .from('sent_emails')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('sent_at', { ascending: false })
+          .limit(50)
+
+        if (error) {
+          throw error
+        }
+
+        setEmails(data || [])
+      } catch (error) {
+        console.error('Failed to fetch email history:', error)
+        toast.error('Failed to load email history. Please try again.')
+      } finally {
+        setLoading(false)
       }
-
-      const { data, error } = await supabase
-        .from('sent_emails')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('sent_at', { ascending: false })
-        .limit(50)
-
-      if (error) {
-        throw error
-      }
-
-      setEmails(data || [])
-    } catch (error) {
-      console.error('Failed to fetch email history:', error)
-      toast.error('Failed to load email history. Please try again.')
-    } finally {
-      setLoading(false)
     }
-  }
+
+    fetchEmailHistory()
+  }, [supabase]) // Added supabase as dependency, function moved inside
 
   function toggleExpanded(id: string) {
     setExpandedIds((prev) => {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
@@ -31,7 +31,7 @@ interface ProductCardProps {
 export function ProductCard({ product, priority = false, className }: ProductCardProps) {
     const { name, slug, price, images, category, id } = product;
     const imageUrl = images?.[0] || '/placeholder-product.jpg';
-    const router = useRouter();
+    // const router = useRouter();
 
     // Optimistic favorite state
     const [isFavorited, setIsFavorited] = useState(false);
@@ -64,7 +64,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
                     removeFromGuestWishlist(id);
                     toast.success('Removed from wishlist');
                 }
-            } catch (error) {
+            } catch {
                 setIsFavorited(isFavorited);
                 toast.error('Failed to update wishlist');
             }
@@ -92,7 +92,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
                     toast.success('Removed from wishlist');
                 }
             }
-        } catch (error) {
+        } catch {
             setIsFavorited(isFavorited);
             toast.error('Failed to update wishlist');
         }

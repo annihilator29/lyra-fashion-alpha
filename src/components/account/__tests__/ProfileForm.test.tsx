@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import ProfileForm from '../ProfileForm'
 import type { Customer } from '@/types/database.types'
