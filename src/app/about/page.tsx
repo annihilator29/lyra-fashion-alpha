@@ -7,6 +7,7 @@ import { PhotoGallery } from '@/components/transparency/photo-gallery';
 import { TeamSection } from '@/components/transparency/team-section';
 import { CredentialsSection } from '@/components/transparency/credentials-section';
 import { ValuePropositionSection } from '@/components/transparency/value-proposition-section';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 export const metadata: Metadata = {
   title: 'About Lyra Fashion - Factory-Direct Quality',
@@ -56,23 +57,23 @@ export default function AboutPage() {
         <PhotoGallery
           images={[
             {
-              src: '/images/factory-1.png',
+              src: getStorageImageUrl('factory-1.png'),
               alt: 'Design process at Lyra Fashion factory',
             },
             {
-              src: '/images/factory-2.png',
+              src: getStorageImageUrl('factory-2.png'),
               alt: 'Cutting fabric for production',
             },
             {
-              src: '/images/factory-3.png',
+              src: getStorageImageUrl('factory-3.png'),
               alt: 'Skilled artisans at work',
             },
             {
-              src: '/images/factory-4.png',
+              src: getStorageImageUrl('factory-4.png'),
               alt: 'Sewing and assembly',
             },
             {
-              src: '/images/factory-5.png',
+              src: getStorageImageUrl('factory-5.png'),
               alt: 'Quality control inspection',
             },
             // Note: skipping factory-6 as generation failed, can add later

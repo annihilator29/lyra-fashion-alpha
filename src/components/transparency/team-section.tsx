@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { TeamMember } from '@/types/factory-story';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface TeamSectionProps {
   members?: TeamMember[];
@@ -10,25 +11,25 @@ const DEFAULT_MEMBERS: TeamMember[] = [
     name: 'Priya Sharma',
     role: 'Head Artisan',
     bio: 'With 15 years of experience in traditional textile craftsmanship, Priya leads our artisan team with precision and dedication to quality.',
-    photo: '/images/team-1.png',
+    photo: getStorageImageUrl('team-1.png'),
   },
   {
     name: 'Rajesh Kumar',
     role: 'Quality Assurance Lead',
     bio: 'Rajesh ensures every piece meets our exacting standards, overseeing the entire quality control process from start to finish.',
-    photo: '/images/team-2.png',
+    photo: getStorageImageUrl('team-2.png'),
   },
   {
     name: 'Anita Desai',
     role: 'Design Director',
     bio: 'Anita brings innovative design concepts to life, blending modern aesthetics with traditional craftsmanship techniques.',
-    photo: '/images/team-3.png',
+    photo: getStorageImageUrl('team-3.png'),
   },
   {
     name: 'Vikram Patel',
     role: 'Production Manager',
     bio: 'Vikram coordinates our entire production workflow, ensuring efficiency and maintaining our commitment to ethical manufacturing.',
-    photo: '/images/team-4.png',
+    photo: getStorageImageUrl('team-4.png'),
   },
 ];
 

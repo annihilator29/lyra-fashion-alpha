@@ -1,7 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
-import fs from 'fs';
-import path from 'path';
-import { loadEnvConfig } from '@next/env';
+/* eslint-disable */
+const { createClient } = require('@supabase/supabase-js');
+const fs = require('fs');
+const path = require('path');
+const { loadEnvConfig } = require('@next/env');
 
 // Load environment variables from .env.local
 const projectDir = process.cwd();

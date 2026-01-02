@@ -7,6 +7,7 @@ import { ProductCard } from '@/components/shop/product-card';
 import { ProductCardSkeleton } from '@/components/shop/product-card-skeleton';
 import { Button } from '@/components/ui/button';
 import type { Product } from '@/types/database.types';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 // ISR: Revalidate every hour
 export const revalidate = 3600;
@@ -87,7 +88,7 @@ function HeroSection() {
     <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden px-4 py-24 sm:px-6 lg:px-8">
       {/* Background Image */}
       <Image
-        src="/images/home-hero.png"
+        src={getStorageImageUrl('home-hero.png')}
         alt="Sustainable fashion collection"
         fill
         className="object-cover"
