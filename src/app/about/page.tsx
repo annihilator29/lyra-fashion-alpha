@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { HeroSection } from '@/components/layout/hero-section';
 import { FactoryTimeline } from '@/components/transparency/factory-timeline';
 import { PhotoGallery } from '@/components/transparency/photo-gallery';
+import { TeamSection } from '@/components/transparency/team-section';
 import { CredentialsSection } from '@/components/transparency/credentials-section';
 import { ValuePropositionSection } from '@/components/transparency/value-proposition-section';
 
@@ -78,6 +79,8 @@ export default function AboutPage() {
           ]}
         />
       </section>
+
+      <TeamSection />
 
       <CredentialsSection />
 

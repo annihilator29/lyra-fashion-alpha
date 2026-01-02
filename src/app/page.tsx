@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { createClient } from '@/lib/supabase/server';
+import Image from 'next/image';
 import { ProductCard } from '@/components/shop/product-card';
 import { ProductCardSkeleton } from '@/components/shop/product-card-skeleton';
 import { Button } from '@/components/ui/button';
@@ -83,44 +84,48 @@ async function getFeaturedProducts(): Promise<Product[]> {
 // Hero Section Component
 function HeroSection() {
   return (
-    <section className="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-4 py-24 sm:px-6 lg:px-8">
-      {/* Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-rose-50 via-white to-amber-50 dark:from-stone-900 dark:via-stone-950 dark:to-stone-900" />
-
-      {/* Decorative Circles */}
-      <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-gradient-to-br from-primary/10 to-primary/5 blur-3xl" />
-      <div className="absolute -bottom-24 -left-24 h-96 w-96 rounded-full bg-gradient-to-tr from-amber-200/20 to-rose-200/20 blur-3xl" />
-
-      {/* Background Pattern */}
-      <div className="pointer-events-none absolute inset-0 opacity-[0.03]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,_currentColor_1px,_transparent_1px)] bg-[length:32px_32px]" />
-      </div>
+    <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden px-4 py-24 sm:px-6 lg:px-8">
+      {/* Background Image */}
+      <Image
+        src="/images/home-hero.png"
+        alt="Sustainable fashion collection"
+        fill
+        className="object-cover"
+        priority
+        quality={90}
+      />
+      
+      {/* Overlay - adjusting opacity for text readability */}
+      <div className="absolute inset-0 bg-white/30 dark:bg-black/60 backdrop-blur-[1px]" />
+      
+      {/* Gradient Overlay for text contrast */}
+      <div className="absolute inset-0 bg-gradient-to-t from-white/80 via-white/40 to-transparent dark:from-black/80 dark:via-black/40" />
 
       <div className="relative z-10 mx-auto max-w-4xl text-center">
         {/* Tagline */}
-        <p className="mb-4 text-sm font-medium uppercase tracking-widest text-muted-foreground">
+        <p className="mb-4 text-sm font-medium uppercase tracking-widest text-[#3A3531] dark:text-neutral-200">
           Factory-Direct Fashion
         </p>
 
         {/* Main Heading */}
-        <h1 className="mb-6 font-serif text-4xl font-bold leading-tight tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+        <h1 className="mb-6 font-serif text-5xl font-bold leading-tight tracking-tight text-[#3A3531] dark:text-white sm:text-6xl lg:text-7xl drop-shadow-sm">
           Thoughtfully Crafted,
           <br />
-          <span className="text-primary">Artisan Quality</span>
+          <span className="text-[#4A5F4B] dark:text-[#7A9B7C]">Artisan Quality</span>
         </h1>
 
         {/* Description */}
-        <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-muted-foreground sm:text-xl">
+        <p className="mx-auto mb-10 max-w-2xl text-lg leading-relaxed text-[#3A3531]/90 dark:text-neutral-200 sm:text-xl font-medium">
           Discover women&apos;s fashion that bridges the gap between factory and wardrobe.
           Every piece tells a story of craftsmanship, transparency, and exceptional value.
         </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-          <Button asChild size="lg" className="min-w-[200px]">
+          <Button asChild size="lg" className="min-w-[200px] bg-[#4A5F4B] hover:bg-[#7A9B7C] text-white border-none shadow-lg hover:shadow-xl transition-all">
             <Link href="/products">Shop Collection</Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="min-w-[200px]">
+          <Button asChild variant="outline" size="lg" className="min-w-[200px] bg-white/80 hover:bg-white backdrop-blur-sm border-[#4A5F4B] text-[#4A5F4B] hover:text-[#3A3531]">
             <Link href="/about">Our Story</Link>
           </Button>
         </div>

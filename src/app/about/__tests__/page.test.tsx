@@ -14,6 +14,10 @@ jest.mock('@/components/transparency/photo-gallery', () => ({
   PhotoGallery: () => <div data-testid="photo-gallery">Gallery</div>,
 }));
 
+jest.mock('@/components/transparency/team-section', () => ({
+  TeamSection: () => <div data-testid="team-section">Team</div>,
+}));
+
 jest.mock('@/components/transparency/credentials-section', () => ({
   CredentialsSection: () => <div data-testid="credentials-section">Credentials</div>,
 }));
@@ -36,6 +40,11 @@ describe('About Page', () => {
   it('renders the photo gallery', () => {
     render(<AboutPage />);
     expect(screen.getByTestId('photo-gallery')).toBeInTheDocument();
+  });
+
+  it('renders team section', () => {
+    render(<AboutPage />);
+    expect(screen.getByTestId('team-section')).toBeInTheDocument();
   });
 
   it('contains appropriate heading', () => {

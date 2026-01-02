@@ -12,19 +12,19 @@ describe('FactoryTimeline', () => {
   it('renders all timeline stages', () => {
     render(<FactoryTimeline stages={mockStages} />);
 
-    expect(screen.getAllByText('Design')).toHaveLength(2); // Mobile + desktop
-    expect(screen.getAllByText('Cutting')).toHaveLength(2);
-    expect(screen.getAllByText('Sewing')).toHaveLength(2);
-    expect(screen.getAllByText('Finishing')).toHaveLength(2);
+    expect(screen.getAllByText('Design')).toHaveLength(1);
+    expect(screen.getAllByText('Cutting')).toHaveLength(1);
+    expect(screen.getAllByText('Sewing')).toHaveLength(1);
+    expect(screen.getAllByText('Finishing')).toHaveLength(1);
   });
 
   it('renders stage descriptions', () => {
     render(<FactoryTimeline stages={mockStages} />);
 
-    expect(screen.getAllByText('Initial design and pattern creation')).toHaveLength(2);
-    expect(screen.getAllByText('Precision cutting of fabric pieces')).toHaveLength(2);
-    expect(screen.getAllByText('Expert assembly by skilled artisans')).toHaveLength(2);
-    expect(screen.getAllByText('Quality control and final touches')).toHaveLength(2);
+    expect(screen.getAllByText('Initial design and pattern creation')).toHaveLength(1);
+    expect(screen.getAllByText('Precision cutting of fabric pieces')).toHaveLength(1);
+    expect(screen.getAllByText('Expert assembly by skilled artisans')).toHaveLength(1);
+    expect(screen.getAllByText('Quality control and final touches')).toHaveLength(1);
   });
 
   it('renders timeline with correct structure', () => {
