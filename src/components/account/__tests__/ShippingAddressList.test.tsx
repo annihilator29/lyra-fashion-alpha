@@ -43,6 +43,16 @@ describe('ShippingAddressList', () => {
     },
   ]
 
+  beforeEach(() => {
+    // Reset confirm mock before each test
+    global.confirm = jest.fn() as any
+  })
+
+  afterEach(() => {
+    // Clean up confirm mock after each test
+    jest.clearAllMocks()
+  })
+
   it('renders empty state when no addresses', () => {
     render(<ShippingAddressList addresses={[]} />)
     

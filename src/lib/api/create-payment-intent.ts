@@ -105,17 +105,60 @@ export async function createPaymentIntent(
 
     const { data: existingOrder } = await getSupabase()
       .from('orders')
-      .select('id, order_number, stripe_payment_intent_id, status')
+      .select('id, order_number, stripe_payment_intent_id, status, total')
       .eq('idempotency_key', idempotencyKey)
       .maybeSingle();
 
     if (existingOrder) {
+      // Validate amount matches existing order
+      if (existingOrder.total && existingOrder.total !== totalInDollars) {
+        console.log('*** PAYMENT INTENT DEBUG: Amount mismatch detected ***');
+        console.log('Existing total:', existingOrder.total);
+        console.log('New total:', totalInDollars);
+
+        return {
+          error: {
+            message: 'Amount mismatch for existing idempotency key. This may indicate a security issue.'
+          }
+        };
+      }
       console.log('*** PAYMENT INTENT DEBUG: Order already exists with this idempotency key ***');
       console.log('Existing order ID:', existingOrder.id);
       console.log('Existing order number:', existingOrder.order_number);
       console.log('Existing payment intent ID:', existingOrder.stripe_payment_intent_id);
       console.log('Existing status:', existingOrder.status);
 
+      // Fetch the existing payment intent from Stripe to return its client secret
+      if (existingOrder.stripe_payment_intent_id) {
+        try {
+          const paymentIntent = await getStripe().paymentIntents.retrieve(
+            existingOrder.stripe_payment_intent_id
+          );
+
+          console.log('*** PAYMENT INTENT DEBUG: Retrieved existing payment intent ***');
+          console.log('Payment intent client secret:', paymentIntent.client_secret);
+
+          return {
+            data: {
+              clientSecret: paymentIntent.client_secret || 'REUSED_ORDER',
+              orderId: existingOrder.id,
+              orderNumber: existingOrder.order_number!,
+            },
+          };
+        } catch (stripeError) {
+          console.error('Error fetching existing payment intent:', stripeError);
+          // Fallback to marker if Stripe fetch fails
+          return {
+            data: {
+              clientSecret: 'REUSED_ORDER',
+              orderId: existingOrder.id,
+              orderNumber: existingOrder.order_number!,
+            },
+          };
+        }
+      }
+
+      // Fallback for orders without payment intent ID
       return {
         data: {
           clientSecret: 'REUSED_ORDER',

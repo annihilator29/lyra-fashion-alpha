@@ -25,11 +25,14 @@ describe('useAuth', () => {
   let mockSupabase: MockSupabaseClient
   let mockAuthStateChange: jest.Mock
   let mockUnsubscribe: jest.Mock
+  let storedCallback: any = null
 
   beforeEach(() => {
+    storedCallback = null
+
     mockAuthStateChange = jest.fn((callback) => {
-      // Immediately call callback with null session (unauthenticated)
-      callback('INITIAL_SESSION', null)
+      // Store callback for later invocation
+      storedCallback = callback
 
       // Return mock subscription object
       const subscription = {
@@ -43,7 +46,12 @@ describe('useAuth', () => {
     mockSupabase = {
       auth: {
         onAuthStateChange: mockAuthStateChange,
-        signOut: jest.fn(),
+        signOut: jest.fn(async () => {
+          // Simulate Supabase signOut triggering state change
+          if (storedCallback) {
+            await storedCallback('SIGNED_OUT', null)
+          }
+        }),
       },
     }
 
@@ -58,6 +66,7 @@ describe('useAuth', () => {
     it('initializes with loading state true', () => {
       const { result } = renderHook(() => useAuth())
 
+      // Loading should be true initially
       expect(result.current.loading).toBe(true)
       expect(result.current.user).toBeNull()
       expect(result.current.session).toBeNull()
@@ -182,10 +191,45 @@ describe('useAuth', () => {
   })
 
   describe('Sign Out', () => {
-    it('provides signOut function', () => {
+    it('clears user state after signOut', async () => {
+      const mockUser = {
+        id: 'user-123',
+        email: 'test@example.com',
+        aud: 'authenticated',
+      }
+      const mockSession = {
+        user: mockUser,
+        access_token: 'mock-token',
+        expires_in: 3600,
+      }
+
+      // Override mock to simulate authenticated state
+      mockAuthStateChange = jest.fn((callback) => {
+        storedCallback = callback
+
+        const subscription = {
+          data: { subscription: { unsubscribe: mockUnsubscribe } },
+        }
+
+        callback('SIGNED_IN', mockSession)
+        return subscription
+      })
+
+      mockSupabase.auth.onAuthStateChange = mockAuthStateChange
+
       const { result } = renderHook(() => useAuth())
 
-      expect(typeof result.current.signOut).toBe('function')
+      await waitFor(() => {
+        expect(result.current.user).toEqual(mockUser)
+      })
+
+      await act(async () => {
+        await result.current.signOut()
+      })
+
+      await waitFor(() => {
+        expect(result.current.user).toBeNull()
+      })
     })
 
     it('calls supabase signOut when signOut is invoked', async () => {
@@ -256,19 +300,15 @@ describe('useAuth', () => {
         expires_in: 3600,
       }
 
-      let callCount = 0
+      // Override mock to simulate authenticated state
       mockAuthStateChange = jest.fn((callback) => {
+        storedCallback = callback
+
         const subscription = {
           data: { subscription: { unsubscribe: mockUnsubscribe } },
         }
 
-        if (callCount === 0) {
-          callback('SIGNED_IN', mockSession)
-        } else {
-          callback('SIGNED_OUT', null)
-        }
-
-        callCount++
+        callback('SIGNED_IN', mockSession)
         return subscription
       })
 
@@ -338,19 +378,15 @@ describe('useAuth', () => {
         expires_in: 3600,
       }
 
-      let callCount = 0
+      // Override mock to simulate session refresh
       mockAuthStateChange = jest.fn((callback) => {
+        storedCallback = callback
+
         const subscription = {
           data: { subscription: { unsubscribe: mockUnsubscribe } },
         }
 
-        if (callCount === 0) {
-          callback('SIGNED_IN', initialSession)
-        } else if (callCount === 1) {
-          callback('TOKEN_REFRESHED', updatedSession)
-        }
-
-        callCount++
+        callback('SIGNED_IN', initialSession)
         return subscription
       })
 
@@ -364,9 +400,8 @@ describe('useAuth', () => {
 
       // Simulate token refresh
       act(() => {
-        const callbacks = mockAuthStateChange.mock.calls
-        if (callbacks.length > 0) {
-          callbacks[0][0](updatedSession)
+        if (storedCallback) {
+          storedCallback('TOKEN_REFRESHED', updatedSession)
         }
       })
 

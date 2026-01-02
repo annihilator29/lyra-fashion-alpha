@@ -437,12 +437,12 @@ export async function createShippingAddress(formData: FormData) {
     const validatedData = shippingAddressSchema.parse({
       name: formData.get('name'),
       address_line1: formData.get('address_line1'),
-      address_line2: formData.get('address_line2'),
+      address_line2: formData.get('address_line2') || undefined,
       city: formData.get('city'),
-      state: formData.get('state'),
+      state: formData.get('state') || undefined,
       postal_code: formData.get('postal_code'),
       country: formData.get('country'),
-      phone: formData.get('phone'),
+      phone: formData.get('phone') || undefined,
       is_default: formData.get('is_default') === 'true',
     })
 
@@ -497,12 +497,12 @@ export async function updateShippingAddress(id: string, formData: FormData) {
     const validatedData = shippingAddressSchema.parse({
       name: formData.get('name'),
       address_line1: formData.get('address_line1'),
-      address_line2: formData.get('address_line2'),
+      address_line2: formData.get('address_line2') || undefined,
       city: formData.get('city'),
-      state: formData.get('state'),
+      state: formData.get('state') || undefined,
       postal_code: formData.get('postal_code'),
       country: formData.get('country'),
-      phone: formData.get('phone'),
+      phone: formData.get('phone') || undefined,
       is_default: formData.get('is_default') === 'true',
     })
 

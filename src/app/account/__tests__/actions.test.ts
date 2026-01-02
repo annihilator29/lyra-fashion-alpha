@@ -21,13 +21,20 @@ jest.mock('@/lib/supabase/server', () => ({
       signOut: jest.fn(),
     },
     from: jest.fn(() => ({
-      update: jest.fn(() => ({
-        eq: jest.fn(() => ({
-          select: jest.fn(() => ({
-            single: jest.fn(() => Promise.resolve({ data: {}, error: null })),
-          })),
+        update: jest.fn((data) => ({
+          eq: jest.fn((field) => {
+            // First update (unset defaults) - return promise directly
+            if (field === 'customer_id') {
+              return Promise.resolve({ error: null });
+            }
+            // Second update (set new default) - return chain
+            return {
+              eq: jest.fn().mockReturnThis(),
+              select: jest.fn().mockReturnThis(),
+              single: jest.fn(() => Promise.resolve({ data: { ...data, id: 'addr-123' }, error: null })),
+            };
+          }),
         })),
-      })),
       insert: jest.fn(() => ({
         select: jest.fn(() => ({
           single: jest.fn(() => Promise.resolve({ data: {}, error: null })),
@@ -217,13 +224,17 @@ describe('Account Server Actions', () => {
         auth: {
           getUser: jest.fn(() => Promise.resolve({ data: { user: { id: 'user-123' } }, error: null })),
         },
-        from: jest.fn(() => ({
-          select: jest.fn(() => ({
-            eq: jest.fn(() => ({
-              maybeSingle: jest.fn(() => Promise.resolve({ data: null, error: { message: 'Order not found' } })),
-            })),
-          })),
-        })),
+        from: jest.fn((table: string) => {
+          if (table === 'order_items') {
+            const builder: any = {};
+            builder.select = jest.fn().mockReturnThis();
+            builder.eq = jest.fn().mockReturnThis();
+            builder.eq = jest.fn().mockReturnThis();
+            builder.maybeSingle = jest.fn(() => Promise.resolve({ data: null, error: { message: 'Order not found' } }));
+            return builder;
+          }
+          return {};
+        }),
       }
       jest.mocked(createClient).mockReturnValueOnce(mockSupabase as any)
 
@@ -239,18 +250,49 @@ describe('Account Server Actions', () => {
         auth: {
           getUser: jest.fn(() => Promise.resolve({ data: { user: { id: 'user-123' } }, error: null })),
         },
-        from: jest.fn(() => ({
-          select: jest.fn(() => ({
-            eq: jest.fn(() => ({
-              maybeSingle: jest.fn(() => Promise.resolve({
-                data: [{ id: 'item-1' }],
-                error: null,
+        from: jest.fn((table: string) => {
+          if (table === 'order_items') {
+            let eqCalls = 0;
+            const builder: any = {};
+            builder.select = jest.fn().mockReturnThis();
+            builder.eq = jest.fn().mockImplementation(() => {
+              eqCalls++;
+              // After two eq() calls, return the data directly
+              // This mimics Supabase auto-executing the query
+              if (eqCalls === 2) {
+                return Promise.resolve({
+                  data: [{ id: 'item-1', quantity: 1, product_id: 'prod-1', products: { id: 'prod-1' } }],
+                  error: null,
+                });
+              }
+              return builder;
+            });
+            return builder;
+          }
+          if (table === 'inventory') {
+             return {
+               select: jest.fn(() => ({
+                 eq: jest.fn(() => ({
+                   single: jest.fn(() => Promise.resolve({ data: { quantity: 10, reserved: 0 }, error: null })),
+                 })),
+               })),
+             };
+          }
+          if (table === 'cart_items') {
+            return {
+              select: jest.fn(() => ({
+                eq: jest.fn(() => ({
+                  eq: jest.fn(() => ({
+                    maybeSingle: jest.fn(() => Promise.resolve({ data: null, error: null })),
+                  })),
+                })),
               })),
-            })),
-          })),
-          insert: jest.fn(() => Promise.resolve({ error: null, data: { id: 'cart-item-1' } })),
-          update: jest.fn(() => Promise.resolve({ error: null })),
-        })),
+              insert: jest.fn(() => Promise.resolve({ error: null, data: { id: 'cart-item-1' } })),
+              update: jest.fn(() => Promise.resolve({ error: null })),
+            };
+          }
+          return {};
+        }),
       }
       jest.mocked(createClient).mockReturnValueOnce(mockSupabase as any)
 
