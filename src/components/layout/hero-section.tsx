@@ -18,7 +18,7 @@ export function HeroSection({ title, subtitle, image, cta }: HeroSectionProps) {
       <div className="container mx-auto px-4">
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="flex-1 space-y-6">
-            <h2 className="text-4xl md:text-5xl lg:text-6xl font-playfair font-bold text-[#3A3531]">
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold text-[#3A3531]">
               {title}
             </h2>
             <p className="text-lg md:text-xl text-[#3A3531]/80 max-w-2xl">

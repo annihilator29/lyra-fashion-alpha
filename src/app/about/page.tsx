@@ -26,7 +26,7 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen">
       <section className="container mx-auto px-4 py-12 md:py-20">
-        <h1 className="text-4xl md:text-6xl font-playfair font-bold mb-8 text-center text-[#3A3531]">
+        <h1 className="text-4xl md:text-6xl font-serif font-bold mb-8 text-center text-[#3A3531]">
           Factory-Direct Quality
         </h1>
       </section>
@@ -34,7 +34,7 @@ export default function AboutPage() {
       <HeroSection
         title="Factory-Direct Quality, Every Time"
         subtitle="Experience authentic craftsmanship, transparent production, and fair pricing"
-        image="/images/factory-hero.jpg"
+        image="/images/factory-hero.png"
         cta={{
           text: 'Explore Our Process',
           link: '#timeline',
@@ -42,42 +42,39 @@ export default function AboutPage() {
       />
 
       <section id="timeline" className="container mx-auto px-4 py-12 md:py-20">
-        <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-8 text-center text-[#3A3531]">
+        <h2 className="text-3xl md:text-4xl font-serif font-bold mb-8 text-center text-[#3A3531]">
           Our Production Process
         </h2>
         <FactoryTimeline />
       </section>
 
       <section className="container mx-auto px-4 py-12 md:py-20">
-        <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-8 text-center text-[#3A3531]">
+        <h2 className="text-3xl md:text-4xl font-serif font-bold mb-8 text-center text-[#3A3531]">
           Behind the Seams
         </h2>
         <PhotoGallery
           images={[
             {
-              src: '/images/factory-1.jpg',
+              src: '/images/factory-1.png',
               alt: 'Design process at Lyra Fashion factory',
             },
             {
-              src: '/images/factory-2.jpg',
+              src: '/images/factory-2.png',
               alt: 'Cutting fabric for production',
             },
             {
-              src: '/images/factory-3.jpg',
+              src: '/images/factory-3.png',
               alt: 'Skilled artisans at work',
             },
             {
-              src: '/images/factory-4.jpg',
+              src: '/images/factory-4.png',
               alt: 'Sewing and assembly',
             },
             {
-              src: '/images/factory-5.jpg',
+              src: '/images/factory-5.png',
               alt: 'Quality control inspection',
             },
-            {
-              src: '/images/factory-6.jpg',
-              alt: 'Finished products ready for shipping',
-            },
+            // Note: skipping factory-6 as generation failed, can add later
           ]}
         />
       </section>
@@ -87,7 +84,7 @@ export default function AboutPage() {
       <ValuePropositionSection />
 
       <section className="container mx-auto px-4 py-12 md:py-20 bg-[#F5F3F0]">
-        <h2 className="text-3xl md:text-4xl font-playfair font-bold mb-12 text-center text-[#3A3531]">
+        <h2 className="text-3xl md:text-4xl font-serif font-bold mb-12 text-center text-[#3A3531]">
           Ready to Explore?
         </h2>
         <div className="flex flex-col md:flex-row gap-4 justify-center">
