@@ -70,11 +70,11 @@ export async function POST(request: NextRequest) {
     const randomStr = Math.random().toString(36).substring(7);
     const baseFileName = `${timestamp}-${randomStr}`;
 
-    // Create folder structure: blog-images/{year}/{month}/
+    // Create folder structure: {year}/{month}/ (bucket name already is 'blog-images')
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
-    const basePath = `blog-images/${year}/${month}`;
+    const basePath = `${year}/${month}`;
 
     const mainImagePath = `${basePath}/${baseFileName}.webp`;
     const thumbnailPath = `${basePath}/${baseFileName}-thumb.webp`;
