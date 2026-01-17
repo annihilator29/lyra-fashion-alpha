@@ -32,17 +32,22 @@ export function calculateReadingTime(content: string): number {
 
 /**
  * Formats a date string for blog display
- * @param dateString - ISO date string
+ * @param dateString - ISO date string or Date object
  * @returns Formatted date (e.g., "January 15, 2026")
  */
-export function formatBlogDate(dateString: string): string {
-  const date = new Date(dateString);
+export function formatBlogDate(dateString: string | Date): string {
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
   return new Intl.DateTimeFormat('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   }).format(date);
 }
+
+/**
+ * Alias for formatBlogDate (for consistency with admin usage)
+ */
+export const formatDate = formatBlogDate;
 
 /**
  * Validates that slug is unique (to be called with Supabase check)

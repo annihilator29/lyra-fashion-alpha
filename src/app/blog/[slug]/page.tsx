@@ -58,8 +58,38 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const categories = (post.categories as string[]) || [];
   const relatedPosts = await getRelatedPosts(post.id, categories, 3);
 
+  // JSON-LD structured data for SEO
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: post.title,
+    description: post.excerpt || '',
+    image: post.featured_image || '',
+    datePublished: post.published_at || post.created_at,
+    dateModified: post.updated_at || post.created_at,
+    author: {
+      '@type': 'Organization',
+      name: 'Lyra Fashion',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Lyra Fashion',
+      logo: {
+        '@type': 'ImageObject',
+        url: '/logo.png', // Adjust to actual logo path
+      },
+    },
+  };
+
   return (
-    <article className="container mx-auto px-4 py-12">
+    <>
+      {/* JSON-LD structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
+      <article className="container mx-auto px-4 py-12">
       {/* Header */}
       <header className="mx-auto mb-12 max-w-4xl">
         {/* Categories */}
@@ -124,5 +154,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       )}
     </article>
+    </>
   );
 }

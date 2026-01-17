@@ -83,7 +83,8 @@ export async function middleware(request: NextRequest) {
   const isAuthRoute = request.nextUrl.pathname.startsWith('/account') ||
                       request.nextUrl.pathname.startsWith('/orders') ||
                       request.nextUrl.pathname.startsWith('/wishlist') ||
-                      request.nextUrl.pathname.startsWith('/checkout')
+                      request.nextUrl.pathname.startsWith('/checkout') ||
+                      request.nextUrl.pathname.startsWith('/admin')
 
   // Redirect unauthenticated users to login
   if (isAuthRoute && !user) {

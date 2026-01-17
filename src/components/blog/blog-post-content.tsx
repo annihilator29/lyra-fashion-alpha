@@ -1,15 +1,33 @@
 'use client';
 
+import { useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github-dark.css';
 
 interface BlogPostContentProps {
   content: string;
 }
 
 export function BlogPostContent({ content }: BlogPostContentProps) {
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Initialize syntax highlighting on mount and when content changes
+  useEffect(() => {
+    if (contentRef.current) {
+      // Find all code blocks and apply syntax highlighting
+      const codeBlocks = contentRef.current.querySelectorAll('pre code');
+      codeBlocks.forEach((block) => {
+        const element = block as HTMLElement;
+        const result = hljs.highlightAuto(element.textContent || '');
+        element.innerHTML = result.value;
+      });
+    }
+  }, [content]);
+
   return (
-    <div className="prose prose-lg prose-gray max-w-none">
+    <div ref={contentRef} className="prose prose-lg prose-gray max-w-none">
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={{
@@ -54,14 +72,24 @@ export function BlogPostContent({ content }: BlogPostContentProps) {
           ),
           code: ({ children, className }) => {
             const isInline = !className;
-            return isInline ? (
-              <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800">
-                {children}
-              </code>
-            ) : (
-              <code className="block overflow-x-auto rounded-lg bg-gray-900 p-4 font-mono text-sm text-gray-100">
-                {children}
-              </code>
+            
+            if (isInline) {
+              return (
+                <code className="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-sm text-gray-800">
+                  {children}
+                </code>
+              );
+            }
+
+            // Extract language from className (e.g., "language-javascript")
+            const language = className?.replace('language-', '') || '';
+            
+            return (
+              <pre className="my-6 overflow-x-auto rounded-lg bg-gray-900 p-4">
+                <code className={`language-${language} hljs`}>
+                  {children}
+                </code>
+              </pre>
             );
           },
           img: ({ src, alt }) => (
