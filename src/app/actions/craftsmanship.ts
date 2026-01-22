@@ -74,20 +74,29 @@ export async function saveCraftsmanshipContent(
       };
     }
 
-    // ✅ SECURITY FIX: Verify user has admin role from auth metadata
-    console.log('Checking admin role...', { 
-      userId: user.id, 
-      email: user.email,
-      rawMetadata: user.raw_user_meta_data,
-      metadataKeys: Object.keys(user.raw_user_meta_data || {})
-    });
+    // ✅ SECURITY FIX: Verify user has admin role using database function
+    console.log('Checking admin role using is_admin() function...');
     
-    const userRole = user.raw_user_meta_data?.role || user.raw_user_meta_data?.user_metadata?.role;
-    console.log('User role found:', userRole);
-    const isAdmin = userRole === 'admin';
-    console.log('Is admin:', isAdmin);
+    // Call is_admin() function (no parameters - uses auth.uid() internally)
+    const { data: isAdmin, error: adminCheckError } = await supabase
+      .rpc('is_admin');
 
-    if (!isAdmin) {
+    console.log('is_admin result:', { isAdmin, adminCheckError });
+
+    if (adminCheckError) {
+      console.error('Error checking admin status:', adminCheckError);
+      // Fallback to checking metadata directly
+      const userRole = user.raw_user_meta_data?.role || user.raw_user_meta_data?.user_metadata?.role;
+      const isAdminFallback = userRole === 'admin';
+      console.log('Fallback admin check:', { userRole, isAdmin: isAdminFallback });
+      
+      if (!isAdminFallback) {
+        return {
+          success: false,
+          error: { code: 'PERMISSION_DENIED' }
+        };
+      }
+    } else if (!isAdmin) {
       console.log('User is not admin - returning PERMISSION_DENIED');
       return {
         success: false,
@@ -185,25 +194,52 @@ export async function deleteCraftsmanshipContent(
     const supabase = await createClient();
 
     // ✅ SECURITY FIX: Check user authentication
-    const { data: { user } } = await supabase.auth.getUser();
+    console.log('Delete: Checking user authentication...');
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError) {
+      console.error('Delete: Auth error:', authError);
+    }
 
     if (!user) {
+      console.log('Delete: No user found - returning UNAUTHORIZED');
       return {
         success: false,
         error: { code: 'UNAUTHORIZED' }
       };
     }
 
-    // ✅ SECURITY FIX: Verify user has admin role from auth metadata
-    const userRole = user.raw_user_meta_data?.role;
-    const isAdmin = userRole === 'admin';
+    // ✅ SECURITY FIX: Verify user has admin role using database function
+    console.log('Delete: Checking admin role using is_admin() function...');
+    
+    // Call is_admin() function (no parameters - uses auth.uid() internally)
+    const { data: isAdmin, error: adminCheckError } = await supabase
+      .rpc('is_admin');
 
-    if (!isAdmin) {
+    console.log('Delete: is_admin result:', { isAdmin, adminCheckError });
+
+    if (adminCheckError) {
+      console.error('Delete: Error checking admin status:', adminCheckError);
+      // Fallback to checking metadata directly
+      const userRole = user.raw_user_meta_data?.role || user.raw_user_meta_data?.user_metadata?.role;
+      const isAdminFallback = userRole === 'admin';
+      console.log('Delete: Fallback admin check:', { userRole, isAdmin: isAdminFallback });
+      
+      if (!isAdminFallback) {
+        return {
+          success: false,
+          error: { code: 'PERMISSION_DENIED' }
+        };
+      }
+    } else if (!isAdmin) {
+      console.log('Delete: User is not admin - returning PERMISSION_DENIED');
       return {
         success: false,
         error: { code: 'PERMISSION_DENIED' }
       };
     }
+
+    console.log('Delete: Authorization passed, proceeding...');
 
     // Check if product exists
     const { data: product, error: fetchError } = await supabase
