@@ -10,8 +10,9 @@ import {
     AccordionTrigger,
 } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
-import type { CraftsmanshipContent } from '@/types/product';
+import type { CraftsmanshipContent } from '@/lib/craftsmanship/types';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface CraftsmanshipSectionProps {
     craftsmanship: CraftsmanshipContent | null;
@@ -42,13 +43,13 @@ export function CraftsmanshipSection({ craftsmanship, className }: Craftsmanship
     }
 
     const { materials, construction, quality_checks, care_instructions, factory_story_link } = craftsmanship;
-    const hasConstruction = construction && construction.length > 0;
+    const hasConstruction = construction && (construction.stitching?.length > 0 || construction.finishing?.length > 0);
     const hasQualityChecks = quality_checks && quality_checks.length > 0;
     const hasCareInstructions = care_instructions && care_instructions.length > 0;
 
     // Shared content components
     const MaterialsContent = () => (
-        <div className="space-y-3 text-sm text-muted-foreground">
+        <div className="space-y-4 text-sm text-muted-foreground">
             <div className="flex items-start gap-2">
                 <span className="font-medium text-foreground min-w-[80px]">Fabric:</span>
                 <span>{materials.fabric}</span>
@@ -59,10 +60,22 @@ export function CraftsmanshipSection({ craftsmanship, className }: Craftsmanship
                     <span>{materials.origin}</span>
                 </div>
             )}
-            {materials.composition && (
+            {materials.weight && (
                 <div className="flex items-start gap-2">
-                    <span className="font-medium text-foreground min-w-[80px]">Composition:</span>
-                    <span>{materials.composition}</span>
+                    <span className="font-medium text-foreground min-w-[80px]">Weight:</span>
+                    <span>{materials.weight}</span>
+                </div>
+            )}
+            {materials.certifications && materials.certifications.length > 0 && (
+                <div className="flex items-start gap-2">
+                    <span className="font-medium text-foreground min-w-[80px]">Certifications:</span>
+                    <div className="flex flex-wrap gap-1">
+                        {materials.certifications.map((cert) => (
+                            <Badge key={cert} variant="outline" className="text-xs">
+                                {cert}
+                            </Badge>
+                        ))}
+                    </div>
                 </div>
             )}
             {hasCareInstructions && (
@@ -71,31 +84,41 @@ export function CraftsmanshipSection({ craftsmanship, className }: Craftsmanship
                         <Leaf className="h-4 w-4 text-primary" />
                         <span className="font-medium text-foreground">Care Instructions</span>
                     </div>
-                    <ul className="space-y-1 ml-6">
-                        {care_instructions!.map((instruction, index) => (
-                            <li key={index} className="flex items-start gap-2">
-                                <span className="mt-1.5 h-1 w-1 flex-shrink-0 rounded-full bg-primary" />
-                                {instruction}
-                            </li>
-                        ))}
-                    </ul>
+                    <p className="ml-6">{care_instructions}</p>
                 </div>
             )}
         </div>
     );
 
     const ConstructionContent = () => (
-        <div className="space-y-2 text-sm text-muted-foreground">
-            {hasConstruction ? (
-                <ul className="space-y-2">
-                    {construction.map((technique, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                            <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
-                            {technique}
-                        </li>
-                    ))}
-                </ul>
-            ) : (
+        <div className="space-y-4 text-sm text-muted-foreground">
+            {construction.stitching && construction.stitching.length > 0 && (
+                <div>
+                    <h4 className="font-medium text-foreground mb-2">Stitching</h4>
+                    <ul className="space-y-2 ml-2">
+                        {construction.stitching.map((technique, index) => (
+                            <li key={index} className="flex items-start gap-2">
+                                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+                                {technique}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            {construction.finishing && construction.finishing.length > 0 && (
+                <div>
+                    <h4 className="font-medium text-foreground mb-2">Finishing</h4>
+                    <ul className="space-y-2 ml-2">
+                        {construction.finishing.map((technique, index) => (
+                            <li key={index} className="flex items-start gap-2">
+                                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+                                {technique}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            {!hasConstruction && (
                 <p className="text-muted-foreground">Construction details not available.</p>
             )}
         </div>

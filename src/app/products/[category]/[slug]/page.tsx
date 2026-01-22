@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
-import { VALID_CATEGORIES, type ProductCategory, type ProductWithVariants, type CraftsmanshipContent } from '@/types/product';
+import { VALID_CATEGORIES, type ProductCategory, type ProductWithVariants } from '@/types/product';
+import type { CraftsmanshipContent } from '@/lib/craftsmanship/types';
 import { RelatedProducts } from '@/components/shop/related-products';
 import { ProductDetailClient } from './product-detail-client';
 

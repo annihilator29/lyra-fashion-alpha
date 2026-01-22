@@ -13,7 +13,8 @@ import { useCartStore } from '@/lib/cart-store';
 import { toast } from 'sonner';
 import { isInGuestWishlist, addToGuestWishlist, removeFromGuestWishlist } from '@/lib/wishlist-utils';
 import { createClient } from '@/lib/supabase/client';
-import type { ProductWithVariants, ProductVariantRow, CraftsmanshipContent } from '@/types/product';
+import type { ProductWithVariants, ProductVariantRow } from '@/types/product';
+import type { CraftsmanshipContent } from '@/lib/craftsmanship/types';
 
 interface ProductDetailClientProps {
     product: ProductWithVariants;

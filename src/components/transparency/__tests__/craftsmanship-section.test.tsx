@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CraftsmanshipSection } from '../craftsmanship-section';
-import type { CraftsmanshipContent } from '@/types/product';
+import type { CraftsmanshipContent } from '@/lib/craftsmanship/types';
 import React from 'react';
 
 // Mock Next.js Link component
@@ -15,30 +15,32 @@ describe('CraftsmanshipSection', () => {
         materials: {
             fabric: '100% Organic Cotton',
             origin: 'Gujarat, India',
-            composition: 'Ring-spun organic cotton, GOTS certified',
+            weight: 'GSM 180',
+            certifications: ['GOTS Certified', 'Fair Trade'],
         },
-        construction: [
-            'French seams for durability',
-            'Double-needle stitching at stress points',
-            'Hand-finished buttonholes',
-        ],
+        construction: {
+            stitching: ['French seams for durability', 'Double-needle stitching at stress points', 'Hand-finished buttonholes'],
+            finishing: ['Hand-finished hems', 'Overlocked seams'],
+            quality_checks: ['Color fastness check', 'Stitch density verification'],
+        },
         quality_checks: [
             'Fabric inspection for defects',
             'Stitch integrity verification',
             'Color fastness testing',
         ],
-        care_instructions: [
-            'Machine wash cold',
-            'Tumble dry low',
-        ],
+        care_instructions: 'Machine wash cold, tumble dry low, iron medium. Do not bleach.',
         factory_story_link: '/factory-story',
     };
 
     const mockMinimalCraftsmanship: CraftsmanshipContent = {
         materials: {
             fabric: 'Silk Blend',
+            origin: 'Italy',
         },
-        construction: [],
+        construction: {
+            stitching: [],
+            finishing: [],
+        },
         quality_checks: [],
     };
 
@@ -54,16 +56,18 @@ describe('CraftsmanshipSection', () => {
             expect(screen.getByText('Discover the quality and care behind every piece')).toBeInTheDocument();
         });
 
-        it('displays Materials tab with fabric, origin, and composition', () => {
+        it('displays Materials tab with fabric, origin, certifications, and weight', () => {
             render(<CraftsmanshipSection craftsmanship={mockFullCraftsmanship} />);
 
             // Materials content should be visible by default
             expect(screen.getByText('100% Organic Cotton')).toBeInTheDocument();
             expect(screen.getByText('Gujarat, India')).toBeInTheDocument();
-            expect(screen.getByText('Ring-spun organic cotton, GOTS certified')).toBeInTheDocument();
+            expect(screen.getByText('GSM 180')).toBeInTheDocument();
+            expect(screen.getByText('GOTS Certified')).toBeInTheDocument();
+            expect(screen.getByText('Fair Trade')).toBeInTheDocument();
         });
 
-        it('renders Construction tab with techniques list', () => {
+        it('renders Construction tab with stitching and finishing lists', () => {
             render(<CraftsmanshipSection craftsmanship={mockFullCraftsmanship} />);
 
             // Find accordion triggers specifically (they have data-slot="accordion-trigger")
@@ -82,6 +86,8 @@ describe('CraftsmanshipSection', () => {
             expect(screen.getByText('French seams for durability')).toBeInTheDocument();
             expect(screen.getByText('Double-needle stitching at stress points')).toBeInTheDocument();
             expect(screen.getByText('Hand-finished buttonholes')).toBeInTheDocument();
+            expect(screen.getByText('Hand-finished hems')).toBeInTheDocument();
+            expect(screen.getByText('Overlocked seams')).toBeInTheDocument();
         });
 
         it('renders Quality tab with checkpoints list', () => {
@@ -106,25 +112,23 @@ describe('CraftsmanshipSection', () => {
             expect(link).toHaveAttribute('href', '/factory-story');
         });
 
-        it('displays care instructions in Materials tab', () => {
+        it('displays care instructions in Materials section', () => {
             render(<CraftsmanshipSection craftsmanship={mockFullCraftsmanship} />);
 
             expect(screen.getByText('Care Instructions')).toBeInTheDocument();
-            expect(screen.getByText('Machine wash cold')).toBeInTheDocument();
-            expect(screen.getByText('Tumble dry low')).toBeInTheDocument();
+            expect(screen.getByText('Machine wash cold, tumble dry low, iron medium. Do not bleach.')).toBeInTheDocument();
         });
     });
 
     describe('Minimal craftsmanship data', () => {
-        it('renders only fabric when origin and composition are missing', () => {
+        it('renders only fabric when other fields are missing', () => {
             render(<CraftsmanshipSection craftsmanship={mockMinimalCraftsmanship} />);
 
             expect(screen.getByText('Silk Blend')).toBeInTheDocument();
             expect(screen.queryByText('Origin:')).not.toBeInTheDocument();
-            expect(screen.queryByText('Composition:')).not.toBeInTheDocument();
         });
 
-        it('hides Construction tab when construction array is empty', () => {
+        it('hides Construction tab when stitching and finishing arrays are empty', () => {
             render(<CraftsmanshipSection craftsmanship={mockMinimalCraftsmanship} />);
 
             // Construction tab should not appear in desktop tabs
@@ -158,7 +162,7 @@ describe('CraftsmanshipSection', () => {
         });
 
         it('shows fallback message when materials is undefined', () => {
-            const incomplete = { construction: [], quality_checks: [] } as unknown as CraftsmanshipContent;
+            const incomplete = { construction: { stitching: [], finishing: [] }, quality_checks: [] } as unknown as CraftsmanshipContent;
             render(<CraftsmanshipSection craftsmanship={incomplete} />);
 
             expect(screen.getByText('Craftsmanship details coming soon.')).toBeInTheDocument();
