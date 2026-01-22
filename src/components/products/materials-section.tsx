@@ -18,11 +18,13 @@ export function MaterialsSection({ data }: MaterialsSectionProps) {
         <p className="text-neutral-700">{data.fabric}</p>
       </div>
 
-      {/* Origin */}
-      <div>
-        <h3 className="text-xl font-serif text-primary mb-2">Origin</h3>
-        <p className="text-neutral-700">{data.origin}</p>
-      </div>
+      {/* Origin (optional) */}
+      {data.origin && (
+        <div>
+          <h3 className="text-xl font-serif text-primary mb-2">Origin</h3>
+          <p className="text-neutral-700">{data.origin}</p>
+        </div>
+      )}
 
       {/* Weight (optional) */}
       {data.weight && (

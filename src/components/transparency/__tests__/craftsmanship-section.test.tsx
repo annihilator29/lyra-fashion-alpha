@@ -121,11 +121,13 @@ describe('CraftsmanshipSection', () => {
     });
 
     describe('Minimal craftsmanship data', () => {
-        it('renders only fabric when other fields are missing', () => {
+        it('renders fabric and origin when provided, hides empty sections', () => {
             render(<CraftsmanshipSection craftsmanship={mockMinimalCraftsmanship} />);
 
             expect(screen.getByText('Silk Blend')).toBeInTheDocument();
-            expect(screen.queryByText('Origin:')).not.toBeInTheDocument();
+            expect(screen.getByText('Italy')).toBeInTheDocument();
+            // Origin section should appear since origin is provided
+            expect(screen.getByText('Origin:')).toBeInTheDocument();
         });
 
         it('hides Construction tab when stitching and finishing arrays are empty', () => {

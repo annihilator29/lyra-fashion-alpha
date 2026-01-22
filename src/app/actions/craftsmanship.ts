@@ -56,6 +56,32 @@ export async function saveCraftsmanshipContent(
 
     const supabase = await createClient();
 
+    // ✅ SECURITY FIX: Check user authentication
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        success: false,
+        error: { code: 'UNAUTHORIZED' }
+      };
+    }
+
+    // ✅ SECURITY FIX: Verify user has admin role or permission to edit this product
+    const { data: customer } = await supabase
+      .from('customers')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const isAdmin = customer?.role === 'admin';
+
+    if (!isAdmin) {
+      return {
+        success: false,
+        error: { code: 'PERMISSION_DENIED' }
+      };
+    }
+
     // Check if product exists
     const { data: product, error: fetchError } = await supabase
       .from('products')
@@ -142,6 +168,32 @@ export async function deleteCraftsmanshipContent(
   try {
     const supabase = await createClient();
 
+    // ✅ SECURITY FIX: Check user authentication
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return {
+        success: false,
+        error: { code: 'UNAUTHORIZED' }
+      };
+    }
+
+    // ✅ SECURITY FIX: Verify user has admin role
+    const { data: customer } = await supabase
+      .from('customers')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    const isAdmin = customer?.role === 'admin';
+
+    if (!isAdmin) {
+      return {
+        success: false,
+        error: { code: 'PERMISSION_DENIED' }
+      };
+    }
+
     // Check if product exists
     const { data: product, error: fetchError } = await supabase
       .from('products')
@@ -210,6 +262,13 @@ export async function checkProductCraftsmanship(
 ): Promise<{ hasCraftsmanship: boolean }> {
   try {
     const supabase = await createClient();
+
+    // ✅ SECURITY FIX: Check user authentication (read operations still need auth)
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { hasCraftsmanship: false };
+    }
 
     const { data: product, error } = await supabase
       .from('products')
