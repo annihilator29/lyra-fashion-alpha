@@ -57,9 +57,17 @@ export async function saveCraftsmanshipContent(
     const supabase = await createClient();
 
     // ✅ SECURITY FIX: Check user authentication
-    const { data: { user } } = await supabase.auth.getUser();
+    console.log('Checking user authentication...');
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    console.log('Auth result:', { userId: user?.id, authError });
+
+    if (authError) {
+      console.error('Auth error:', authError);
+    }
 
     if (!user) {
+      console.log('No user found - returning UNAUTHORIZED');
       return {
         success: false,
         error: { code: 'UNAUTHORIZED' }
@@ -67,15 +75,27 @@ export async function saveCraftsmanshipContent(
     }
 
     // ✅ SECURITY FIX: Verify user has admin role from auth metadata
-    const userRole = user.raw_user_meta_data?.role;
+    console.log('Checking admin role...', { 
+      userId: user.id, 
+      email: user.email,
+      rawMetadata: user.raw_user_meta_data,
+      metadataKeys: Object.keys(user.raw_user_meta_data || {})
+    });
+    
+    const userRole = user.raw_user_meta_data?.role || user.raw_user_meta_data?.user_metadata?.role;
+    console.log('User role found:', userRole);
     const isAdmin = userRole === 'admin';
+    console.log('Is admin:', isAdmin);
 
     if (!isAdmin) {
+      console.log('User is not admin - returning PERMISSION_DENIED');
       return {
         success: false,
         error: { code: 'PERMISSION_DENIED' }
       };
     }
+
+    console.log('Authorization passed, proceeding to save...');
 
     // Check if product exists
     const { data: product, error: fetchError } = await supabase
@@ -124,6 +144,7 @@ export async function saveCraftsmanshipContent(
       product: validatedContent
     };
   } catch (err) {
+    console.error('Craftsmanship action error:', err);
     if (err instanceof z.ZodError) {
       // Serialize the ZodError for client-side consumption
       return {

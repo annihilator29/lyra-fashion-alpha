@@ -265,7 +265,7 @@ export function CraftsmanshipEditorForm({
         
         setErrorMessage(errorMessages);
       } else {
-        setErrorMessage(`${errorDetails.code}: ${'message' in errorDetails ? errorDetails.message : 'Unknown error'}`);
+        setErrorMessage(`${errorDetails.code}: ${'message' in errorDetails && errorDetails.message ? errorDetails.message : 'Access denied - admin permissions required'}`);
       }
     }
 
