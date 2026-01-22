@@ -66,14 +66,9 @@ export async function saveCraftsmanshipContent(
       };
     }
 
-    // ✅ SECURITY FIX: Verify user has admin role or permission to edit this product
-    const { data: customer } = await supabase
-      .from('customers')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    const isAdmin = customer?.role === 'admin';
+    // ✅ SECURITY FIX: Verify user has admin role from auth metadata
+    const userRole = user.raw_user_meta_data?.role;
+    const isAdmin = userRole === 'admin';
 
     if (!isAdmin) {
       return {
@@ -178,14 +173,9 @@ export async function deleteCraftsmanshipContent(
       };
     }
 
-    // ✅ SECURITY FIX: Verify user has admin role
-    const { data: customer } = await supabase
-      .from('customers')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-
-    const isAdmin = customer?.role === 'admin';
+    // ✅ SECURITY FIX: Verify user has admin role from auth metadata
+    const userRole = user.raw_user_meta_data?.role;
+    const isAdmin = userRole === 'admin';
 
     if (!isAdmin) {
       return {
