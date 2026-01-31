@@ -4,7 +4,6 @@ import {
   ConstructionSchema,
   ManufacturerSchema 
 } from '../validation';
-import { z } from 'zod';
 
 describe('Craftsmanship Validation Schemas', () => {
   describe('MaterialsSchema', () => {

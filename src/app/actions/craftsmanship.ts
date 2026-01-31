@@ -11,7 +11,7 @@
 import { revalidatePath } from 'next/cache';
 import { createClient } from '@/lib/supabase/server';
 import { CraftsmanshipContentSchema } from '@/lib/craftsmanship/validation';
-import type { SaveCraftsmanshipResult, CraftsmanshipContent } from '@/lib/craftsmanship/types';
+import type { CraftsmanshipContent } from '@/lib/craftsmanship/types';
 import { z } from 'zod';
 
 /**
@@ -86,7 +86,7 @@ export async function saveCraftsmanshipContent(
     if (adminCheckError) {
       console.error('Error checking admin status:', adminCheckError);
       // Fallback to checking metadata directly
-      const userRole = user.raw_user_meta_data?.role || user.raw_user_meta_data?.user_metadata?.role;
+      const userRole = user.user_metadata?.role;
       const isAdminFallback = userRole === 'admin';
       console.log('Fallback admin check:', { userRole, isAdmin: isAdminFallback });
       
@@ -221,7 +221,7 @@ export async function deleteCraftsmanshipContent(
     if (adminCheckError) {
       console.error('Delete: Error checking admin status:', adminCheckError);
       // Fallback to checking metadata directly
-      const userRole = user.raw_user_meta_data?.role || user.raw_user_meta_data?.user_metadata?.role;
+      const userRole = user.user_metadata?.role;
       const isAdminFallback = userRole === 'admin';
       console.log('Delete: Fallback admin check:', { userRole, isAdmin: isAdminFallback });
       

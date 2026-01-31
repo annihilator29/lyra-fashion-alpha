@@ -94,7 +94,7 @@ function normalizeCraftsmanshipData(data: unknown): CraftsmanshipContent {
 export function CraftsmanshipEditorForm({
   productId,
   initialData,
-  productName
+  productName: _productName
 }: CraftsmanshipEditorFormProps) {
   const normalizedData = normalizeCraftsmanshipData(initialData);
   const [formData, setFormData] = useState<CraftsmanshipContent>(normalizedData);
