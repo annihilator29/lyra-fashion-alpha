@@ -56,7 +56,7 @@ async function getProducts(
     // Build query
     let query = supabase
         .from('products')
-        .select('id, name, slug, description, price, images, category, craftsmanship_content, transparency_data, created_at, updated_at', { count: 'exact' })
+        .select('id, name, slug, description, price, images, category, craftsmanship_content, transparency_data, created_at, updated_at, avg_rating, review_count', { count: 'exact' })
         .eq('category', category);
 
     // Apply price filters

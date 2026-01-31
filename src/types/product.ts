@@ -96,6 +96,8 @@ export interface ProductWithVariants {
     transparency_data: unknown | null;
     created_at: string;
     updated_at: string;
+    avg_rating?: number;
+    review_count?: number;
     product_variants: ProductVariantRow[];
 }
 

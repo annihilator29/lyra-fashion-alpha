@@ -9,6 +9,7 @@ import { render } from '@react-email/components';
 import OrderConfirmationEmail from '@/emails/order-confirmation';
 import ShipmentNotificationEmail from '@/emails/shipment-notification';
 import DeliveryConfirmationEmail from '@/emails/delivery-confirmation';
+import ReviewRequestEmail from '@/emails/review-request';
 import NewsletterEmail from '@/emails/newsletter';
 import SalesEmail from '@/emails/sales';
 import PersonalizedRecommendationsEmail from '@/emails/personalized-recommendations';
@@ -23,6 +24,7 @@ export type EmailType =
   | 'order_confirmation'
   | 'shipment_notification'
   | 'delivery_confirmation'
+  | 'review_request'
   | 'newsletter'
   | 'sales'
   | 'personalized_recommendations';
@@ -242,6 +244,61 @@ export async function sendDeliveryConfirmation(
     }
 
     logEmailError('delivery_confirmation', details.orderNumber, error);
+    throw new Error('EMAIL_SEND_FAILED');
+  }
+}
+
+/**
+ * Send review request email
+ * Story 5.4 Task 4: Post-Purchase Email Workflow (AC #5)
+ * 7-day review request email sent after order delivery
+ * @param email - Recipient email address
+ * @param details - Review request details
+ * @returns Email ID if successful, throws error if failed
+ */
+export async function sendReviewRequestEmail(
+  email: string,
+  details: {
+    customerName: string;
+    productName: string;
+    productImage: string;
+    reviewUrl: string;
+    orderDate: string;
+  }
+): Promise<{ emailId: string }> {
+  // Validate email
+  if (!email || !validateEmail(email)) {
+    throw new Error('INVALID_EMAIL');
+  }
+
+  try {
+    const resend = getResendClient();
+    const emailHtml = await render(<ReviewRequestEmail {...details} />);
+
+    const { data, error } = await resend.emails.send({
+      from: 'Lyra Fashion <reviews@lyrafashion.com.np>',
+      to: email,
+      subject: `How's Your New ${details.productName}? Share Your Review`,
+      html: emailHtml,
+      replyTo: 'support@lyrafashion.com',
+    });
+
+    if (error) {
+      logEmailError('review_request', email, error);
+      throw new Error('EMAIL_SEND_FAILED');
+    }
+
+    return { emailId: data.id };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === 'INVALID_EMAIL') {
+      throw error;
+    }
+
+    if (error instanceof Error && error.message === 'EMAIL_SEND_FAILED') {
+      throw error;
+    }
+
+    logEmailError('review_request', email, error);
     throw new Error('EMAIL_SEND_FAILED');
   }
 }

@@ -3,6 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { createClient } from '@/lib/supabase/server';
+import { queueReviewRequest } from '@/actions/review-emails';
 import {
   sendOrderConfirmation,
   sendShipmentNotification,
@@ -10,6 +11,7 @@ import {
   sendNewsletter,
   sendSalesEmail,
   sendPersonalizedRecommendations,
+  sendReviewRequestEmail,
 } from '@/lib/email-service';
 
 export interface QueueItem {
@@ -140,6 +142,21 @@ export async function processEmailQueue(batchSize: number = 50): Promise<QueueRe
  */
 async function sendQueuedEmail(item: QueueItem): Promise<void> {
   switch (item.email_type) {
+    case 'review_request_trigger':
+      // This is a trigger task that generates the actual review emails
+      await queueReviewRequest(item.template_data.order_id);
+      break;
+
+    case 'review_request_email':
+      await sendReviewRequestEmail(item.recipient_email, {
+        customerName: item.template_data.customer_name,
+        productName: item.template_data.product_name,
+        productImage: item.template_data.product_image,
+        reviewUrl: item.template_data.review_url,
+        orderDate: item.template_data.order_date,
+      });
+      break;
+
     case 'newsletter':
       await sendNewsletter(item.recipient_email, {
         customerName: item.template_data.customer_name,

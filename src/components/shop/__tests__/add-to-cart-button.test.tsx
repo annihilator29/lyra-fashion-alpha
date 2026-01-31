@@ -25,6 +25,8 @@ const mockProduct: Product = {
   transparency_data: null,
   created_at: '2025-01-01',
   updated_at: '2025-01-01',
+  avg_rating: null,
+  review_count: null,
 };
 
 describe('AddToCartButton', () => {

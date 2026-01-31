@@ -33,6 +33,8 @@ const mockProducts: Product[] = [
         transparency_data: null,
         created_at: '2025-01-01T00:00:00Z',
         updated_at: '2025-01-01T00:00:00Z',
+        avg_rating: 4.5,
+        review_count: 10,
     },
     {
         id: '2',
@@ -46,6 +48,8 @@ const mockProducts: Product[] = [
         transparency_data: null,
         created_at: '2025-01-02T00:00:00Z',
         updated_at: '2025-01-02T00:00:00Z',
+        avg_rating: 5.0,
+        review_count: 5,
     },
 ];
 

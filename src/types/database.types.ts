@@ -30,6 +30,8 @@ export interface Database {
           transparency_data: Json | null;
           created_at: string;
           updated_at: string;
+          avg_rating: number | null;
+          review_count: number | null;
         };
         Insert: {
           id?: string;
@@ -43,6 +45,8 @@ export interface Database {
           transparency_data?: Json | null;
           created_at?: string;
           updated_at?: string;
+          avg_rating?: number | null;
+          review_count?: number | null;
         };
         Update: {
           id?: string;
@@ -56,6 +60,8 @@ export interface Database {
           transparency_data?: Json | null;
           created_at?: string;
           updated_at?: string;
+          avg_rating?: number | null;
+          review_count?: number | null;
         };
         Relationships: [];
       };
@@ -482,6 +488,218 @@ export interface Database {
           },
         ];
       };
+      product_reviews: {
+        Row: {
+          id: string;
+          product_id: string;
+          customer_id: string;
+          order_id: string;
+          rating: number;
+          title: string;
+          content: string;
+          fit_feedback: 'true-to-size' | 'small' | 'large' | 'n/a';
+          status: 'pending' | 'approved' | 'rejected';
+          verified: boolean;
+          helpful_count: number;
+          rejection_reason: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          customer_id: string;
+          order_id: string;
+          rating: number;
+          title: string;
+          content: string;
+          fit_feedback: 'true-to-size' | 'small' | 'large' | 'n/a';
+          status?: 'pending' | 'approved' | 'rejected';
+          verified?: boolean;
+          helpful_count?: number;
+          rejection_reason?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          product_id?: string;
+          customer_id?: string;
+          order_id?: string;
+          rating?: number;
+          title?: string;
+          content?: string;
+          fit_feedback?: 'true-to-size' | 'small' | 'large' | 'n/a';
+          status?: 'pending' | 'approved' | 'rejected';
+          verified?: boolean;
+          helpful_count?: number;
+          rejection_reason?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'product_reviews_product_id_fkey';
+            columns: ['product_id'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'product_reviews_customer_id_fkey';
+            columns: ['customer_id'];
+            isOneToOne: false;
+            referencedRelation: 'customers';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'product_reviews_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'orders';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      review_request_queue: {
+        Row: {
+          id: string;
+          order_id: string;
+          product_id: string;
+          customer_id: string;
+          email: string;
+          product_name: string;
+          product_image: string | null;
+          review_token: string;
+          review_url: string;
+          status: 'pending' | 'sent' | 'failed' | 'cancelled';
+          scheduled_for: string;
+          sent_at: string | null;
+          error_message: string | null;
+          retry_count: number;
+          max_retries: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          order_id: string;
+          product_id: string;
+          customer_id: string;
+          email: string;
+          product_name: string;
+          product_image?: string | null;
+          review_token: string;
+          review_url: string;
+          status?: 'pending' | 'sent' | 'failed' | 'cancelled';
+          scheduled_for: string;
+          sent_at?: string | null;
+          error_message?: string | null;
+          retry_count?: number;
+          max_retries?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          order_id?: string;
+          product_id?: string;
+          customer_id?: string;
+          email?: string;
+          product_name?: string;
+          product_image?: string | null;
+          review_token?: string;
+          review_url?: string;
+          status?: 'pending' | 'sent' | 'failed' | 'cancelled';
+          scheduled_for?: string;
+          sent_at?: string | null;
+          error_message?: string | null;
+          retry_count?: number;
+          max_retries?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'review_request_queue_order_id_fkey';
+            columns: ['order_id'];
+            isOneToOne: false;
+            referencedRelation: 'orders';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'review_request_queue_product_id_fkey';
+            columns: ['product_id'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'review_request_queue_customer_id_fkey';
+            columns: ['customer_id'];
+            isOneToOne: false;
+            referencedRelation: 'customers';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      email_queue: {
+        Row: {
+          id: string;
+          email_type: string;
+          recipient_email: string;
+          user_id: string | null;
+          subject: string;
+          template_id: string | null;
+          template_data: Json;
+          priority: number;
+          status: 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled';
+          error_message: string | null;
+          retry_count: number;
+          max_retries: number;
+          scheduled_for: string;
+          sent_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          email_type: string;
+          recipient_email: string;
+          user_id?: string | null;
+          subject: string;
+          template_id?: string | null;
+          template_data: Json;
+          priority?: number;
+          status?: 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled';
+          error_message?: string | null;
+          retry_count?: number;
+          max_retries?: number;
+          scheduled_for: string;
+          sent_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          email_type?: string;
+          recipient_email?: string;
+          user_id?: string | null;
+          subject?: string;
+          template_id?: string | null;
+          template_data?: Json;
+          priority?: number;
+          status?: 'pending' | 'processing' | 'sent' | 'failed' | 'cancelled';
+          error_message?: string | null;
+          retry_count?: number;
+          max_retries?: number;
+          scheduled_for?: string;
+          sent_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -508,6 +726,9 @@ export type OrderItem = Tables<'order_items'>;
 export type Inventory = Tables<'inventory'>;
 export type EmailLog = Tables<'email_logs'>;
 export type BlogPost = Tables<'blog_posts'>;
+export type ProductReview = Tables<'product_reviews'>;
+export type ReviewRequestQueue = Tables<'review_request_queue'>;
+export type EmailQueue = Tables<'email_queue'>;
 
 // Insert types
 export type ProductInsert = InsertTables<'products'>;

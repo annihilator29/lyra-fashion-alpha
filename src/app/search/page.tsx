@@ -39,7 +39,7 @@ async function getSearchResults(query: string): Promise<Product[]> {
     // Try to use ilike for pattern matching (fallback approach)
     const { data, error } = await supabase
         .from('products')
-        .select('id, name, slug, description, price, images, category, craftsmanship_content, transparency_data, created_at, updated_at')
+        .select('id, name, slug, description, price, images, category, craftsmanship_content, transparency_data, created_at, updated_at, avg_rating, review_count')
         .or(`name.ilike.%${trimmedQuery}%,description.ilike.%${trimmedQuery}%,category.ilike.%${trimmedQuery}%`)
         .order('name')
         .limit(24);

@@ -70,7 +70,6 @@ function normalizeCraftsmanshipData(data: unknown): CraftsmanshipContent | null 
 
 export function CraftsmanshipSection({ 
   craftsmanship, 
-  productName: _productName 
 }: CraftsmanshipSectionProps) {
   const normalizedCraftsmanship = normalizeCraftsmanshipData(craftsmanship);
   const viewMode = useResponsiveView({ mobileBreakpoint: 768 });
