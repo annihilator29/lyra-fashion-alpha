@@ -29,8 +29,24 @@ export interface BulkModerationResponse {
 
 /**
  * Submit a product review
- * This server action validates the input, verifies the token,
- * checks order ownership, prevents duplicates, and inserts the review
+ * 
+ * Validates input using Zod schema, verifies JWT token from email link,
+ * checks order ownership and delivery status, prevents duplicate reviews,
+ * and inserts the review with 'pending' status for admin moderation.
+ * 
+ * Security: Uses admin client to bypass RLS for token-based auth (magic link pattern)
+ * 
+ * @param data - Review submission data including rating, title, content, fit feedback, and token
+ * @returns ReviewSubmissionResponse with success status, message, and optional reviewId or error
+ * 
+ * @example
+ * const result = await submitProductReview({
+ *   rating: 5,
+ *   title: 'Great product!',
+ *   content: 'This product exceeded my expectations...',
+ *   fitFeedback: 'true-to-size',
+ *   token: 'jwt-token-from-email'
+ * });
  */
 export async function submitProductReview(
   data: ReviewSubmissionData
@@ -184,8 +200,21 @@ export async function submitProductReview(
 // ============================================================================
 
 /**
- * Approve a review
- * Updates status to 'approved' and recalculates product aggregates
+ * Approve a pending review (Admin only)
+ * 
+ * Verifies admin access, updates review status to 'approved',
+ * recalculates product aggregate ratings, and revalidates relevant paths.
+ * 
+ * @param reviewId - UUID of the review to approve
+ * @returns ModerationActionResponse with success status and message
+ * 
+ * @throws Will throw if user is not an admin
+ * 
+ * @example
+ * const result = await approveReview('review-uuid-123');
+ * if (result.success) {
+ *   console.log('Review approved');
+ * }
  */
 export async function approveReview(reviewId: string): Promise<ModerationActionResponse> {
   try {
@@ -249,8 +278,22 @@ export async function approveReview(reviewId: string): Promise<ModerationActionR
 }
 
 /**
- * Reject a review
- * Updates status to 'rejected' and logs the rejection reason
+ * Reject a pending review (Admin only)
+ * 
+ * Verifies admin access, updates review status to 'rejected',
+ * stores optional rejection reason, and revalidates admin paths.
+ * 
+ * @param reviewId - UUID of the review to reject
+ * @param reason - Optional rejection reason (displayed to customer)
+ * @returns ModerationActionResponse with success status and message
+ * 
+ * @throws Will throw if user is not an admin
+ * 
+ * @example
+ * const result = await rejectReview('review-uuid-123', 'Contains inappropriate content');
+ * if (result.success) {
+ *   console.log('Review rejected');
+ * }
  */
 export async function rejectReview(
   reviewId: string,
@@ -314,8 +357,24 @@ export async function rejectReview(
 }
 
 /**
- * Delete a review
- * Performs a hard delete with confirmation required
+ * Permanently delete a review (Admin only)
+ * 
+ * Verifies admin access, performs hard delete of review record.
+ * If the review was approved, updates product aggregate ratings.
+ * Revalidates relevant paths after deletion.
+ * 
+ * WARNING: This action cannot be undone. Consider rejecting instead.
+ * 
+ * @param reviewId - UUID of the review to delete
+ * @returns ModerationActionResponse with success status and message
+ * 
+ * @throws Will throw if user is not an admin
+ * 
+ * @example
+ * const result = await deleteReview('review-uuid-123');
+ * if (result.success) {
+ *   console.log('Review permanently deleted');
+ * }
  */
 export async function deleteReview(reviewId: string): Promise<ModerationActionResponse> {
   try {

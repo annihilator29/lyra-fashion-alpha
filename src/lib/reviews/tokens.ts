@@ -34,8 +34,11 @@ export async function generateReviewToken(
   // Encode payload to base64
   const payloadBase64 = Buffer.from(JSON.stringify(payload)).toString('base64url');
   
-  // Create signature using a secret (in production, use a proper JWT library)
-  const secret = process.env.REVIEW_TOKEN_SECRET || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'fallback-secret';
+  // Create signature using a secret - MUST be set in environment
+  const secret = process.env.REVIEW_TOKEN_SECRET;
+  if (!secret) {
+    throw new Error('REVIEW_TOKEN_SECRET environment variable is not set');
+  }
   const signature = await createSignature(payloadBase64, secret);
   
   // Return token in JWT format (header.payload.signature)
@@ -54,8 +57,12 @@ export async function verifyReviewToken(token: string): Promise<ReviewTokenPaylo
 
     const [, payloadBase64, signature] = parts;
 
-    // Verify signature
-    const secret = process.env.REVIEW_TOKEN_SECRET || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'fallback-secret';
+    // Verify signature - MUST use same secret as generation
+    const secret = process.env.REVIEW_TOKEN_SECRET;
+    if (!secret) {
+      console.error('REVIEW_TOKEN_SECRET environment variable is not set');
+      return null;
+    }
     const expectedSignature = await createSignature(payloadBase64, secret);
     
     if (signature !== expectedSignature) {
