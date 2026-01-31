@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { Review, ReviewSummary, ReviewFilters } from '@/lib/reviews/types';
 
 const PAGE_SIZE = 10;
-const CACHE_DURATION = 3600000; // 1 hour in milliseconds
+const CACHE_DURATION = 60000; // 1 minute in milliseconds
 
 interface ReviewPage {
   reviews: Review[];
@@ -40,7 +40,7 @@ async function fetchReviewsPage(params: FetchReviewsParams): Promise<ReviewPage>
     .from('product_reviews')
     .select(`
       *,
-      customer:customers(first_name, last_name)
+      customer:customers(name)
     `)
     .eq('product_id', productId)
     .eq('status', 'approved');
