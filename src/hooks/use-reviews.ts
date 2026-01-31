@@ -123,7 +123,7 @@ async function fetchReviewSummary(productId: string): Promise<ReviewSummary> {
     };
   }
 
-  return summaryData;
+  return Array.isArray(summaryData) ? summaryData[0] : summaryData;
 }
 
 function getCacheKey(productId: string, cursor: string | null, filters: ReviewFilters): string {
