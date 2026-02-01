@@ -403,13 +403,21 @@ export interface Database {
       inventory: {
         Row: {
           product_id: string;
-          quantity: number;
-          reserved: number;
+          variant_id: string | null;
+          total_quantity: number;
+          reserved_quantity: number;
+          low_stock_threshold: number;
+          quantity: number; // deprecated: use total_quantity
+          reserved: number; // deprecated: use reserved_quantity
           production_status: string | null;
           updated_at: string;
         };
         Insert: {
           product_id: string;
+          variant_id?: string | null;
+          total_quantity?: number;
+          reserved_quantity?: number;
+          low_stock_threshold?: number;
           quantity?: number;
           reserved?: number;
           production_status?: string | null;
@@ -417,6 +425,10 @@ export interface Database {
         };
         Update: {
           product_id?: string;
+          variant_id?: string | null;
+          total_quantity?: number;
+          reserved_quantity?: number;
+          low_stock_threshold?: number;
           quantity?: number;
           reserved?: number;
           production_status?: string | null;
@@ -427,6 +439,156 @@ export interface Database {
             foreignKeyName: 'inventory_product_id_fkey';
             columns: ['product_id'];
             isOneToOne: true;
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'inventory_variant_id_fkey';
+            columns: ['variant_id'];
+            isOneToOne: false;
+            referencedRelation: 'product_variants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      cart_reservations: {
+        Row: {
+          id: string;
+          cart_id: string;
+          product_id: string;
+          variant_id: string | null;
+          quantity: number;
+          expires_at: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          cart_id: string;
+          product_id: string;
+          variant_id?: string | null;
+          quantity: number;
+          expires_at: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          cart_id?: string;
+          product_id?: string;
+          variant_id?: string | null;
+          quantity?: number;
+          expires_at?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'cart_reservations_product_id_fkey';
+            columns: ['product_id'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'cart_reservations_variant_id_fkey';
+            columns: ['variant_id'];
+            isOneToOne: false;
+            referencedRelation: 'product_variants';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      inventory_audit_log: {
+        Row: {
+          id: string;
+          product_id: string;
+          variant_id: string | null;
+          quantity_before: number;
+          quantity_after: number;
+          change_amount: number;
+          reason: 'sale' | 'reservation' | 'release' | 'restock' | 'sync' | 'adjustment' | 'cancellation';
+          source: 'cart' | 'checkout' | 'factory_sync' | 'return' | 'admin' | 'system';
+          user_id: string | null;
+          metadata: Json;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          variant_id?: string | null;
+          quantity_before: number;
+          quantity_after: number;
+          change_amount: number;
+          reason: 'sale' | 'reservation' | 'release' | 'restock' | 'sync' | 'adjustment' | 'cancellation';
+          source: 'cart' | 'checkout' | 'factory_sync' | 'return' | 'admin' | 'system';
+          user_id?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          product_id?: string;
+          variant_id?: string | null;
+          quantity_before?: number;
+          quantity_after?: number;
+          change_amount?: number;
+          reason?: 'sale' | 'reservation' | 'release' | 'restock' | 'sync' | 'adjustment' | 'cancellation';
+          source?: 'cart' | 'checkout' | 'factory_sync' | 'return' | 'admin' | 'system';
+          user_id?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'inventory_audit_log_product_id_fkey';
+            columns: ['product_id'];
+            isOneToOne: false;
+            referencedRelation: 'products';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'inventory_audit_log_user_id_fkey';
+            columns: ['user_id'];
+            isOneToOne: false;
+            referencedRelation: 'users';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      stock_notifications: {
+        Row: {
+          id: string;
+          product_id: string;
+          variant_id: string | null;
+          email: string;
+          status: 'pending' | 'notified' | 'unsubscribed';
+          created_at: string;
+          notified_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          product_id: string;
+          variant_id?: string | null;
+          email: string;
+          status?: 'pending' | 'notified' | 'unsubscribed';
+          created_at?: string;
+          notified_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          product_id?: string;
+          variant_id?: string | null;
+          email?: string;
+          status?: 'pending' | 'notified' | 'unsubscribed';
+          created_at?: string;
+          notified_at?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'stock_notifications_product_id_fkey';
+            columns: ['product_id'];
+            isOneToOne: false;
             referencedRelation: 'products';
             referencedColumns: ['id'];
           },
@@ -727,6 +889,9 @@ export type ShippingAddress = Tables<'shipping_addresses'>;
 export type Order = Tables<'orders'>;
 export type OrderItem = Tables<'order_items'>;
 export type Inventory = Tables<'inventory'>;
+export type CartReservation = Tables<'cart_reservations'>;
+export type InventoryAuditLog = Tables<'inventory_audit_log'>;
+export type StockNotification = Tables<'stock_notifications'>;
 export type EmailLog = Tables<'email_logs'>;
 export type BlogPost = Tables<'blog_posts'>;
 export type ProductReview = Tables<'product_reviews'>;
@@ -739,6 +904,9 @@ export type CustomerInsert = InsertTables<'customers'>;
 export type OrderInsert = InsertTables<'orders'>;
 export type OrderItemInsert = InsertTables<'order_items'>;
 export type InventoryInsert = InsertTables<'inventory'>;
+export type CartReservationInsert = InsertTables<'cart_reservations'>;
+export type InventoryAuditLogInsert = InsertTables<'inventory_audit_log'>;
+export type StockNotificationInsert = InsertTables<'stock_notifications'>;
 export type EmailLogInsert = InsertTables<'email_logs'>;
 export type NewsletterSubscription = Tables<'newsletter_subscriptions'>;
 export type NewsletterSubscriptionInsert = InsertTables<'newsletter_subscriptions'>;
@@ -751,6 +919,9 @@ export type CustomerUpdate = UpdateTables<'customers'>;
 export type OrderUpdate = UpdateTables<'orders'>;
 export type OrderItemUpdate = UpdateTables<'order_items'>;
 export type InventoryUpdate = UpdateTables<'inventory'>;
+export type CartReservationUpdate = UpdateTables<'cart_reservations'>;
+export type InventoryAuditLogUpdate = UpdateTables<'inventory_audit_log'>;
+export type StockNotificationUpdate = UpdateTables<'stock_notifications'>;
 export type EmailLogUpdate = UpdateTables<'email_logs'>;
 export type BlogPostUpdate = UpdateTables<'blog_posts'>;
 
