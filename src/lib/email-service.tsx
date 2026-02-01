@@ -7,6 +7,8 @@ import React from 'react';
 import { Resend } from 'resend';
 import { render } from '@react-email/components';
 import OrderConfirmationEmail from '@/emails/order-confirmation';
+import ProductionStartedEmail from '@/emails/production-started';
+import QualityCheckEmail from '@/emails/quality-check-complete';
 import ShipmentNotificationEmail from '@/emails/shipment-notification';
 import DeliveryConfirmationEmail from '@/emails/delivery-confirmation';
 import ReviewRequestEmail from '@/emails/review-request';
@@ -22,6 +24,8 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  */
 export type EmailType =
   | 'order_confirmation'
+  | 'production_started'
+  | 'quality_check_complete'
   | 'shipment_notification'
   | 'delivery_confirmation'
   | 'review_request'
@@ -141,6 +145,106 @@ export async function sendOrderConfirmation(
     }
 
     logEmailError('order_confirmation', order.order_number, error);
+    throw new Error('EMAIL_SEND_FAILED');
+  }
+}
+
+/**
+ * Send production started email
+ * @param email - Recipient email address
+ * @param details - Production started details
+ * @returns Email ID if successful, throws error if failed
+ */
+export async function sendProductionStartedEmail(
+  email: string,
+  details: {
+    customerName?: string;
+    orderNumber: string;
+    items: number;
+    estimatedDelivery?: string;
+  }
+): Promise<{ emailId: string }> {
+  if (!email || !validateEmail(email)) {
+    throw new Error('INVALID_EMAIL');
+  }
+
+  try {
+    const resend = getResendClient();
+    const emailHtml = await render(<ProductionStartedEmail {...details} />);
+
+    const { data, error } = await resend.emails.send({
+      from: 'Lyra Fashion <orders@lyrafashion.com.np>',
+      to: email,
+      subject: `Your Order is in Production - ${details.orderNumber}`,
+      html: emailHtml,
+    });
+
+    if (error) {
+      logEmailError('production_started', details.orderNumber, error);
+      throw new Error('EMAIL_SEND_FAILED');
+    }
+
+    return { emailId: data.id };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === 'INVALID_EMAIL') {
+      throw error;
+    }
+
+    if (error instanceof Error && error.message === 'EMAIL_SEND_FAILED') {
+      throw error;
+    }
+
+    logEmailError('production_started', details.orderNumber, error);
+    throw new Error('EMAIL_SEND_FAILED');
+  }
+}
+
+/**
+ * Send quality check complete email
+ * @param email - Recipient email address
+ * @param details - Quality check complete details
+ * @returns Email ID if successful, throws error if failed
+ */
+export async function sendQualityCheckEmail(
+  email: string,
+  details: {
+    customerName?: string;
+    orderNumber: string;
+    items: number;
+    estimatedDelivery?: string;
+  }
+): Promise<{ emailId: string }> {
+  if (!email || !validateEmail(email)) {
+    throw new Error('INVALID_EMAIL');
+  }
+
+  try {
+    const resend = getResendClient();
+    const emailHtml = await render(<QualityCheckEmail {...details} />);
+
+    const { data, error } = await resend.emails.send({
+      from: 'Lyra Fashion <orders@lyrafashion.com.np>',
+      to: email,
+      subject: `Quality Check Complete - ${details.orderNumber}`,
+      html: emailHtml,
+    });
+
+    if (error) {
+      logEmailError('quality_check_complete', details.orderNumber, error);
+      throw new Error('EMAIL_SEND_FAILED');
+    }
+
+    return { emailId: data.id };
+  } catch (error: unknown) {
+    if (error instanceof Error && error.message === 'INVALID_EMAIL') {
+      throw error;
+    }
+
+    if (error instanceof Error && error.message === 'EMAIL_SEND_FAILED') {
+      throw error;
+    }
+
+    logEmailError('quality_check_complete', details.orderNumber, error);
     throw new Error('EMAIL_SEND_FAILED');
   }
 }

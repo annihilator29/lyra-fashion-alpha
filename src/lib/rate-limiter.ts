@@ -119,6 +119,32 @@ class RateLimiter {
 export const rateLimiter = new RateLimiter();
 
 /**
+ * Rate limit result type for modern API
+ */
+export interface RateLimitResult {
+  success: boolean;
+  limit: number;
+  remaining: number;
+  reset: number;
+}
+
+/**
+ * Modern rate limiter interface for API routes
+ * Compatible with @upstash/ratelimit style API
+ */
+export const ratelimit = {
+  async limit(identifier: string): Promise<RateLimitResult> {
+    const result = rateLimiter.check(identifier, 10, 60 * 1000); // 10 requests per minute for order lookup
+    return {
+      success: !result.isLimited,
+      limit: 10,
+      remaining: result.remaining,
+      reset: result.resetTime,
+    };
+  }
+};
+
+/**
  * Middleware-specific rate limiting helper
  * Returns true if request should be blocked, false otherwise
  */

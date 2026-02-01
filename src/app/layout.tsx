@@ -28,10 +28,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased`}>
+    <html lang="en" className="h-full">
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased h-full flex flex-col`}>
         <Header />
-        {children}
+        <main className="flex-1">
+          {children}
+        </main>
         <SiteFooter />
         <Toaster richColors />
       </body>

@@ -235,6 +235,7 @@ export interface Database {
           production_stages: Json | null;
           tracking_number: string | null;
           carrier: string | null;
+          estimated_delivery_date: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -257,6 +258,7 @@ export interface Database {
           production_stages?: Json | null;
           tracking_number?: string | null;
           carrier?: string | null;
+          estimated_delivery_date?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -279,6 +281,7 @@ export interface Database {
           production_stages?: Json | null;
           tracking_number?: string | null;
           carrier?: string | null;
+          estimated_delivery_date?: string | null;
           created_at?: string;
           updated_at?: string;
         };

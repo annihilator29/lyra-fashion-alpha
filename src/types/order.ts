@@ -19,6 +19,7 @@ export interface ProductionStages {
 
 export interface OrderWithItems {
   id: string;
+  order_number?: string;
   customer_id: string | null;
   customer_email: string | null;
   status: OrderStatus;
@@ -50,6 +51,7 @@ export interface OrderWithItems {
   production_stages: ProductionStages | null;
   tracking_number: string | null;
   carrier: string | null;
+  estimated_delivery_date: string | null;
   created_at: string;
   updated_at: string;
   order_items?: Array<{

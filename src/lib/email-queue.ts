@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 import { queueReviewRequest } from '@/actions/review-emails';
 import {
   sendOrderConfirmation,
+  sendProductionStartedEmail,
+  sendQualityCheckEmail,
   sendShipmentNotification,
   sendDeliveryConfirmation,
   sendNewsletter,
@@ -197,6 +199,24 @@ async function sendQueuedEmail(item: QueueItem): Promise<void> {
         created_at: item.template_data.created_at,
         order_items: item.template_data.order_items,
         shipping_address: item.template_data.shipping_address,
+      });
+      break;
+
+    case 'production_started':
+      await sendProductionStartedEmail(item.recipient_email, {
+        customerName: item.template_data.customer_name,
+        orderNumber: item.template_data.order_number,
+        items: item.template_data.item_count,
+        estimatedDelivery: item.template_data.estimated_delivery,
+      });
+      break;
+
+    case 'quality_check_complete':
+      await sendQualityCheckEmail(item.recipient_email, {
+        customerName: item.template_data.customer_name,
+        orderNumber: item.template_data.order_number,
+        items: item.template_data.item_count,
+        estimatedDelivery: item.template_data.estimated_delivery,
       });
       break;
 
