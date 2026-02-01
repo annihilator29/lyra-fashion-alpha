@@ -6,11 +6,12 @@
 
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { createClient } from '@/lib/supabase/client';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Inventory } from '@/types/database.types';
+import type { RealtimeChannel } from '@supabase/supabase-js';
 
 interface StockIndicatorProps {
   productId: string;
@@ -27,6 +28,7 @@ export function StockIndicator({
 }: StockIndicatorProps) {
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const channelRef = useRef<RealtimeChannel | null>(null);
 
   const fetchInventory = useCallback(async () => {
     setIsLoading(true);
@@ -58,6 +60,12 @@ export function StockIndicator({
     // Initial fetch
     fetchInventory();
 
+    // Cleanup any existing subscription first
+    if (channelRef.current) {
+      channelRef.current.unsubscribe();
+      channelRef.current = null;
+    }
+
     // Subscribe to realtime changes
     const channel = supabase
       .channel(`inventory:${productId}:${variantId || 'default'}`)
@@ -71,20 +79,26 @@ export function StockIndicator({
         },
         (payload) => {
           const newInventory = payload.new as Inventory;
-          // Check if variant matches (if specified)
-          if (variantId && newInventory.variant_id !== variantId) {
-            return;
+          // Check if variant matches (handle all cases explicitly)
+          const variantMatches = variantId 
+            ? variantId === newInventory.variant_id
+            : (newInventory.variant_id === null || newInventory.variant_id === undefined);
+
+          if (variantMatches) {
+            setInventory(newInventory);
           }
-          if (!variantId && newInventory.variant_id !== null) {
-            return;
-          }
-          setInventory(newInventory);
         }
       )
       .subscribe();
 
+    // Store reference for cleanup
+    channelRef.current = channel;
+
     return () => {
-      channel.unsubscribe();
+      if (channelRef.current) {
+        channelRef.current.unsubscribe();
+        channelRef.current = null;
+      }
     };
   }, [productId, variantId, fetchInventory]);
 

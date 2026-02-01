@@ -70,7 +70,7 @@ describe('Inventory System', () => {
     it('should successfully reserve inventory when available', async () => {
       const mockResult = {
         success: true,
-        reservation_id: 'res-123',
+        reservation_id: '550e8400-e29b-41d4-a716-446655440001',
         message: 'Inventory reserved successfully',
       };
 
@@ -79,14 +79,19 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const result = await reserveInventory('cart-1', 'prod-1', 'var-1', 5);
+      const result = await reserveInventory(
+        '550e8400-e29b-41d4-a716-446655440002',
+        '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        '6ba7b811-9dad-11d1-80b4-00c04fd430c9',
+        5
+      );
 
       expect(result.success).toBe(true);
-      expect(result.reservation_id).toBe('res-123');
+      expect(result.reservation_id).toBe('550e8400-e29b-41d4-a716-446655440001');
       expect(mockSupabase.rpc).toHaveBeenCalledWith('reserve_inventory', {
-        p_cart_id: 'cart-1',
-        p_product_id: 'prod-1',
-        p_variant_id: 'var-1',
+        p_cart_id: '550e8400-e29b-41d4-a716-446655440002',
+        p_product_id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        p_variant_id: '6ba7b811-9dad-11d1-80b4-00c04fd430c9',
         p_quantity: 5,
         p_expires_at: expect.any(String),
       });
@@ -105,7 +110,12 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const result = await reserveInventory('cart-1', 'prod-1', null, 10);
+      const result = await reserveInventory(
+        '550e8400-e29b-41d4-a716-446655440002',
+        '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        null,
+        10
+      );
 
       expect(result.success).toBe(false);
       expect(result.error).toBe('INSUFFICIENT_INVENTORY');
@@ -117,10 +127,36 @@ describe('Inventory System', () => {
         error: { message: 'Database connection failed' },
       });
 
-      const result = await reserveInventory('cart-1', 'prod-1', null, 5);
+      const result = await reserveInventory(
+        '550e8400-e29b-41d4-a716-446655440002',
+        '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        null,
+        5
+      );
 
       expect(result.success).toBe(false);
-      expect(result.message).toContain('Failed to reserve inventory');
+      expect(result.message).toContain('Database connection failed');
+    });
+
+    it('should reject invalid UUID format', async () => {
+      const result = await reserveInventory('invalid-id', '6ba7b810-9dad-11d1-80b4-00c04fd430c8', null, 5);
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('INVALID_INPUT');
+      expect(result.message).toContain('Invalid ID format');
+    });
+
+    it('should reject negative quantity', async () => {
+      const result = await reserveInventory(
+        '550e8400-e29b-41d4-a716-446655440002',
+        '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        null,
+        -5
+      );
+
+      expect(result.success).toBe(false);
+      expect(result.error).toBe('INVALID_INPUT');
+      expect(result.message).toContain('Quantity must be greater than 0');
     });
   });
 
@@ -137,7 +173,10 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const result = await releaseReservation('res-123', 'cancellation');
+      const result = await releaseReservation(
+        '550e8400-e29b-41d4-a716-446655440001',
+        'cancellation'
+      );
 
       expect(result.success).toBe(true);
       expect(result.quantity_released).toBe(5);
@@ -155,10 +194,19 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const result = await releaseReservation('invalid-id');
+      const result = await releaseReservation(
+        '6ba7b812-9dad-11d1-80b4-00c04fd430ca'
+      );
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('not found');
+    });
+
+    it('should reject invalid UUID format', async () => {
+      const result = await releaseReservation('not-a-uuid');
+
+      expect(result.success).toBe(false);
+      expect(result.message).toContain('Invalid ID format');
     });
   });
 
@@ -171,7 +219,7 @@ describe('Inventory System', () => {
         eq: jest.fn().mockReturnThis(),
       });
 
-      const result = await extendReservation('res-123', 30);
+      const result = await extendReservation('6ba7b812-9dad-11d1-80b4-00c04fd430ca', 30);
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('30 minutes');
@@ -193,7 +241,7 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const result = await adjustInventory('prod-1', null, 20, 'restock', 'admin');
+      const result = await adjustInventory('6ba7b810-9dad-11d1-80b4-00c04fd430c8', null, 20, 'restock', 'admin');
 
       expect(result.success).toBe(true);
       expect(result.quantity_after).toBe(120);
@@ -213,7 +261,7 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const result = await adjustInventory('prod-1', null, -5, 'sale', 'checkout');
+      const result = await adjustInventory('6ba7b810-9dad-11d1-80b4-00c04fd430c8', null, -5, 'sale', 'checkout');
 
       expect(result.success).toBe(true);
       expect(result.quantity_after).toBe(95);
@@ -223,8 +271,8 @@ describe('Inventory System', () => {
   describe('convertReservationsToSales', () => {
     it('should convert all reservations to sales after checkout', async () => {
       const mockReservations = [
-        { id: 'res-1', product_id: 'prod-1', variant_id: null, quantity: 2 },
-        { id: 'res-2', product_id: 'prod-2', variant_id: 'var-1', quantity: 1 },
+        { id: '550e8400-e29b-41d4-a716-446655440001', product_id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8', variant_id: null, quantity: 2 },
+        { id: '6ba7b812-9dad-11d1-80b4-00c04fd430ca', product_id: '6ba7b813-9dad-11d1-80b4-00c04fd430cb', variant_id: '6ba7b811-9dad-11d1-80b4-00c04fd430c9', quantity: 1 },
       ];
 
       const mockGt = createMock();
@@ -241,7 +289,7 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const result = await convertReservationsToSales('cart-1', 'order-1');
+      const result = await convertReservationsToSales('550e8400-e29b-41d4-a716-446655440002', '6ba7b814-9dad-11d1-80b4-00c04fd430cc');
 
       expect(result.processed).toBe(2);
     });
@@ -256,15 +304,15 @@ describe('Inventory System', () => {
       });
 
       const result = await createStockNotification({
-        productId: 'prod-1',
-        variantId: 'var-1',
+        productId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        variantId: '6ba7b811-9dad-11d1-80b4-00c04fd430c9',
         email: 'test@example.com',
       });
 
       expect(result.success).toBe(true);
       expect(mockInsert).toHaveBeenCalledWith({
-        product_id: 'prod-1',
-        variant_id: 'var-1',
+        product_id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        variant_id: '6ba7b811-9dad-11d1-80b4-00c04fd430c9',
         email: 'test@example.com',
         status: 'pending',
       });
@@ -280,7 +328,7 @@ describe('Inventory System', () => {
       });
 
       const result = await createStockNotification({
-        productId: 'prod-1',
+        productId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
         email: 'test@example.com',
       });
 
@@ -292,7 +340,7 @@ describe('Inventory System', () => {
   describe('getAvailableInventory', () => {
     it('should return available inventory for a product', async () => {
       const mockInventory = {
-        product_id: 'prod-1',
+        product_id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
         variant_id: null,
         total_quantity: 100,
         reserved_quantity: 10,
@@ -308,7 +356,7 @@ describe('Inventory System', () => {
         single: mockSingle,
       });
 
-      const { data, error } = await getAvailableInventory('prod-1');
+      const { data, error } = await getAvailableInventory('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
 
       expect(error).toBeNull();
       expect(data).not.toBeNull();
@@ -344,7 +392,7 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const { data, error } = await checkStockStatus('prod-1');
+      const { data, error } = await checkStockStatus('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
 
       expect(error).toBeNull();
       expect(data?.isLowStock).toBe(false);
@@ -363,7 +411,7 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const { data, error } = await checkStockStatus('prod-1');
+      const { data, error } = await checkStockStatus('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
 
       expect(error).toBeNull();
       expect(data?.isLowStock).toBe(true);
@@ -381,7 +429,7 @@ describe('Inventory System', () => {
         error: null,
       });
 
-      const { data, error } = await checkStockStatus('prod-1');
+      const { data, error } = await checkStockStatus('6ba7b810-9dad-11d1-80b4-00c04fd430c8');
 
       expect(error).toBeNull();
       expect(data?.isLowStock).toBe(false);
@@ -393,9 +441,9 @@ describe('Inventory System', () => {
     it('should return active reservations for a cart', async () => {
       const mockReservations = [
         {
-          id: 'res-1',
-          cart_id: 'cart-1',
-          product_id: 'prod-1',
+          id: '550e8400-e29b-41d4-a716-446655440001',
+          cart_id: '550e8400-e29b-41d4-a716-446655440002',
+          product_id: '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
           quantity: 2,
           expires_at: '2026-12-31T23:59:59Z',
         },
@@ -410,7 +458,7 @@ describe('Inventory System', () => {
         order: mockOrder,
       });
 
-      const { data, error } = await getCartReservations('cart-1');
+      const { data, error } = await getCartReservations('550e8400-e29b-41d4-a716-446655440002');
 
       expect(error).toBeNull();
       expect(data).toHaveLength(1);
@@ -420,8 +468,8 @@ describe('Inventory System', () => {
   describe('releaseExpiredReservations', () => {
     it('should release all expired reservations', async () => {
       const mockExpiredReservations = [
-        { id: 'res-1' },
-        { id: 'res-2' },
+        { id: '550e8400-e29b-41d4-a716-446655440001' },
+        { id: '6ba7b812-9dad-11d1-80b4-00c04fd430ca' },
       ];
 
       const mockLt = createMock();

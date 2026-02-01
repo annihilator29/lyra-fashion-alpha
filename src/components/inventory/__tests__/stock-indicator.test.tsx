@@ -43,7 +43,7 @@ describe('StockIndicator', () => {
   });
 
   it('renders loading state initially', () => {
-    render(<StockIndicator productId="prod-1" />);
+    render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
     
     // Should show skeleton loader
     // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
@@ -66,7 +66,7 @@ describe('StockIndicator', () => {
       single: mockSingle,
     });
 
-    render(<StockIndicator productId="prod-1" />);
+    render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
 
     await waitFor(() => {
       // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
@@ -90,7 +90,7 @@ describe('StockIndicator', () => {
       single: mockSingle,
     });
 
-    render(<StockIndicator productId="prod-1" />);
+    render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
 
     await waitFor(() => {
       // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
@@ -114,7 +114,7 @@ describe('StockIndicator', () => {
       single: mockSingle,
     });
 
-    render(<StockIndicator productId="prod-1" showQuantity={true} />);
+    render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" showQuantity={true} />);
 
     await waitFor(() => {
       // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
@@ -132,7 +132,7 @@ describe('StockIndicator', () => {
       single: mockSingle,
     });
 
-    render(<StockIndicator productId="prod-1" />);
+    render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
 
     await waitFor(() => {
       // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
@@ -156,7 +156,7 @@ describe('StockIndicator', () => {
       single: mockSingle,
     });
 
-    render(<StockIndicator productId="prod-1" />);
+    render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
 
     await waitFor(() => {
       const indicator = screen.getByLabelText(/Stock status: Out of stock/i);
