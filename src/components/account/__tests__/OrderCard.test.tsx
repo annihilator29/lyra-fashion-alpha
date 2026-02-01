@@ -34,6 +34,8 @@ const mockOrder: OrderWithItems = {
   shipped_at: '2025-01-04T10:00:00Z',
   delivered_at: '2025-01-05T10:00:00Z',
   production_stages: null,
+  production_completion_estimate: null,
+  qc_photo_url: null,
   tracking_number: '1Z999AA10123456784',
   carrier: 'ups',
   estimated_delivery_date: '2025-01-06T10:00:00Z',

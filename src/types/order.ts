@@ -10,12 +10,25 @@ export type OrderStatus =
   | 'delivered'
   | 'cancelled';
 
-export interface ProductionStages {
-  cutting?: { status: string; completed_at?: string };
-  sewing?: { status: string; completed_at?: string };
-  finishing?: { status: string; completed_at?: string };
-  qc?: { status: string; completed_at?: string };
+export type ProductionStageStatus = 'not_started' | 'in_progress' | 'completed';
+
+export type ProductionStageName = 'cutting' | 'sewing' | 'finishing' | 'qc';
+
+export interface ProductionStage {
+  status: ProductionStageStatus;
+  started_at?: string;
+  completed_at?: string;
 }
+
+export interface ProductionStages {
+  cutting: ProductionStage;
+  sewing: ProductionStage;
+  finishing: ProductionStage;
+  qc: ProductionStage;
+}
+
+// Helper type for indexing ProductionStages
+export type ProductionStagesMap = Record<ProductionStageName, ProductionStage>;
 
 export interface OrderWithItems {
   id: string;
@@ -49,6 +62,8 @@ export interface OrderWithItems {
   shipped_at: string | null;
   delivered_at: string | null;
   production_stages: ProductionStages | null;
+  production_completion_estimate: string | null;
+  qc_photo_url: string | null;
   tracking_number: string | null;
   carrier: string | null;
   estimated_delivery_date: string | null;

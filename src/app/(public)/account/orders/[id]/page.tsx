@@ -7,6 +7,8 @@ import OrderItemsList from '@/components/account/OrderItemsList';
 import ShippingAddressDisplay from '@/components/account/ShippingAddressDisplay';
 import TrackingLink from '@/components/account/TrackingLink';
 import OrderDetailClient from '@/components/account/OrderDetailClient';
+import { ProductionStages } from '@/components/orders/production-stages';
+import { QCPhotoGallery, QCPhotoPlaceholder } from '@/components/orders/qc-photo-gallery';
 import type { OrderWithItems } from '@/types/order';
 
 interface PageProps {
@@ -65,9 +67,43 @@ export default async function OrderDetailPage({ params }: PageProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
         {/* Status Timeline */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4">Order Status</h2>
-          <OrderStatusTimeline order={order as OrderWithItems} />
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-xl font-semibold mb-4">Order Status</h2>
+            <OrderStatusTimeline order={order as OrderWithItems} />
+          </div>
+          
+          {/* Production Stages - shown when in production or quality_check */}
+          {(order.status === 'production' || order.status === 'quality_check') && order.production_stages && (
+            <ProductionStages 
+              stages={order.production_stages as NonNullable<OrderWithItems['production_stages']>} 
+            />
+          )}
+          
+          {/* Production Completion Estimate - AC-2 */}
+          {(order.status === 'production' || order.status === 'quality_check') && order.production_completion_estimate && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <h4 className="font-semibold text-blue-900 mb-1">Estimated Completion</h4>
+              <p className="text-blue-800">
+                {new Date(order.production_completion_estimate).toLocaleDateString('en-US', {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              </p>
+            </div>
+          )}
+          
+          {/* QC Photo Gallery - AC-4 (optional, graceful degradation) */}
+          {order.qc_photo_url ? (
+            <QCPhotoGallery 
+              photoUrl={order.qc_photo_url} 
+              orderNumber={order.order_number || undefined}
+            />
+          ) : order.status === 'quality_check' || order.status === 'shipped' || order.status === 'delivered' ? (
+            <QCPhotoPlaceholder />
+          ) : null}
         </div>
 
         {/* Order Details */}

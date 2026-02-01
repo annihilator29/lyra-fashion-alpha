@@ -233,6 +233,8 @@ export interface Database {
           shipped_at: string | null;
           delivered_at: string | null;
           production_stages: Json | null;
+          production_completion_estimate: string | null;
+          qc_photo_url: string | null;
           tracking_number: string | null;
           carrier: string | null;
           estimated_delivery_date: string | null;
@@ -256,6 +258,8 @@ export interface Database {
           shipped_at?: string | null;
           delivered_at?: string | null;
           production_stages?: Json | null;
+          production_completion_estimate?: string | null;
+          qc_photo_url?: string | null;
           tracking_number?: string | null;
           carrier?: string | null;
           estimated_delivery_date?: string | null;
@@ -279,6 +283,8 @@ export interface Database {
           shipped_at?: string | null;
           delivered_at?: string | null;
           production_stages?: Json | null;
+          production_completion_estimate?: string | null;
+          qc_photo_url?: string | null;
           tracking_number?: string | null;
           carrier?: string | null;
           estimated_delivery_date?: string | null;
