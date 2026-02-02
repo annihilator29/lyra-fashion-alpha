@@ -87,6 +87,7 @@ export interface OrderWithItems {
       category: string;
       images: string[];
       price: number;
+      final_sale?: boolean;
     };
   }>;
 }
