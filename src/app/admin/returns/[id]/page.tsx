@@ -12,6 +12,7 @@
 
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
 import { isAdmin } from '@/lib/auth/roles';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,6 @@ import {
   Package, 
   User, 
   DollarSign, 
-  Calendar,
   Truck,
   FileText,
   CheckCircle,
@@ -169,10 +169,12 @@ export default async function AdminReturnDetailPage({ params }: AdminReturnDetai
                   <div key={item.id} className="flex items-start gap-4 p-4 border rounded-lg">
                     {item.products?.images?.[0] && (
                       <div className="relative w-20 h-20 flex-shrink-0">
-                        <img
+                        <Image
                           src={item.products.images[0]}
                           alt={item.products.name}
-                          className="w-full h-full object-cover rounded-md"
+                          width={80}
+                          height={80}
+                          className="object-cover rounded-md"
                         />
                       </div>
                     )}

@@ -6,7 +6,13 @@
  */
 
 import { createClient } from '@/lib/supabase/client';
-import type { CreateReturnData, ReturnStatusUpdate, Return, ReturnWithOrder } from '@/types/returns';
+import type { CreateReturnData, ReturnStatusUpdate, Return } from '@/types/returns';
+import {
+  sendReturnRequestedEmail,
+  sendReturnApprovedEmail,
+  sendReturnRefundedEmail,
+  sendReturnRejectedEmail,
+} from '@/lib/emails/returns';
 
 /**
  * Error code to user-friendly message mapping
@@ -219,6 +225,22 @@ export async function createReturnRequest(
     };
   }
 
+  // Send confirmation email asynchronously (AC-2)
+  if (returnRecord) {
+    const { data: orderData } = await supabase
+      .from('orders')
+      .select('id, order_number, customer_email')
+      .eq('id', data.orderId)
+      .single();
+
+    if (orderData?.customer_email) {
+      sendReturnRequestedEmail({
+        returnData: returnRecord as Return,
+        order: orderData,
+      }).catch(err => console.error('Failed to send return requested email:', err));
+    }
+  }
+
   return {
     success: true,
     return: returnRecord as Return,
@@ -367,6 +389,22 @@ export async function approveReturn(
     };
   }
 
+  // Send approved email with shipping label (AC-4)
+  if (returnRecord) {
+    const { data: orderData } = await supabase
+      .from('orders')
+      .select('id, order_number, customer_email')
+      .eq('id', returnRecord.order_id)
+      .single();
+
+    if (orderData?.customer_email) {
+      sendReturnApprovedEmail({
+        returnData: returnRecord as Return,
+        order: orderData,
+      }).catch(err => console.error('Failed to send return approved email:', err));
+    }
+  }
+
   return {
     success: true,
     return: returnRecord as Return,
@@ -421,6 +459,22 @@ export async function processRefund(
       error: error.code || 'UNKNOWN_ERROR',
       message: error.message || ERROR_MESSAGES.UNKNOWN_ERROR,
     };
+  }
+
+  // Send refund confirmation email (AC-4)
+  if (returnRecord) {
+    const { data: orderData } = await supabase
+      .from('orders')
+      .select('id, order_number, customer_email')
+      .eq('id', returnRecord.order_id)
+      .single();
+
+    if (orderData?.customer_email) {
+      sendReturnRefundedEmail({
+        returnData: returnRecord as Return,
+        order: orderData,
+      }).catch(err => console.error('Failed to send return refunded email:', err));
+    }
   }
 
   return {
@@ -481,6 +535,22 @@ export async function rejectReturn(
       error: error.code || 'UNKNOWN_ERROR',
       message: error.message || ERROR_MESSAGES.UNKNOWN_ERROR,
     };
+  }
+
+  // Send rejection email (AC-4)
+  if (returnRecord) {
+    const { data: orderData } = await supabase
+      .from('orders')
+      .select('id, order_number, customer_email')
+      .eq('id', returnRecord.order_id)
+      .single();
+
+    if (orderData?.customer_email) {
+      sendReturnRejectedEmail({
+        returnData: returnRecord as Return,
+        order: orderData,
+      }).catch(err => console.error('Failed to send return rejected email:', err));
+    }
   }
 
   return {

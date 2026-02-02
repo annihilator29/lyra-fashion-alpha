@@ -35,6 +35,15 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
+  // Validate Shippo API key is configured
+  if (!SHIPPO_API_KEY) {
+    console.error('SHIPPO_API_KEY environment variable is not set');
+    return NextResponse.json(
+      { error: 'Shipping service not configured. Contact support.' },
+      { status: 503 }
+    );
+  }
+
   try {
     const { id } = await params;
 

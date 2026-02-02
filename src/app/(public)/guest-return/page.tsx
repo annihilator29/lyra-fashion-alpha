@@ -179,7 +179,7 @@ export default async function GuestReturnPage({ searchParams }: GuestReturnPageP
                           <strong>{daysRemaining} days remaining</strong> to initiate a return.
                         </p>
                         <Link 
-                          href={`/account/orders/${order.id}/return`}
+                          href={`/guest-return/${order.id}/request?email=${encodeURIComponent(email || '')}`}
                         >
                           <Button className="w-full" size="lg">
                             Start Return Process

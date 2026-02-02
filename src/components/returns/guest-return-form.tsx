@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Package, Search, AlertCircle } from 'lucide-react';
+import { Package, Search } from 'lucide-react';
 
 export function GuestReturnForm() {
   const router = useRouter();
