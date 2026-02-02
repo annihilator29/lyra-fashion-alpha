@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Scissors, PenTool, Sparkles, CheckCircle2, Upload } from 'lucide-react';
 import { ProductionStageName, ProductionStageStatus, ProductionStages } from '@/types/order';
 import { 
@@ -283,9 +284,11 @@ export function ProductionStageUpdateForm({
         {qcPhotoUrl ? (
           <div className="mb-4">
             <p className="text-sm text-green-600 mb-2">✓ QC photo already uploaded</p>
-            <img 
-              src={qcPhotoUrl} 
-              alt="QC Photo" 
+            <Image
+              src={qcPhotoUrl}
+              alt="QC Photo"
+              width={320}
+              height={240}
               className="w-full max-w-xs rounded-lg border"
             />
           </div>

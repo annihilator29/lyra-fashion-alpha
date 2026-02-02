@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { isAdmin } from '@/lib/auth/roles';
 import { ProductionStages } from '@/components/orders/production-stages';
 import { ProductionStageUpdateForm } from '@/components/orders/production-update-form';
@@ -149,9 +150,11 @@ export default async function AdminProductionDetailPage({ params }: PageProps) {
               }) => (
                 <div key={item.id} className="flex items-center gap-4">
                   {item.products?.images?.[0] && (
-                    <img 
-                      src={item.products.images[0]} 
+                    <Image
+                      src={item.products.images[0]}
                       alt={item.products.name}
+                      width={64}
+                      height={64}
                       className="w-16 h-16 object-cover rounded"
                     />
                   )}
