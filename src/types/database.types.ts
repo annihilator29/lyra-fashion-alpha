@@ -124,6 +124,8 @@ export interface Database {
           avatar_url: string | null;
           preferences: Json | null;
           email_preferences: Json | null;
+          role: 'customer' | 'admin' | 'super_admin';
+          last_login: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -135,6 +137,8 @@ export interface Database {
           avatar_url?: string | null;
           preferences?: Json | null;
           email_preferences?: Json | null;
+          role?: 'customer' | 'admin' | 'super_admin';
+          last_login?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -146,6 +150,8 @@ export interface Database {
           avatar_url?: string | null;
           preferences?: Json | null;
           email_preferences?: Json | null;
+          role?: 'customer' | 'admin' | 'super_admin';
+          last_login?: string | null;
           created_at?: string;
           updated_at?: string;
         };

@@ -24,6 +24,8 @@ describe('ProfileForm', () => {
     avatar_url: null,
     preferences: null,
     email_preferences: null,
+    role: 'customer',
+    last_login: null,
     created_at: '2025-01-01T00:00:00Z',
     updated_at: '2025-01-01T00:00:00Z',
   }
