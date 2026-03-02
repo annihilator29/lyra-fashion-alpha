@@ -6,6 +6,7 @@
 
 'use client';
 
+import Image from 'next/image';
 import { Menu, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAdmin } from './admin-provider';
@@ -43,10 +44,12 @@ export function AdminHeader() {
           </div>
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
             {user.avatar_url ? (
-              <img
+              <Image
                 src={user.avatar_url}
                 alt={user.name || user.email}
-                className="h-10 w-10 rounded-full object-cover"
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
               />
             ) : (
               <span className="text-sm font-medium text-primary">

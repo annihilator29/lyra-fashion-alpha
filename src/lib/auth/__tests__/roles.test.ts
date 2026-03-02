@@ -10,8 +10,7 @@ import {
   isAdmin, 
   getUserRole, 
   requireAdmin, 
-  hasRole,
-  UserRole 
+  hasRole
 } from '@/lib/auth/roles';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';

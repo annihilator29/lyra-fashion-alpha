@@ -6,8 +6,7 @@
 
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
-import { getUserRole, isAdmin } from '@/lib/auth/roles';
+import { isAdmin } from '@/lib/auth/roles';
 import { getDashboardMetrics } from '@/app/admin/actions';
 import { MetricCard } from '@/components/admin/metric-card';
 import { QuickLinksGrid } from '@/components/admin/quick-links-grid';
@@ -23,8 +22,6 @@ import {
   Factory,
   FileText,
   Box,
-  Settings,
-  Shield,
 } from 'lucide-react';
 
 // Loading skeleton for dashboard metrics
