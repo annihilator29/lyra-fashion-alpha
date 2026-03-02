@@ -1,0 +1,1 @@
+Backup of original admin page before 7.1c changes

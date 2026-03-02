@@ -5,24 +5,25 @@
 
 export const ORDER_STATUS_COLORS = {
   pending: '#F59E0B', // Amber
-  processing: '#3B82F6', // Blue
+  production: '#3B82F6', // Blue
+  quality_check: '#8B5CF6', // Purple
   shipped: '#6366F1', // Indigo
   delivered: '#10B981', // Green
   cancelled: '#EF4444', // Red
-  refunded: '#6B7280', // Gray
 } as const;
 
-export type OrderStatus = keyof typeof ORDER_STATUS_COLORS;
+export type OrderStatusColor = keyof typeof ORDER_STATUS_COLORS;
 
 export const getStatusColor = (status: string): string => {
-  return ORDER_STATUS_COLORS[status as OrderStatus] ?? '#9CA3AF'; // Default gray
+  return ORDER_STATUS_COLORS[status as OrderStatusColor] ?? '#9CA3AF'; // Default gray
 };
 
-export const STATUS_LABELS: Record<OrderStatus, string> = {
+// Simple status labels for visualization purposes
+export const STATUS_LABELS_FOR_CHARTS: Record<string, string> = {
   pending: 'Pending',
-  processing: 'Processing',
+  production: 'In Production',
+  quality_check: 'Quality Check',
   shipped: 'Shipped',
   delivered: 'Delivered',
   cancelled: 'Cancelled',
-  refunded: 'Refunded',
 };

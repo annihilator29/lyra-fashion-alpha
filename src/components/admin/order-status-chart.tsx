@@ -10,7 +10,8 @@ import { memo } from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrderStatusData } from '@/app/admin/analytics-actions';
-import { ORDER_STATUS_COLORS, STATUS_LABELS } from '@/lib/constants/status-colors';
+import { ORDER_STATUS_COLORS } from '@/lib/constants/status-colors';
+import { STATUS_LABELS } from '@/lib/orders/status-transitions';
 
 interface OrderStatusChartProps {
   data: OrderStatusData[];
@@ -32,7 +33,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
   return (
     <div className="rounded-lg border bg-popover p-3 shadow-md text-sm">
       <p className="font-medium mb-1">
-        {STATUS_LABELS[item?.status ?? 'pending'] ?? item?.status}
+        {(STATUS_LABELS[item?.status as keyof typeof STATUS_LABELS] ?? item?.status)}
       </p>
       <p className="text-muted-foreground">
         {item?.count} orders ({item?.percentage}%)
@@ -61,7 +62,7 @@ function CustomLegend({ payload }: CustomLegendProps) {
             style={{ backgroundColor: entry.color }}
           />
           <span className="text-muted-foreground">
-            {STATUS_LABELS[entry.payload.status] ?? entry.payload.status} (
+            {STATUS_LABELS[entry.payload.status as keyof typeof STATUS_LABELS] ?? entry.payload.status} (
             {entry.payload.count})
           </span>
         </div>
@@ -178,7 +179,7 @@ function OrderStatusChart({ data, isLoading = false }: OrderStatusChartProps) {
             {data.map((entry) => (
               <Cell
                 key={`cell-${entry.status}`}
-                fill={ORDER_STATUS_COLORS[entry.status] ?? '#9CA3AF'}
+                fill={ORDER_STATUS_COLORS[entry.status as keyof typeof ORDER_STATUS_COLORS] ?? '#9CA3AF'}
               />
             ))}
           </Pie>

@@ -1,17 +1,18 @@
 /**
  * Admin Dashboard Page
- * Story 7.1a + 7.1b: Admin Dashboard - Foundation + Data Visualization
- * Main dashboard displaying key metrics, quick navigation, and charts
+ * Story 7.1a + 7.1b + 7.1c: Admin Dashboard - Foundation + Data Visualization + Real-Time Features
+ * Main dashboard displaying key metrics, quick navigation, charts, and real-time recent orders
  */
 
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { isAdmin } from '@/lib/auth/roles';
-import { getDashboardMetrics } from '@/app/admin/actions';
+import { getDashboardMetrics, getRecentOrders } from '@/app/admin/actions';
 import { getDashboardChartData } from '@/app/admin/analytics-actions';
 import { MetricCard } from '@/components/admin/metric-card';
 import { QuickLinksGrid } from '@/components/admin/quick-links-grid';
 import { ChartsSection } from '@/components/admin/charts-section';
+import { RecentOrdersSection } from '@/components/admin/recent-orders-section';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   DollarSign,
@@ -162,6 +163,9 @@ export default async function AdminDashboardPage() {
     redirect('/login?redirect=/admin');
   }
 
+  // Fetch initial recent orders for real-time section
+  const { orders: initialOrders } = await getRecentOrders(10);
+
   return (
     <div className="space-y-8" data-testid="admin-dashboard">
       {/* Page Header */}
@@ -190,18 +194,15 @@ export default async function AdminDashboardPage() {
         </Suspense>
       </section>
 
+      {/* Recent Orders with Real-Time Updates */}
+      <section>
+        <RecentOrdersSection initialOrders={initialOrders} />
+      </section>
+
       {/* Quick Navigation */}
       <section>
         <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
         <QuickLinksGrid links={quickLinks} />
-      </section>
-
-      {/* Recent Activity Placeholder */}
-      <section>
-        <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-        <div className="rounded-lg border bg-card p-8 text-center text-muted-foreground">
-          <p>Recent activity feed coming in Story 7.1c (Real-time Updates)</p>
-        </div>
       </section>
     </div>
   );
