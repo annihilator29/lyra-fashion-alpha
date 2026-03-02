@@ -1,15 +1,17 @@
 /**
  * Admin Dashboard Page
- * Story 7.1a: Admin Dashboard - Foundation
- * Main dashboard displaying key metrics and quick navigation
+ * Story 7.1a + 7.1b: Admin Dashboard - Foundation + Data Visualization
+ * Main dashboard displaying key metrics, quick navigation, and charts
  */
 
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { isAdmin } from '@/lib/auth/roles';
 import { getDashboardMetrics } from '@/app/admin/actions';
+import { getDashboardChartData } from '@/app/admin/analytics-actions';
 import { MetricCard } from '@/components/admin/metric-card';
 import { QuickLinksGrid } from '@/components/admin/quick-links-grid';
+import { ChartsSection } from '@/components/admin/charts-section';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   DollarSign,
@@ -30,6 +32,20 @@ function MetricsSkeleton() {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {[...Array(6)].map((_, i) => (
         <Skeleton key={i} className="h-[120px]" />
+      ))}
+    </div>
+  );
+}
+
+// Loading skeleton for charts
+function ChartsSkeleton() {
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="rounded-xl border bg-card p-6 shadow-sm">
+          <Skeleton className="h-4 w-32 mb-4" />
+          <Skeleton className="h-[300px] w-full" />
+        </div>
       ))}
     </div>
   );
@@ -81,6 +97,21 @@ async function DashboardMetrics() {
         icon={<Users className="h-5 w-5" />}
       />
     </div>
+  );
+}
+
+// Charts section — server component that loads data then passes to client wrapper
+async function DashboardCharts() {
+  const { salesTrends, topProducts, customerGrowth, orderStatus } =
+    await getDashboardChartData('daily');
+
+  return (
+    <ChartsSection
+      initialSalesTrends={salesTrends}
+      initialTopProducts={topProducts}
+      initialCustomerGrowth={customerGrowth}
+      initialOrderStatus={orderStatus}
+    />
   );
 }
 
@@ -148,6 +179,14 @@ export default async function AdminDashboardPage() {
         <h2 className="text-lg font-semibold mb-4">Key Metrics</h2>
         <Suspense fallback={<MetricsSkeleton />}>
           <DashboardMetrics />
+        </Suspense>
+      </section>
+
+      {/* Data Visualization Charts */}
+      <section>
+        <h2 className="text-lg font-semibold mb-4">Analytics</h2>
+        <Suspense fallback={<ChartsSkeleton />}>
+          <DashboardCharts />
         </Suspense>
       </section>
 
