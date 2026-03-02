@@ -46,13 +46,28 @@ function formatXAxisDate(date: string, timeRange: TimeRange): string {
   if (timeRange === 'daily') {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   } else if (timeRange === 'weekly') {
-    return `W${d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+    // Show week range: "Jan 5-11"
+    const weekStart = new Date(d);
+    const weekEnd = new Date(d);
+    weekEnd.setDate(weekEnd.getDate() + 6);
+    const startStr = weekStart.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const endStr = weekEnd.toLocaleDateString('en-US', { day: 'numeric' });
+    return `${startStr}-${endStr}`;
   }
   return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CustomTooltip({ active, payload, label }: any) {
+interface TooltipPayloadItem {
+  value: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadItem[];
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border bg-popover p-3 shadow-md text-sm">
@@ -119,7 +134,7 @@ function RevenueChart({ data, timeRange, onTimeRangeChange, isLoading = false }:
             interval="preserveStartEnd"
           />
           <YAxis
-            tickFormatter={(v) => formatCurrency(v)}
+            tickFormatter={(v: number) => formatCurrency(v)}
             tick={{ fontSize: 11 }}
             tickLine={false}
             axisLine={false}

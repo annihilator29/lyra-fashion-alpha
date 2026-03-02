@@ -16,6 +16,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  LabelList,
 } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TopProductData } from '@/app/admin/analytics-actions';
@@ -39,10 +40,19 @@ function formatCurrency(value: number): string {
   }).format(value / 100);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CustomTooltip({ active, payload }: any) {
+interface TooltipPayloadItem {
+  payload: TopProductData;
+  value: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadItem[];
+}
+
+function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
-  const item = payload[0]?.payload as TopProductData;
+  const item = payload[0]?.payload;
   return (
     <div className="rounded-lg border bg-popover p-3 shadow-md text-sm">
       <p className="font-medium mb-1">{item?.name}</p>
@@ -51,14 +61,14 @@ function CustomTooltip({ active, payload }: any) {
   );
 }
 
-// Color palette for bars
+// Color palette for bars using theme tokens
 const BAR_COLORS = [
   'hsl(var(--primary))',
-  'hsl(207 90% 54%)',
-  'hsl(174 72% 43%)',
-  'hsl(263 70% 58%)',
-  'hsl(31 90% 58%)',
-  'hsl(349 89% 60%)',
+  'hsl(var(--chart-1, 207 90% 54%))',
+  'hsl(var(--chart-2, 174 72% 43%))',
+  'hsl(var(--chart-3, 263 70% 58%))',
+  'hsl(var(--chart-4, 31 90% 58%))',
+  'hsl(var(--chart-5, 349 89% 60%))',
   'hsl(199 89% 48%)',
   'hsl(145 63% 42%)',
   'hsl(45 93% 47%)',
@@ -93,12 +103,12 @@ function TopProductsChart({ data, onViewAll, isLoading = false }: TopProductsCha
         <BarChart
           data={chartData}
           layout="vertical"
-          margin={{ top: 5, right: 40, left: 10, bottom: 5 }}
+          margin={{ top: 5, right: 60, left: 10, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" horizontal={false} className="stroke-muted" />
           <XAxis
             type="number"
-            tickFormatter={(v) => formatCurrency(v)}
+            tickFormatter={(v: number) => formatCurrency(v)}
             tick={{ fontSize: 10 }}
             tickLine={false}
             axisLine={false}
@@ -113,6 +123,13 @@ function TopProductsChart({ data, onViewAll, isLoading = false }: TopProductsCha
           />
           <Tooltip content={<CustomTooltip />} />
           <Bar dataKey="revenue" barSize={20} animationDuration={300} radius={[0, 3, 3, 0]}>
+            <LabelList
+              dataKey="revenue"
+              position="right"
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              formatter={(value: any) => formatCurrency(value as number)}
+              style={{ fontSize: '10px', fill: 'hsl(var(--muted-foreground))' }}
+            />
             {chartData.map((_, index) => (
               <Cell key={`cell-${index}`} fill={BAR_COLORS[index % BAR_COLORS.length]} />
             ))}

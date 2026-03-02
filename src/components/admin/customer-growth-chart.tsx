@@ -43,13 +43,24 @@ function formatXAxisDate(date: string, timeRange: TimeRange): string {
   return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CustomTooltip({ active, payload, label }: any) {
+interface TooltipPayloadEntry {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadEntry[];
+  label?: string;
+}
+
+function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border bg-popover p-3 shadow-md text-sm">
       <p className="font-medium mb-2">{label}</p>
-      {payload.map((entry: { name: string; value: number; color: string }, i: number) => (
+      {payload.map((entry: TooltipPayloadEntry, i: number) => (
         <p key={i} style={{ color: entry.color }} className="font-medium">
           {entry.name}: {entry.value}
         </p>
@@ -117,7 +128,7 @@ function CustomerGrowthChart({
           <Tooltip content={<CustomTooltip />} />
           <Legend
             wrapperStyle={{ paddingTop: '16px', fontSize: '12px' }}
-            formatter={(value) =>
+            formatter={(value: string) =>
               value === 'newSignups' ? 'New Signups' : 'Active Users (Trailing 30d)'
             }
           />

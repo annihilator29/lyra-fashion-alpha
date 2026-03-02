@@ -7,7 +7,7 @@
  */
 
 import { memo } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrderStatusData } from '@/app/admin/analytics-actions';
 import { ORDER_STATUS_COLORS, STATUS_LABELS } from '@/lib/constants/status-colors';
@@ -17,10 +17,18 @@ interface OrderStatusChartProps {
   isLoading?: boolean;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CustomTooltip({ active, payload }: any) {
+interface TooltipPayloadItem {
+  payload: OrderStatusData;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayloadItem[];
+}
+
+function CustomTooltip({ active, payload }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
-  const item = payload[0]?.payload as OrderStatusData;
+  const item = payload[0]?.payload;
   return (
     <div className="rounded-lg border bg-popover p-3 shadow-md text-sm">
       <p className="font-medium mb-1">
@@ -33,36 +41,76 @@ function CustomTooltip({ active, payload }: any) {
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function CustomLegend({ payload }: any) {
+interface LegendEntry {
+  color: string;
+  payload: OrderStatusData;
+}
+
+interface CustomLegendProps {
+  payload?: LegendEntry[];
+}
+
+function CustomLegend({ payload }: CustomLegendProps) {
   if (!payload) return null;
   return (
     <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-2">
-      {payload.map(
-        (
-          entry: { color: string; payload: OrderStatusData },
-          i: number
-        ) => (
-          <div key={i} className="flex items-center gap-1 text-xs">
-            <span
-              className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: entry.color }}
-            />
-            <span className="text-muted-foreground">
-              {STATUS_LABELS[entry.payload.status] ?? entry.payload.status} (
-              {entry.payload.count})
-            </span>
-          </div>
-        )
-      )}
+      {payload.map((entry: LegendEntry, i: number) => (
+        <div key={i} className="flex items-center gap-1 text-xs">
+          <span
+            className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
+            style={{ backgroundColor: entry.color }}
+          />
+          <span className="text-muted-foreground">
+            {STATUS_LABELS[entry.payload.status] ?? entry.payload.status} (
+            {entry.payload.count})
+          </span>
+        </div>
+      ))}
     </div>
   );
 }
 
+// Render percentage labels on pie segments - using Recharts PieLabelRenderProps
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function renderPieLabel(props: any) {
+  const { cx, cy, midAngle, innerRadius, outerRadius, percent } = props;
+  
+  // Validate all required properties are present
+  if (cx == null || cy == null || midAngle == null || innerRadius == null || outerRadius == null || percent == null) {
+    return null;
+  }
+  
+  // Only show label if segment is at least 5%
+  if (percent < 0.05) return null;
+  
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? 'start' : 'end'}
+      dominantBaseline="central"
+      fontSize={12}
+      fontWeight={600}
+    >
+      {`${Math.round(percent * 100)}%`}
+    </text>
+  );
+}
+
 // Center label renders total count inside the donut hole via SVG
-function renderCenterLabel(total: number) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return function CenterLabel(props: any) {
+interface CenterLabelProps {
+  cx: number;
+  cy: number;
+}
+
+function createCenterLabel(total: number) {
+  return function CenterLabel(props: CenterLabelProps) {
     const { cx, cy } = props;
     if (cx == null || cy == null) return null;
     return (
@@ -124,12 +172,12 @@ function OrderStatusChart({ data, isLoading = false }: OrderStatusChartProps) {
             outerRadius={100}
             paddingAngle={2}
             animationDuration={300}
-            label={renderCenterLabel(total)}
+            label={renderPieLabel}
             labelLine={false}
           >
-            {data.map((entry, index) => (
+            {data.map((entry) => (
               <Cell
-                key={`cell-${index}`}
+                key={`cell-${entry.status}`}
                 fill={ORDER_STATUS_COLORS[entry.status] ?? '#9CA3AF'}
               />
             ))}
