@@ -478,3 +478,333 @@ export async function getOrderById(orderId: string): Promise<{
     };
   }
 }
+
+// ============================================================================
+// Story 7.1d: Admin Dashboard - Alerts & Notifications
+// Alert Data Layer Server Actions
+// ============================================================================
+
+import { LOW_INVENTORY_THRESHOLD, getInventoryPriority } from '@/lib/config/alerts';
+import {
+  getLowInventoryPriority,
+  getPendingReturnsPriority,
+  getSupportTicketPriority,
+  getFailedPaymentsPriority,
+  AlertPriority,
+} from '@/lib/alerts/priority';
+
+export interface LowInventoryProduct {
+  id: string;
+  name: string;
+  quantity: number;
+  priority: AlertPriority;
+}
+
+export interface PendingReturn {
+  id: string;
+  order_id: string;
+  customer_name: string;
+  request_date: string;
+  reason: string;
+}
+
+export interface OpenSupportTicket {
+  id: string;
+  subject: string;
+  created_at: string;
+  customer_name: string;
+  priority: AlertPriority;
+}
+
+export interface FailedPaymentOrder {
+  id: string;
+  order_number: string;
+  total: number;
+  failure_date: string;
+  customer_name: string;
+  customer_email: string;
+  payment_error_message?: string;
+}
+
+export interface AlertCounts {
+  lowInventory: { count: number; priority: AlertPriority };
+  pendingReturns: { count: number; priority: AlertPriority };
+  supportTickets: { count: number; priority: AlertPriority };
+  failedPayments: { count: number; priority: AlertPriority };
+}
+
+/**
+ * Get products with low inventory (quantity < threshold)
+ * @param threshold - Low inventory threshold (default: LOW_INVENTORY_THRESHOLD env var)
+ * @returns Array of products below threshold with priority
+ */
+export async function getLowInventoryProducts(
+  threshold: number = LOW_INVENTORY_THRESHOLD
+): Promise<{ products: LowInventoryProduct[]; error?: string }> {
+  try {
+    await requireAdmin();
+    const supabase = createAdminClient();
+
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('id, name, inventory!inner(quantity)')
+      .lt('inventory.quantity', threshold)
+      .order('inventory.quantity', { ascending: true })
+      .limit(10);
+
+    if (error) {
+      console.error('getLowInventoryProducts - Error:', JSON.stringify(error, null, 2));
+      return { products: [], error: error.message };
+    }
+
+    const lowInventoryProducts: LowInventoryProduct[] =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      products?.map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        quantity: p.inventory.quantity,
+        priority: getInventoryPriority(p.inventory.quantity) as AlertPriority,
+      })) || [];
+
+    return { products: lowInventoryProducts };
+  } catch (error) {
+    console.error('getLowInventoryProducts - Catch Error:', JSON.stringify(error, null, 2));
+    return {
+      products: [],
+      error: error instanceof Error ? error.message : 'Failed to fetch low inventory products',
+    };
+  }
+}
+
+/**
+ * Get pending returns (status = 'requested')
+ * @returns Array of pending returns with customer info
+ */
+export async function getPendingReturns(): Promise<{
+  returns: PendingReturn[];
+  error?: string;
+}> {
+  try {
+    await requireAdmin();
+    const supabase = createAdminClient();
+
+    const { data: returns, error } = await supabase
+      .from('returns')
+      .select(
+        `
+        id,
+        order_id,
+        reason,
+        requested_at,
+        orders!inner(customer_id),
+        customers!orders.customer_id(full_name)
+      `
+      )
+      .eq('status', 'requested')
+      .order('requested_at', { ascending: true })
+      .limit(10);
+
+    if (error) {
+      console.error('getPendingReturns - Error:', JSON.stringify(error, null, 2));
+      return { returns: [], error: error.message };
+    }
+
+    const pendingReturns: PendingReturn[] =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      returns?.map((r: any) => ({
+        id: r.id,
+        order_id: r.order_id,
+        customer_name: r.customers?.full_name || 'Unknown',
+        request_date: r.requested_at,
+        reason: r.reason || 'Not specified',
+      })) || [];
+
+    return { returns: pendingReturns };
+  } catch (error) {
+    console.error('getPendingReturns - Catch Error:', JSON.stringify(error, null, 2));
+    return {
+      returns: [],
+      error: error instanceof Error ? error.message : 'Failed to fetch pending returns',
+    };
+  }
+}
+
+/**
+ * Get open support tickets
+ * Note: Requires support_tickets table (optional feature)
+ * @returns Array of open tickets or empty array if table doesn't exist
+ */
+export async function getOpenSupportTickets(): Promise<{
+  tickets: OpenSupportTicket[];
+  error?: string;
+  supported: boolean;
+}> {
+  try {
+    await requireAdmin();
+    const supabase = createAdminClient();
+
+    // Check if support_tickets table exists
+    const { error: tableCheckError } = await supabase
+      .from('support_tickets')
+      .select('id', { count: 'exact', head: true });
+
+    if (tableCheckError) {
+      // Table doesn't exist - return empty with supported: false
+      return { tickets: [], supported: false };
+    }
+
+    const { data: tickets, error } = await supabase
+      .from('support_tickets')
+      .select(
+        `
+        id,
+        subject,
+        created_at,
+        customers!inner(full_name)
+      `
+      )
+      .eq('status', 'open')
+      .order('created_at', { ascending: true })
+      .limit(10);
+
+    if (error) {
+      console.error('getOpenSupportTickets - Error:', JSON.stringify(error, null, 2));
+      return { tickets: [], supported: true, error: error.message };
+    }
+
+    const openTickets: OpenSupportTicket[] =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      tickets?.map((t: any) => ({
+        id: t.id,
+        subject: t.subject,
+        created_at: t.created_at,
+        customer_name: t.customers?.full_name || 'Unknown',
+        priority: getSupportTicketPriority([t]),
+      })) || [];
+
+    return { tickets: openTickets, supported: true };
+  } catch (error) {
+    console.error('getOpenSupportTickets - Catch Error:', JSON.stringify(error, null, 2));
+    return {
+      tickets: [],
+      supported: false,
+      error: error instanceof Error ? error.message : 'Failed to fetch support tickets',
+    };
+  }
+}
+
+/**
+ * Get orders with failed payment status
+ * @returns Array of failed payment orders
+ */
+export async function getFailedPaymentOrders(): Promise<{
+  orders: FailedPaymentOrder[];
+  error?: string;
+}> {
+  try {
+    await requireAdmin();
+    const supabase = createAdminClient();
+
+    const { data: orders, error } = await supabase
+      .from('orders')
+      .select(
+        `
+        id,
+        order_number,
+        total,
+        created_at,
+        payment_error_message,
+        customers!inner(full_name, email)
+      `
+      )
+      .eq('status', 'payment_failed')
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error('getFailedPaymentOrders - Error:', JSON.stringify(error, null, 2));
+      return { orders: [], error: error.message };
+    }
+
+    const failedOrders: FailedPaymentOrder[] =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      orders?.map((o: any) => ({
+        id: o.id,
+        order_number: o.order_number,
+        total: o.total,
+        failure_date: o.created_at,
+        customer_name: o.customers?.full_name || 'Unknown',
+        customer_email: o.customers?.email || 'Unknown',
+        payment_error_message: o.payment_error_message,
+      })) || [];
+
+    return { orders: failedOrders };
+  } catch (error) {
+    console.error('getFailedPaymentOrders - Catch Error:', JSON.stringify(error, null, 2));
+    return {
+      orders: [],
+      error: error instanceof Error ? error.message : 'Failed to fetch failed payment orders',
+    };
+  }
+}
+
+/**
+ * Get aggregated alert counts for all alert types
+ * @returns Object with counts and priorities for all alert types
+ */
+export async function getAlertCounts(): Promise<{
+  counts: AlertCounts;
+  error?: string;
+}> {
+  try {
+    await requireAdmin();
+
+    const [lowInventory, pendingReturns, supportTickets, failedPayments] =
+      await Promise.all([
+        getLowInventoryProducts(),
+        getPendingReturns(),
+        getOpenSupportTickets(),
+        getFailedPaymentOrders(),
+      ]);
+
+    return {
+      counts: {
+        lowInventory: {
+          count: lowInventory.products.length,
+          priority:
+            lowInventory.products.length > 0
+              ? getLowInventoryPriority(lowInventory.products)
+              : 'medium',
+        },
+        pendingReturns: {
+          count: pendingReturns.returns.length,
+          priority:
+            pendingReturns.returns.length > 0 ? getPendingReturnsPriority() : 'medium',
+        },
+        supportTickets: {
+          count: supportTickets.tickets.length,
+          priority:
+            supportTickets.tickets.length > 0
+              ? getSupportTicketPriority(supportTickets.tickets)
+              : 'medium',
+        },
+        failedPayments: {
+          count: failedPayments.orders.length,
+          priority:
+            failedPayments.orders.length > 0 ? getFailedPaymentsPriority() : 'medium',
+        },
+      },
+    };
+  } catch (error) {
+    console.error('getAlertCounts - Catch Error:', JSON.stringify(error, null, 2));
+    return {
+      counts: {
+        lowInventory: { count: 0, priority: 'medium' },
+        pendingReturns: { count: 0, priority: 'medium' },
+        supportTickets: { count: 0, priority: 'medium' },
+        failedPayments: { count: 0, priority: 'medium' },
+      },
+      error: error instanceof Error ? error.message : 'Failed to fetch alert counts',
+    };
+  }
+}

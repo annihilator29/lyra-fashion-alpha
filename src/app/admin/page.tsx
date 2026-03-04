@@ -13,6 +13,7 @@ import { MetricCard } from '@/components/admin/metric-card';
 import { QuickLinksGrid } from '@/components/admin/quick-links-grid';
 import { ChartsSection } from '@/components/admin/charts-section';
 import { RecentOrdersSection } from '@/components/admin/recent-orders-section';
+import { DashboardAlertsClient } from '@/components/admin/dashboard-alerts-client';
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   DollarSign,
@@ -47,6 +48,17 @@ function ChartsSkeleton() {
           <Skeleton className="h-4 w-32 mb-4" />
           <Skeleton className="h-[300px] w-full" />
         </div>
+      ))}
+    </div>
+  );
+}
+
+// Loading skeleton for alerts
+function AlertsSkeleton() {
+  return (
+    <div className="grid gap-4 md:grid-cols-2">
+      {[...Array(2)].map((_, i) => (
+        <Skeleton key={i} className="h-[200px]" />
       ))}
     </div>
   );
@@ -191,6 +203,14 @@ export default async function AdminDashboardPage() {
         <h2 className="text-lg font-semibold mb-4">Analytics</h2>
         <Suspense fallback={<ChartsSkeleton />}>
           <DashboardCharts />
+        </Suspense>
+      </section>
+
+      {/* Alerts & Notifications */}
+      <section>
+        <h2 className="text-lg font-semibold mb-4">Alerts &amp; Notifications</h2>
+        <Suspense fallback={<AlertsSkeleton />}>
+          <DashboardAlertsClient />
         </Suspense>
       </section>
 
