@@ -74,6 +74,13 @@ const getCustomerName = (order: Order): string => {
   return order.customer_email || 'Guest';
 };
 
+// NOTE: Order Number Format
+// The story specifies "ORD-001234" format, but the database schema uses UUIDs
+// without a sequential order_number field. We display a shortened version of
+// the order ID for readability. To implement sequential order numbers,
+// a database migration would be needed to add an order_number column with
+// a trigger to auto-generate sequential values (e.g., ORD-000001, ORD-000002).
+
 // Status badge component
 const StatusBadge = ({ status }: { status: OrderStatus }) => {
   const color = ORDER_STATUS_COLORS[status as keyof typeof ORDER_STATUS_COLORS] || '#9CA3AF';

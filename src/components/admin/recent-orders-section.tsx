@@ -34,7 +34,6 @@ export function RecentOrdersSection({ initialOrders }: RecentOrdersSectionProps)
   const {
     orders: realtimeOrders,
     newOrders: realtimeNewOrders,
-    isConnected: isRealtimeConnected,
   } = useRealtimeOrders(initialOrders, connectionStatus === 'connected');
 
   // Polling fallback

@@ -7,7 +7,7 @@
  */
 
 import { memo } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer, LabelList } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OrderStatusData } from '@/app/admin/analytics-actions';
 import { ORDER_STATUS_COLORS } from '@/lib/constants/status-colors';
@@ -104,43 +104,6 @@ function renderPieLabel(props: any) {
   );
 }
 
-// Center label renders total count inside the donut hole via SVG
-interface CenterLabelProps {
-  cx: number;
-  cy: number;
-}
-
-function createCenterLabel(total: number) {
-  return function CenterLabel(props: CenterLabelProps) {
-    const { cx, cy } = props;
-    if (cx == null || cy == null) return null;
-    return (
-      <>
-        <text
-          x={cx}
-          y={cy - 6}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          className="fill-foreground"
-          style={{ fontSize: '1.5rem', fontWeight: 700 }}
-        >
-          {total}
-        </text>
-        <text
-          x={cx}
-          y={cy + 16}
-          textAnchor="middle"
-          dominantBaseline="middle"
-          className="fill-muted-foreground"
-          style={{ fontSize: '0.7rem' }}
-        >
-          orders
-        </text>
-      </>
-    );
-  };
-}
-
 function OrderStatusChart({ data, isLoading = false }: OrderStatusChartProps) {
   if (isLoading) {
     return <Skeleton className="h-[300px] w-full" />;
@@ -156,8 +119,6 @@ function OrderStatusChart({ data, isLoading = false }: OrderStatusChartProps) {
       </div>
     );
   }
-
-  const total = data.reduce((sum, d) => sum + d.count, 0);
 
   return (
     <div data-testid="order-status-chart">

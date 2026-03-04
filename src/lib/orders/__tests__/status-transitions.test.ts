@@ -16,7 +16,6 @@ import {
   requiresConfirmation,
   getConfirmationMessage,
 } from '../status-transitions';
-import type { OrderStatus } from '@/types/order';
 
 describe('status-transitions', () => {
   describe('STATUS_TRANSITIONS', () => {

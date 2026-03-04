@@ -9,7 +9,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { subscribeToOrderStatusChanges } from '@/lib/supabase/realtime';
 import type { OrderRealtimeData } from '@/lib/supabase/realtime';
-import type { Order } from '@/types/database.types';
 
 interface MetricUpdates {
   todaysRevenue?: boolean;
@@ -79,7 +78,7 @@ export function useRealtimeMetrics(
    * Handle order status change
    */
   const handleStatusChange = useCallback(
-    (order: OrderRealtimeData, oldStatus: string | null) => {
+    (order: OrderRealtimeData) => {
       // Always update order counts on any status change
       queueUpdate('orderCounts');
       queueUpdate('newOrders');
@@ -116,9 +115,9 @@ export function useRealtimeMetrics(
     let unsubscribe: (() => void) | null = null;
 
     try {
-      unsubscribe = subscribeToOrderStatusChanges((order, oldStatus) => {
+      unsubscribe = subscribeToOrderStatusChanges((order) => {
         setIsConnected(true);
-        handleStatusChange(order, oldStatus);
+        handleStatusChange(order);
       });
     } catch (error) {
       console.error('[useRealtimeMetrics] Subscription error:', error);

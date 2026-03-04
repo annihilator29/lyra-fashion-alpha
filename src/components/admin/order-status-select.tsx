@@ -54,33 +54,6 @@ export function OrderStatusSelect({
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Handle status selection
-   */
-  const handleStatusChange = useCallback(
-    (newStatus: OrderStatus) => {
-      setError(null);
-
-      // Check if transition is valid
-      const validation = validateStatusTransition(currentStatus, newStatus);
-
-      if (!validation.valid) {
-        setError(validation.error || 'Invalid status transition');
-        return;
-      }
-
-      // Check if confirmation is required
-      if (requiresConfirmation(currentStatus, newStatus)) {
-        setPendingStatus(newStatus);
-        setShowConfirmDialog(true);
-      } else {
-        // Direct update
-        executeStatusChange(newStatus);
-      }
-    },
-    [currentStatus]
-  );
-
-  /**
    * Execute the status change
    */
   const executeStatusChange = useCallback(
@@ -104,11 +77,38 @@ export function OrderStatusSelect({
   );
 
   /**
+   * Handle status selection
+   */
+  const handleStatusChange = useCallback(
+    (newStatus: OrderStatus) => {
+      setError(null);
+
+      // Check if transition is valid
+      const validation = validateStatusTransition(currentStatus, newStatus);
+
+      if (!validation.valid) {
+        setError(validation.error || 'Invalid status transition');
+        return;
+      }
+
+      // Check if confirmation is required
+      if (requiresConfirmation(currentStatus, newStatus)) {
+        setPendingStatus(newStatus);
+        setShowConfirmDialog(true);
+      } else {
+        // Direct update
+        void executeStatusChange(newStatus);
+      }
+    },
+    [currentStatus, executeStatusChange]
+  );
+
+  /**
    * Handle confirmation dialog confirm
    */
   const handleConfirm = useCallback(() => {
     if (pendingStatus) {
-      executeStatusChange(pendingStatus);
+      void executeStatusChange(pendingStatus);
     }
   }, [pendingStatus, executeStatusChange]);
 

@@ -15,6 +15,7 @@ interface MetricCardProps {
   subtitle?: string;
   icon?: ReactNode;
   isLoading?: boolean;
+  isUpdating?: boolean;
   className?: string;
 }
 
@@ -24,6 +25,7 @@ export function MetricCard({
   subtitle,
   icon,
   isLoading,
+  isUpdating,
   className,
 }: MetricCardProps) {
   return (
@@ -40,9 +42,13 @@ export function MetricCard({
         ) : (
           <div className="space-y-1">
             <div className="text-2xl font-bold">{value}</div>
-            {subtitle && (
+            {isUpdating ? (
+              <p className="text-xs text-blue-500 animate-pulse" data-testid="updating-indicator">
+                Updating...
+              </p>
+            ) : subtitle ? (
               <p className="text-xs text-muted-foreground">{subtitle}</p>
-            )}
+            ) : null}
           </div>
         )}
       </CardContent>

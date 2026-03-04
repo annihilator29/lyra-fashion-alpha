@@ -85,6 +85,10 @@ describe('useConnectionStatus', () => {
       jest.advanceTimersByTime(0);
     });
 
+    await act(async () => {
+      jest.advanceTimersByTime(100);
+    });
+
     await waitFor(() => {
       expect(result.current.retryCount).toBeGreaterThan(0);
     });
