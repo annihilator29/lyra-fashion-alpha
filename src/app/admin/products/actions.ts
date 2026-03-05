@@ -183,7 +183,7 @@ function sanitizeImageUrls(images: string[]): string[] {
 /**
  * Calculate total inventory from product variants
  */
-function calculateInventory(variants: any[] | null | undefined) {
+function calculateInventory(variants: Array<{ stock_quantity?: number | null }> | null | undefined) {
   if (!variants || variants.length === 0) {
     return { total_quantity: 0, reserved_quantity: 0 };
   }

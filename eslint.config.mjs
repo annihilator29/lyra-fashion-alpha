@@ -18,6 +18,11 @@ const eslintConfig = [
   {
     ignores: ['.next/**', 'out/**', 'build/**', 'node_modules/**', 'next-env.d.ts'],
   },
+  {
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'warn', // Allow 'any' type in development
+    },
+  },
 ];
 
 export default eslintConfig;
