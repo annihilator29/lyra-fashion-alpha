@@ -5,7 +5,6 @@
  */
 
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import { isAdmin } from '@/lib/auth/roles';
 import { ProductForm } from '@/components/admin/products/product-form';
 import { createProduct } from '@/app/admin/products/actions';

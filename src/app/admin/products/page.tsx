@@ -6,7 +6,7 @@
 
 'use client';
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createColumnHelper,
@@ -20,7 +20,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+
+// Import ProductFilters from actions
+import type { ProductFilters } from './actions';
 
 // UI Components
 import { Button } from '@/components/ui/button';
@@ -42,7 +44,6 @@ import {
 } from '@/components/ui/dialog';
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -59,11 +60,9 @@ import {
   Package,
   Plus,
   Search,
-  Filter,
   MoreHorizontal,
   Edit,
   Eye,
-  Archive,
   Trash2,
   ChevronLeft,
   ChevronRight,
@@ -72,9 +71,7 @@ import {
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Download,
   CheckSquare,
-  X,
 } from 'lucide-react';
 
 // Types
@@ -99,14 +96,13 @@ interface Product {
   inventory?: Array<{
     total_quantity: number;
     reserved_quantity: number;
+    low_stock_threshold?: number;
   }>;
 }
 
-const columnHelper = columnHelper<Product>();
+const productColumnHelper = createColumnHelper<Product>();
 
 export default function ProductsPage() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
 
   // Table state
@@ -136,7 +132,7 @@ export default function ProductsPage() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['products', pagination.pageIndex, pagination.pageSize, categoryFilter, statusFilter, stockFilter, globalFilter],
     queryFn: async () => {
-      const filters: any = {
+      const filters: ProductFilters = {
         page: pagination.pageIndex + 1,
         pageSize: pagination.pageSize,
         sortBy: sorting[0]?.id || 'created_at',
@@ -144,7 +140,7 @@ export default function ProductsPage() {
       };
 
       if (categoryFilter !== 'all') filters.category = categoryFilter;
-      if (statusFilter !== 'all') filters.status = statusFilter;
+      if (statusFilter !== 'all') filters.status = statusFilter as 'draft' | 'active' | 'archived';
       if (stockFilter === 'in-stock') filters.inStock = true;
       if (stockFilter === 'out-of-stock') filters.inStock = false;
       if (globalFilter) filters.search = globalFilter;
@@ -157,8 +153,8 @@ export default function ProductsPage() {
 
   // Mutations
   const updateStatusMutation = useMutation({
-    mutationFn: async ({ ids, status }: { ids: string[]; status: string }) => {
-      const result = await updateProductStatus(ids, status as any);
+    mutationFn: async ({ ids, status }: { ids: string[]; status: 'draft' | 'active' | 'archived' }) => {
+      const result = await updateProductStatus(ids, status);
       if (!result.success) throw new Error(result.error);
       return result;
     },
@@ -189,8 +185,8 @@ export default function ProductsPage() {
   });
 
   const updatePricesMutation = useMutation({
-    mutationFn: async ({ ids, adjustment }: { ids: string[]; adjustment: { type: string; value: number } }) => {
-      const result = await updateProductPrices(ids, adjustment as any);
+    mutationFn: async ({ ids, adjustment }: { ids: string[]; adjustment: { type: 'percentage' | 'fixed'; value: number } }) => {
+      const result = await updateProductPrices(ids, adjustment);
       if (!result.success) throw new Error(result.error);
       return result;
     },
@@ -245,7 +241,7 @@ export default function ProductsPage() {
   // Define columns
   const columns = useMemo(
     () => [
-      columnHelper.display({
+      productColumnHelper.display({
         id: 'select',
         header: ({ table }) => (
           <Checkbox
@@ -267,7 +263,7 @@ export default function ProductsPage() {
         enableSorting: false,
         enableHiding: false,
       }),
-      columnHelper.accessor('name', {
+      productColumnHelper.accessor('name', {
         header: ({ column }) => (
           <Button
             variant="ghost"
@@ -300,7 +296,7 @@ export default function ProductsPage() {
           </div>
         ),
       }),
-      columnHelper.accessor('category', {
+      productColumnHelper.accessor('category', {
         header: ({ column }) => (
           <Button
             variant="ghost"
@@ -321,7 +317,7 @@ export default function ProductsPage() {
           <Badge variant="secondary">{row.original.category}</Badge>
         ),
       }),
-      columnHelper.accessor('price', {
+      productColumnHelper.accessor('price', {
         header: ({ column }) => (
           <Button
             variant="ghost"
@@ -342,7 +338,7 @@ export default function ProductsPage() {
           <div className="font-medium">${(row.original.price / 100).toFixed(2)}</div>
         ),
       }),
-      columnHelper.accessor('status', {
+      productColumnHelper.accessor('status', {
         header: ({ column }) => (
           <Button
             variant="ghost"
@@ -376,7 +372,7 @@ export default function ProductsPage() {
           return value.includes(row.getValue(id));
         },
       }),
-      columnHelper.accessor('inventory', {
+      productColumnHelper.accessor('inventory', {
         header: 'Inventory',
         cell: ({ row }) => {
           const totalQty = row.original.inventory?.[0]?.total_quantity || 0;
@@ -399,7 +395,7 @@ export default function ProductsPage() {
           );
         },
       }),
-      columnHelper.display({
+      productColumnHelper.display({
         id: 'actions',
         header: 'Actions',
         cell: ({ row }) => (
@@ -473,14 +469,14 @@ export default function ProductsPage() {
   // Handle bulk action
   const handleBulkAction = useCallback(() => {
     const selectedIds = Object.keys(rowSelection).map(
-      (index) => data?.data[parseInt(index)]?.id
-    ).filter(Boolean);
+      (index) => data?.data?.[parseInt(index)]?.id
+    ).filter((id): id is string => Boolean(id));
 
     if (selectedIds.length === 0) return;
 
     switch (bulkActionType) {
       case 'status':
-        updateStatusMutation.mutate({ ids: selectedIds, status: bulkActionValue });
+        updateStatusMutation.mutate({ ids: selectedIds, status: bulkActionValue as 'draft' | 'active' | 'archived' });
         break;
       case 'category':
         updateCategoryMutation.mutate({ ids: selectedIds, category: bulkActionValue });
@@ -732,7 +728,7 @@ export default function ProductsPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
-            <Select value={bulkActionType || ''} onValueChange={(v) => setBulkActionType(v as any)}>
+            <Select value={bulkActionType || ''} onValueChange={(v) => setBulkActionType(v as 'status' | 'category' | 'price' | 'delete' | 'export')}>
               <SelectTrigger>
                 <SelectValue placeholder="Select action" />
               </SelectTrigger>

@@ -67,6 +67,7 @@ export interface ProductVariantFormData {
 }
 
 export interface ProductsResponse {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any[] | null;
   error: { message: string; code: string } | null;
   pagination?: {
@@ -78,6 +79,7 @@ export interface ProductsResponse {
 }
 
 export interface ProductResponse {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any | null;
   error: { message: string; code: string } | null;
 }
@@ -86,6 +88,7 @@ export interface ActionResponse {
   success: boolean;
   message?: string;
   error?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
 }
 
@@ -134,13 +137,11 @@ const productSchema = z.object({
 // Helper Functions
 // ============================================================================
 
-/**
- * Convert camelCase to snake_case for database operations
- */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toDbFormat(data: any): any {
   if (!data) return data;
   
-  const dbData: any = {
+  return {
     name: data.name,
     slug: data.slug,
     description: data.description,
@@ -156,13 +157,9 @@ function toDbFormat(data: any): any {
     craftsmanship_content: data.craftsmanshipContent || null,
     updated_at: new Date().toISOString(),
   };
-
-  return dbData;
 }
 
-/**
- * Convert snake_case to camelCase for client responses
- */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toClientFormat(data: any): any {
   if (!data) return data;
   
@@ -203,12 +200,6 @@ function generateSlug(name: string): string {
 /**
  * Generate unique SKU for variant
  */
-function generateVariantSKU(productSlug: string, size: string, color: string): string {
-  const sizeCode = size.toUpperCase().substring(0, 3);
-  const colorCode = color.toUpperCase().substring(0, 3);
-  return `${productSlug.toUpperCase().substring(0, 3)}-${sizeCode}-${colorCode}`;
-}
-
 // ============================================================================
 // Product Query Actions
 // ============================================================================
@@ -391,7 +382,9 @@ export async function getProductBySlug(slug: string): Promise<ProductResponse> {
 /**
  * Validate that all SKUs in a product are unique and don't exist in database
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function validateVariantSKUs(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,
   variants: ProductVariantFormData[],
   excludeProductId?: string
@@ -447,7 +440,7 @@ export async function createProduct(formData: ProductFormData): Promise<ActionRe
     if (!validation.success) {
       return {
         success: false,
-        error: validation.error.errors.map(e => e.message).join(', '),
+        error: validation.error.issues.map((issue) => issue.message).join(', '),
       };
     }
 
@@ -461,7 +454,7 @@ export async function createProduct(formData: ProductFormData): Promise<ActionRe
     }
 
     // Generate unique slug if not provided
-    let slug = formData.slug || generateSlug(formData.name);
+    const slug = formData.slug || generateSlug(formData.name);
     const uniqueSlug = await generateUniqueSlug(slug);
 
     // Prepare product data for database
@@ -485,10 +478,13 @@ export async function createProduct(formData: ProductFormData): Promise<ActionRe
       };
     }
 
+    // Get product ID
+    const productId = (product as { id: string }).id;
+
     // Create variants with inventory
     if (formData.variants && formData.variants.length > 0) {
       const variantsToInsert = formData.variants.map((variant) => ({
-        product_id: product.id,
+        product_id: productId,
         sku: variant.sku,
         size: variant.size,
         color: variant.color,
@@ -504,7 +500,7 @@ export async function createProduct(formData: ProductFormData): Promise<ActionRe
       if (variantsError) {
         console.error('createProduct - Variants Error:', JSON.stringify(variantsError, null, 2));
         // Rollback: delete the product
-        await supabase.from('products').delete().eq('id', product.id);
+        await supabase.from('products').delete().eq('id', productId);
         return {
           success: false,
           error: variantsError.message,
@@ -518,7 +514,7 @@ export async function createProduct(formData: ProductFormData): Promise<ActionRe
     return {
       success: true,
       message: 'Product created successfully',
-      data: { productId: product.id },
+      data: { productId: productId },
     };
   } catch (error) {
     console.error('createProduct - Catch Error:', JSON.stringify(error, null, 2));
@@ -543,7 +539,7 @@ export async function updateProduct(id: string, formData: ProductFormData): Prom
     if (!validation.success) {
       return {
         success: false,
-        error: validation.error.errors.map(e => e.message).join(', '),
+        error: validation.error.issues.map((issue) => issue.message).join(', '),
       };
     }
 
@@ -871,7 +867,7 @@ export async function updateProductPrices(
 export async function uploadProductImages(files: FormData): Promise<ActionResponse> {
   try {
     await requireAdmin();
-    const supabase = createClient();
+    const supabase = await createClient();
 
     const uploadedFiles = files.getAll('files') as File[];
     const uploadedUrls: string[] = [];
@@ -946,7 +942,7 @@ export async function uploadProductImages(files: FormData): Promise<ActionRespon
 export async function deleteProductImage(imagePath: string): Promise<ActionResponse> {
   try {
     await requireAdmin();
-    const supabase = createClient();
+    const supabase = await createClient();
 
     // Extract file path from URL
     let fileName: string;
@@ -1106,9 +1102,24 @@ export async function exportProductsToCSV(ids?: string[]): Promise<ActionRespons
 
     // Convert to CSV format
     const headers = ['ID', 'Name', 'Slug', 'Category', 'Price', 'Status', 'SKU', 'Size', 'Color', 'Inventory'];
-    const rows = data?.flatMap((product) => {
+    interface CsvVariant {
+      sku: string;
+      size: string;
+      color: string;
+      stock_quantity: number;
+    }
+    interface CsvProduct {
+      id: string;
+      name: string;
+      slug: string;
+      category: string;
+      price: number;
+      status: string;
+      product_variants?: CsvVariant[];
+    }
+    const rows = (data as CsvProduct[] | null)?.flatMap((product: CsvProduct) => {
       if (product.product_variants && product.product_variants.length > 0) {
-        return product.product_variants.map((variant: any) => [
+        return product.product_variants.map((variant: CsvVariant) => [
           product.id,
           product.name,
           product.slug,

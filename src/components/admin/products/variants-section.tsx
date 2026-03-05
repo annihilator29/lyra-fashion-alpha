@@ -166,7 +166,15 @@ export function VariantsSection() {
       return;
     }
 
-    const newVariants: any[] = [];
+    const newVariants: Array<{
+      sku: string;
+      size: string;
+      color: string;
+      colorHex: string;
+      priceModifier: number;
+      inventory: number;
+      isOutOfStock: boolean;
+    }> = [];
     sizes.forEach((size) => {
       existingColors.forEach((color) => {
         const exists = variants.some(
@@ -567,7 +575,7 @@ export function VariantsSection() {
       <div className="text-xs text-muted-foreground space-y-1">
         <p>• SKU is auto-generated but can be customized</p>
         <p>• Price modifier is added to the base price (in cents)</p>
-        <p>• Mark variants as "Out of stock" to hide from storefront</p>
+        <p>• Mark variants as &quot;Out of stock&quot; to hide from storefront</p>
         <p>• Use bulk actions to quickly set inventory and prices</p>
       </div>
     </div>

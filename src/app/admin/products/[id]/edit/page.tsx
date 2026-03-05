@@ -5,7 +5,6 @@
  */
 
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 import { isAdmin } from '@/lib/auth/roles';
 import { ProductForm } from '@/components/admin/products/product-form';
 import { updateProduct, getProductById } from '@/app/admin/products/actions';
@@ -35,6 +34,16 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
   const product = productResult.data;
 
   // Transform data for form
+  interface VariantData {
+    id: string;
+    sku: string;
+    size: string;
+    color: string;
+    color_hex?: string;
+    price_modifier?: number;
+    stock_quantity?: number;
+  }
+  
   const initialData = {
     name: product.name,
     slug: product.slug,
@@ -42,10 +51,10 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
     price: product.price,
     compareAtPrice: product.compareAtPrice || 0,
     cost: product.cost || 0,
-    category: product.category as any,
+    category: product.category as 'Dresses' | 'Tops' | 'Bottoms' | 'Outerwear' | 'Accessories',
     tags: product.tags || [],
     images: product.images || [],
-    status: product.status as any,
+    status: product.status as 'draft' | 'active' | 'archived',
     metaTitle: product.metaTitle || '',
     metaDescription: product.metaDescription || '',
     craftsmanshipContent: product.craftsmanshipContent || {
@@ -54,7 +63,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
       qualityChecks: [],
       careInstructions: [],
     },
-    variants: product.variants?.map((v: any) => ({
+    variants: (product.variants as VariantData[] | undefined)?.map((v) => ({
       id: v.id,
       sku: v.sku,
       size: v.size,

@@ -5,6 +5,10 @@
  * Updated: 2026-03-05 with Code Review Fixes
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-require-imports */
+
 import {
   getProducts,
   getProductById,

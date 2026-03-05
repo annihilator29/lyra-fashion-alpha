@@ -37,9 +37,9 @@ const productVariantSchema = z.object({
   size: z.string().min(1, 'Size is required'),
   color: z.string().min(1, 'Color is required'),
   colorHex: z.string().regex(/^#([A-Fa-f0-9]{6})$/, 'Invalid hex color').optional().or(z.literal('')),
-  priceModifier: z.number().default(0),
+  priceModifier: z.number(),
   inventory: z.number().int().min(0, 'Inventory cannot be negative'),
-  isOutOfStock: z.boolean().default(false),
+  isOutOfStock: z.boolean(),
 });
 
 const productSchema = z.object({
@@ -50,7 +50,7 @@ const productSchema = z.object({
   compareAtPrice: z.number().positive().optional().or(z.literal(0)),
   cost: z.number().positive().optional().or(z.literal(0)),
   category: z.enum(['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Accessories']),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string()),
   images: z.array(z.string().url()).min(1, 'At least one image is required').max(10, 'Maximum 10 images allowed'),
   status: z.enum(['draft', 'active', 'archived']),
   metaTitle: z.string().max(60).optional().or(z.literal('')),
@@ -350,7 +350,7 @@ export function ProductForm({ mode, initialData, productId, onSubmit }: ProductF
                   <CardHeader>
                     <CardTitle>Craftsmanship Details</CardTitle>
                     <CardDescription>
-                      Share the story behind your product's quality and construction
+                      Share the story behind your product&apos;s quality and construction
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
