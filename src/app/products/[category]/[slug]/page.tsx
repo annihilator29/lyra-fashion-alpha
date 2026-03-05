@@ -16,6 +16,7 @@ export const revalidate = 3600;
 
 interface PageProps {
     params: Promise<{ category: string; slug: string }>;
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 // Generate metadata for SEO
@@ -71,16 +72,23 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // Fetch product data with review aggregates
-async function getProduct(category: string, slug: string): Promise<ProductWithVariants | null> {
+async function getProduct(category: string, slug: string, isPreview: boolean = false): Promise<ProductWithVariants | null> {
     const supabase = await createClient();
 
-    // Try to fetch with variants and review data first
-    const { data: product, error } = await supabase
+    // Build query
+    let query = supabase
         .from('products')
         .select('*, product_variants(*), avg_rating, review_count')
         .eq('slug', slug)
-        .eq('category', category)
-        .single();
+        .eq('category', category);
+    
+    // Only filter by active status for non-preview requests
+    if (!isPreview) {
+        query = query.eq('status', 'active');
+    }
+
+    // Try to fetch with variants and review data first
+    const { data: product, error } = await query.single();
 
     // If the query fails (e.g., variants table doesn't exist), try without variants
     if (error) {
@@ -174,16 +182,18 @@ async function getReviewsForProduct(productId: string): Promise<{ reviews: Revie
     };
 }
 
-export default async function ProductDetailPage({ params }: PageProps) {
+export default async function ProductDetailPage({ params, searchParams }: PageProps) {
     const { category, slug } = await params;
+    const searchParamsResolved = await searchParams;
+    const isPreview = searchParamsResolved?.preview === 'true';
 
     // Validate category
     if (!VALID_CATEGORIES.includes(category as ProductCategory)) {
         notFound();
     }
 
-    // Fetch product with variants
-    const product = await getProduct(category, slug);
+    // Fetch product with variants (include draft products in preview mode)
+    const product = await getProduct(category, slug, isPreview);
 
     if (!product) {
         notFound();
@@ -234,6 +244,13 @@ export default async function ProductDetailPage({ params }: PageProps) {
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdWithOffers) }}
             />
+
+            {/* Preview Mode Banner */}
+            {isPreview && (
+                <div className="bg-amber-500 text-white text-center py-2 px-4 text-sm font-medium">
+                    Preview Mode - This product is not yet published
+                </div>
+            )}
 
             <main className="relative min-h-screen overflow-hidden">
                 {/* Background Effects */}
