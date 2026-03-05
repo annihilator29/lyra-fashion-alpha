@@ -121,26 +121,28 @@ export function CraftsmanshipSection() {
             </Button>
           </div>
           <div className="space-y-2">
-            {craftsmanshipContent?.construction?.map((item, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  value={item}
-                  onChange={(e) =>
-                    handleUpdateListItem('construction', index, e.target.value)
-                  }
-                  placeholder={`Construction detail ${index + 1}`}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveListItem('construction', index)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ))}
+            {Array.isArray(craftsmanshipContent?.construction) &&
+              craftsmanshipContent.construction.map((item, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    value={item}
+                    onChange={(e) =>
+                      handleUpdateListItem('construction', index, e.target.value)
+                    }
+                    placeholder={`Construction detail ${index + 1}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveListItem('construction', index)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
             {(!craftsmanshipContent?.construction ||
+              !Array.isArray(craftsmanshipContent?.construction) ||
               craftsmanshipContent.construction.length === 0) && (
               <p className="text-sm text-muted-foreground italic">
                 No construction details added yet
@@ -171,26 +173,28 @@ export function CraftsmanshipSection() {
             </Button>
           </div>
           <div className="space-y-2">
-            {craftsmanshipContent?.qualityChecks?.map((item, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  value={item}
-                  onChange={(e) =>
-                    handleUpdateListItem('qualityChecks', index, e.target.value)
-                  }
-                  placeholder={`Quality check ${index + 1}`}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveListItem('qualityChecks', index)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ))}
+            {Array.isArray(craftsmanshipContent?.qualityChecks) &&
+              craftsmanshipContent.qualityChecks.map((item, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    value={item}
+                    onChange={(e) =>
+                      handleUpdateListItem('qualityChecks', index, e.target.value)
+                    }
+                    placeholder={`Quality check ${index + 1}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveListItem('qualityChecks', index)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
             {(!craftsmanshipContent?.qualityChecks ||
+              !Array.isArray(craftsmanshipContent?.qualityChecks) ||
               craftsmanshipContent.qualityChecks.length === 0) && (
               <p className="text-sm text-muted-foreground italic">
                 No quality checks added yet
@@ -221,26 +225,28 @@ export function CraftsmanshipSection() {
             </Button>
           </div>
           <div className="space-y-2">
-            {craftsmanshipContent?.careInstructions?.map((item, index) => (
-              <div key={index} className="flex gap-2">
-                <Input
-                  value={item}
-                  onChange={(e) =>
-                    handleUpdateListItem('careInstructions', index, e.target.value)
-                  }
-                  placeholder={`Care instruction ${index + 1}`}
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => handleRemoveListItem('careInstructions', index)}
-                >
-                  <Trash2 className="h-4 w-4 text-destructive" />
-                </Button>
-              </div>
-            ))}
+            {Array.isArray(craftsmanshipContent?.careInstructions) &&
+              craftsmanshipContent.careInstructions.map((item, index) => (
+                <div key={index} className="flex gap-2">
+                  <Input
+                    value={item}
+                    onChange={(e) =>
+                      handleUpdateListItem('careInstructions', index, e.target.value)
+                    }
+                    placeholder={`Care instruction ${index + 1}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => handleRemoveListItem('careInstructions', index)}
+                  >
+                    <Trash2 className="h-4 w-4 text-destructive" />
+                  </Button>
+                </div>
+              ))}
             {(!craftsmanshipContent?.careInstructions ||
+              !Array.isArray(craftsmanshipContent?.careInstructions) ||
               craftsmanshipContent.careInstructions.length === 0) && (
               <p className="text-sm text-muted-foreground italic">
                 No care instructions added yet

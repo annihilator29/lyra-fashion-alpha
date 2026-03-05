@@ -10,6 +10,7 @@ import { getUserRole, UserRole } from '@/lib/auth/roles';
 import { AdminSidebar } from '@/components/admin/admin-sidebar';
 import { AdminHeader } from '@/components/admin/admin-header';
 import { AdminProvider } from '@/components/admin/admin-provider';
+import { QueryProvider } from '@/components/providers/query-provider';
 
 export const metadata = {
   title: 'Admin Dashboard - Lyra Fashion',
@@ -55,20 +56,22 @@ export default async function AdminLayout({
 
   return (
     <AdminProvider user={adminUser}>
-      <div className="min-h-screen bg-slate-50">
-        <div className="flex h-screen overflow-hidden">
-          {/* Sidebar */}
-          <AdminSidebar />
+      <QueryProvider>
+        <div className="min-h-screen bg-slate-50">
+          <div className="flex h-screen overflow-hidden">
+            {/* Sidebar */}
+            <AdminSidebar />
 
-          {/* Main Content Area */}
-          <div className="flex flex-1 flex-col overflow-hidden lg:ml-0">
-            <AdminHeader />
-            <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-              {children}
-            </main>
+            {/* Main Content Area */}
+            <div className="flex flex-1 flex-col overflow-hidden lg:ml-0">
+              <AdminHeader />
+              <main className="flex-1 overflow-y-auto p-4 lg:p-8">
+                {children}
+              </main>
+            </div>
           </div>
         </div>
-      </div>
+      </QueryProvider>
     </AdminProvider>
   );
 }

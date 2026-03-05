@@ -159,9 +159,48 @@ function toDbFormat(data: any): any {
   };
 }
 
+/**
+ * Validate if a string is a valid HTTP/HTTPS URL
+ */
+function isValidUrl(string: string): boolean {
+  try {
+    const url = new URL(string);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch (_) {
+    return false;
+  }
+}
+
+/**
+ * Sanitize image URLs - ensure they're valid HTTP/HTTPS URLs
+ * Filters out invalid URLs, paths, or non-URL strings
+ */
+function sanitizeImageUrls(images: string[]): string[] {
+  if (!images || !Array.isArray(images)) return [];
+  return images.filter(img => img && isValidUrl(img));
+}
+
+/**
+ * Calculate total inventory from product variants
+ */
+function calculateInventory(variants: any[] | null | undefined) {
+  if (!variants || variants.length === 0) {
+    return { total_quantity: 0, reserved_quantity: 0 };
+  }
+  
+  const totalQuantity = variants.reduce((sum, v) => sum + (v.stock_quantity || 0), 0);
+  // Reserved quantity would come from cart_reservations table (not implemented in this query)
+  const reservedQuantity = 0;
+  
+  return { total_quantity: totalQuantity, reserved_quantity: reservedQuantity };
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function toClientFormat(data: any): any {
   if (!data) return data;
+  
+  // Calculate inventory from variants
+  const inventory = calculateInventory(data.product_variants);
   
   return {
     id: data.id,
@@ -173,7 +212,7 @@ function toClientFormat(data: any): any {
     cost: data.cost,
     category: data.category,
     tags: data.tags || [],
-    images: data.images || [],
+    images: sanitizeImageUrls(data.images),
     status: data.status,
     metaTitle: data.meta_title,
     metaDescription: data.meta_description,
@@ -181,7 +220,7 @@ function toClientFormat(data: any): any {
     createdAt: data.created_at,
     updatedAt: data.updated_at,
     variants: data.product_variants,
-    inventory: data.inventory,
+    inventory: [inventory],
   };
 }
 
@@ -225,16 +264,16 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
       pageSize = 20,
     } = filters;
 
-    // Build query with joins
+    // Build query with joins - get product variants for inventory calculation
     let query = supabase
       .from('products')
-      .select('*, product_variants(*), inventory(total_quantity, reserved_quantity, low_stock_threshold)', {
+      .select('*, product_variants(id, stock_quantity)', {
         count: 'exact',
       });
 
     // Apply filters
     if (search) {
-      query = query.or(`name.ilike.%${search}%,sku.ilike.%${search}%`);
+      query = query.or(`name.ilike.%${search}%,slug.ilike.%${search}%`);
     }
 
     if (category) {
@@ -247,14 +286,6 @@ export async function getProducts(filters: ProductFilters = {}): Promise<Product
 
     if (minPrice !== undefined) {
       query = query.gte('price', minPrice);
-    }
-
-    if (maxPrice !== undefined) {
-      query = query.lte('price', maxPrice);
-    }
-
-    if (inStock) {
-      query = query.gt('inventory.total_quantity', 0);
     }
 
     // Apply sorting
@@ -382,7 +413,7 @@ export async function getProductBySlug(slug: string): Promise<ProductResponse> {
 /**
  * Validate that all SKUs in a product are unique and don't exist in database
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 async function validateVariantSKUs(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   supabase: any,

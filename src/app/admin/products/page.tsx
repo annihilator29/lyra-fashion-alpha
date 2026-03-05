@@ -280,21 +280,39 @@ export default function ProductsPage() {
             )}
           </Button>
         ),
-        cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            {row.original.images?.[0] && (
-              <img
-                src={row.original.images[0]}
-                alt={row.original.name}
-                className="h-10 w-10 rounded object-cover"
-              />
-            )}
-            <div>
-              <div className="font-medium">{row.original.name}</div>
-              <div className="text-xs text-muted-foreground">{row.original.slug}</div>
+        cell: ({ row }) => {
+          // Safely get image URL - handle both full URLs and storage paths
+          const imageUrl = row.original.images?.[0];
+          const isValidUrl = imageUrl && (imageUrl.startsWith('http://') || imageUrl.startsWith('https://'));
+          
+          return (
+            <div className="flex items-center gap-3">
+              {isValidUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={row.original.name}
+                  className="h-10 w-10 rounded object-cover"
+                  onError={(e) => {
+                    // Fallback for broken images
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              ) : imageUrl ? (
+                <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
+                  <Package className="h-5 w-5 text-muted-foreground" />
+                </div>
+              ) : (
+                <div className="h-10 w-10 rounded bg-muted flex items-center justify-center">
+                  <Package className="h-5 w-5 text-muted-foreground" />
+                </div>
+              )}
+              <div>
+                <div className="font-medium">{row.original.name}</div>
+                <div className="text-xs text-muted-foreground">{row.original.slug}</div>
+              </div>
             </div>
-          </div>
-        ),
+          );
+        },
       }),
       productColumnHelper.accessor('category', {
         header: ({ column }) => (
