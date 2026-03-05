@@ -90,26 +90,8 @@ async function getProduct(category: string, slug: string, isPreview: boolean = f
     // Try to fetch with variants and review data first
     const { data: product, error } = await query.single();
 
-    // If the query fails (e.g., variants table doesn't exist), try without variants
-    if (error) {
-        const { data: productOnly, error: productError } = await supabase
-            .from('products')
-            .select('*, avg_rating, review_count')
-            .eq('slug', slug)
-            .eq('category', category)
-            .single();
-
-        if (productError || !productOnly) {
-            return null;
-        }
-
-        return {
-            ...productOnly,
-            product_variants: [],
-        } as unknown as ProductWithVariants;
-    }
-
-    if (!product) {
+    // No product found (404) - return null without logging error
+    if (error || !product) {
         return null;
     }
 

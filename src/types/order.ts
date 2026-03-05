@@ -37,6 +37,9 @@ export interface OrderWithItems {
   customer_email: string | null;
   status: OrderStatus;
   total: number;
+  subtotal?: number;
+  tax?: number;
+  shipping?: number;
   shipping_address: {
     name: string;
     address_line1: string;
@@ -69,10 +72,21 @@ export interface OrderWithItems {
   estimated_delivery_date: string | null;
   created_at: string;
   updated_at: string;
+  payment_status?: string;
+  refunded_amount?: number;
+  status_notes?: string;
+  email_sent?: boolean;
+  email_sent_at?: string | null;
+  email_error?: string | null;
+  customer_profiles?: {
+    full_name?: string;
+    email?: string;
+  };
   order_items?: Array<{
     id: string;
     order_id: string;
     product_id: string;
+    product_name?: string;
     quantity: number;
     price: number;
     variant: {
