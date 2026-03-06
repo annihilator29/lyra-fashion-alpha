@@ -19,6 +19,7 @@ import { OrdersTable } from '@/components/admin/orders/orders-table';
 import { OrderFilters } from '@/components/admin/orders/order-filters';
 import { getOrders } from '@/app/admin/orders/actions';
 import type { OrderFilters as OrderFiltersType } from '@/app/admin/orders/actions';
+import type { Order } from '@/types/database.types';
 
 interface AdminOrdersPageProps {
   searchParams: Promise<{
@@ -103,7 +104,7 @@ export default async function AdminOrdersPage({ searchParams }: AdminOrdersPageP
       </div>
 
       {/* Orders Table with TanStack Table */}
-      <OrdersTable initialOrders={orders} totalCount={total} />
+      <OrdersTable initialOrders={orders as Order[]} totalCount={total} />
 
       {/* Info Footer */}
       <div className="mt-6 text-center text-sm text-muted-foreground">
