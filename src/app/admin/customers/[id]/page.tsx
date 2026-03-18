@@ -55,7 +55,7 @@ export default async function CustomerDetailPage({ params, searchParams }: Custo
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Customer Not Found</h1>
           <p className="text-muted-foreground mb-4">
-            The customer you're looking for doesn't exist or has been removed.
+            The customer you&apos;re looking for doesn&apos;t exist or has been removed.
           </p>
           <Link href="/admin/customers">
             <Button>Back to Customers</Button>
@@ -66,7 +66,7 @@ export default async function CustomerDetailPage({ params, searchParams }: Custo
   }
 
   // Fetch order history if on orders tab
-  let orderHistory = { orders: [], total: 0, hasMore: false };
+  let orderHistory: { orders: import('@/app/admin/customers/actions').OrderHistoryResult[]; total: number; hasMore: boolean } = { orders: [], total: 0, hasMore: false };
   if (currentTab === 'orders') {
     const orderPage = parseInt(resolvedSearchParams.orderPage || '1', 10);
     orderHistory = await getCustomerOrderHistory(customerId, {
@@ -123,9 +123,9 @@ export default async function CustomerDetailPage({ params, searchParams }: Custo
                 <CardTitle className="text-lg">Customer Information</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <InfoRow label="Full Name" value={`${customer.first_name || ''} ${customer.last_name || ''}`.trim() || 'N/A'} />
+                <InfoRow label="Full Name" value={customer.name || 'N/A'} />
                 <InfoRow label="Email" value={customer.email} />
-                <InfoRow label="Phone" value={customer.phone || customer.phone_number} />
+                <InfoRow label="Phone" value={customer.phone_number || 'N/A'} />
                 <InfoRow 
                   label="Account Created" 
                   value={new Date(customer.created_at).toLocaleDateString('en-US', {

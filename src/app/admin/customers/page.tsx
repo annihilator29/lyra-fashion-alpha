@@ -93,11 +93,27 @@ export default async function AdminCustomersPage({ searchParams }: AdminCustomer
 
       {/* Filters */}
       <div className="mb-6">
-        <CustomerFilters currentParams={params} />
+        <CustomerSearchFilters currentParams={params} />
       </div>
 
       {/* Customers Table with TanStack Table */}
-      <CustomersTable initialCustomers={customers} totalCount={total} />
+      <CustomersTable 
+        initialCustomers={customers.map(c => ({
+          id: c.id,
+          name: c.name,
+          first_name: c.first_name,
+          last_name: c.last_name,
+          email: c.email,
+          phone: c.phone,
+          phone_number: c.phone_number,
+          created_at: c.created_at,
+          order_count: c.order_count,
+          lifetime_value: c.lifetime_value,
+          segment: c.segment,
+          last_order_date: c.last_order_date
+        }))} 
+        totalCount={total} 
+      />
 
       {/* Info Footer */}
       <div className="mt-6 text-center text-sm text-muted-foreground">
@@ -116,7 +132,7 @@ export default async function AdminCustomersPage({ searchParams }: AdminCustomer
 /**
  * Customer Filters Component
  */
-function CustomerFilters({ currentParams }: { currentParams: Record<string, any> }) {
+function CustomerSearchFilters({ currentParams }: { currentParams: Record<string, any> }) {
   return (
     <form className="flex flex-wrap gap-4">
       {/* Search Input */}

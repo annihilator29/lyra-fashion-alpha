@@ -46,7 +46,7 @@ describe('StockIndicator', () => {
     render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
     
     // Should show skeleton loader
-    // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
+    // Should show skeleton loader
     expect(document.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
@@ -69,7 +69,6 @@ describe('StockIndicator', () => {
     render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
 
     await waitFor(() => {
-      // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
       expect(screen.getByText(/In Stock/i)).toBeInTheDocument();
     });
   });
@@ -93,7 +92,6 @@ describe('StockIndicator', () => {
     render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
 
     await waitFor(() => {
-      // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
       expect(screen.getByText(/Out of Stock/i)).toBeInTheDocument();
     });
   });
@@ -117,7 +115,6 @@ describe('StockIndicator', () => {
     render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" showQuantity={true} />);
 
     await waitFor(() => {
-      // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
       expect(screen.getByText(/Only 8 left/i)).toBeInTheDocument();
     });
   });
@@ -135,7 +132,6 @@ describe('StockIndicator', () => {
     render(<StockIndicator productId="6ba7b810-9dad-11d1-80b4-00c04fd430c8" />);
 
     await waitFor(() => {
-      // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
       expect(screen.getByText(/Stock unavailable/i)).toBeInTheDocument();
     });
   });
@@ -160,7 +156,6 @@ describe('StockIndicator', () => {
 
     await waitFor(() => {
       const indicator = screen.getByLabelText(/Stock status: Out of stock/i);
-      // @ts-expect-error - jest-dom types not fully compatible with @jest/globals
       expect(indicator).toBeInTheDocument();
     });
   });

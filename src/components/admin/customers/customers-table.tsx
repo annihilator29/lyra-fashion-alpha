@@ -24,6 +24,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -43,6 +44,7 @@ import Link from 'next/link';
 
 interface Customer {
   id: string;
+  name: string | null;
   first_name: string | null;
   last_name: string | null;
   email: string;
@@ -77,18 +79,22 @@ export function CustomersTable({ initialCustomers, totalCount }: CustomersTableP
   const columns: ColumnDef<Customer>[] = [
     {
       id: 'select',
-      header: ({ table }) => (
-        <input
-          type="checkbox"
-          checked={
-            table.getIsAllPageRowsSelected() ||
-            (table.getIsSomePageRowsSelected() && 'indeterminate')
-          }
-          onChange={(e) => table.toggleAllPageRowsSelected(e.target.checked)}
-          aria-label="Select all"
-          className="h-4 w-4"
-        />
-      ),
+      header: ({ table }) => {
+        const isAllSelected = table.getIsAllPageRowsSelected();
+        const isSomeSelected = table.getIsSomePageRowsSelected();
+        return (
+          <input
+            type="checkbox"
+            ref={(el) => {
+              if (el) el.indeterminate = isSomeSelected && !isAllSelected;
+            }}
+            checked={isAllSelected}
+            onChange={(e) => table.toggleAllPageRowsSelected(e.target.checked)}
+            aria-label="Select all"
+            className="h-4 w-4"
+          />
+        );
+      },
       cell: ({ row }) => (
         <input
           type="checkbox"
@@ -105,9 +111,7 @@ export function CustomersTable({ initialCustomers, totalCount }: CustomersTableP
       accessorKey: 'name',
       header: 'Customer',
       cell: ({ row }) => {
-        const firstName = row.original.first_name || '';
-        const lastName = row.original.last_name || '';
-        const name = firstName || lastName ? `${firstName} ${lastName}`.trim() : 'N/A';
+        const name = row.original.name || 'N/A';
         const email = row.original.email;
         
         return (
@@ -227,9 +231,9 @@ export function CustomersTable({ initialCustomers, totalCount }: CustomersTableP
                   Email customer
                 </a>
               </DropdownMenuItem>
-              {(customer.phone || customer.phone_number) && (
+              {customer.phone_number && (
                 <DropdownMenuItem asChild>
-                  <a href={`tel:${customer.phone || customer.phone_number}`}>
+                  <a href={`tel:${customer.phone_number}`}>
                     <Phone className="mr-2 h-4 w-4" />
                     Call customer
                   </a>

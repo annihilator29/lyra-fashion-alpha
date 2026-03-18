@@ -13,6 +13,13 @@
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+
+declare module '@jest/expect' {
+  interface Matchers<R> {
+    toBeInTheDocument(): R;
+  }
+}
 
 // Mock Next.js navigation
 jest.mock('next/navigation', () => ({
@@ -191,7 +198,7 @@ describe('Customer Components', () => {
         />
       );
 
-      expect(screen.getByText('Newsletter')).toBeInTheDocument();
+      expect(screen.getByText('Newsletter Subscription')).toBeInTheDocument();
       expect(screen.getByText('Enabled')).toBeInTheDocument();
     });
 
@@ -207,7 +214,9 @@ describe('Customer Components', () => {
         />
       );
 
-      expect(screen.getByText('Not set')).toBeInTheDocument();
+      const notSetElements = screen.getAllByText('Not set');
+      expect(notSetElements.length).toBeGreaterThan(0);
+      expect(notSetElements[0]).toBeInTheDocument();
     });
   });
 });

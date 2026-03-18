@@ -23,8 +23,8 @@ test.describe('Product Management', () => {
     await page.goto('/admin');
     
     // Login as admin
-    await page.fill('input[type="email"]', adminEmail);
-    await page.fill('input[type="password"]', adminPassword);
+    await page.fill('input[type="email"]', adminEmail || '');
+    await page.fill('input[type="password"]', adminPassword || '');
     await page.click('button[type="submit"]');
     
     // Wait for navigation

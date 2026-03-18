@@ -1,0 +1,435 @@
+﻿node.exe : FAIL src/components/admin/customers/__tests__
+/customer-components.test.tsx
+At line:1 char:1
++ & "C:\Program Files\nodejs/node.exe" 
+"C:\Users\bibek\AppData\Roaming\ ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (FAIL src/c 
+   ompon...onents.test.tsx:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  Customer Components
+    CustomerHeader
+      ΓêÜ should render customer name and email (249 ms)
+      ΓêÜ should display segment badge (5 ms)
+      ΓêÜ should handle missing name gracefully (4 ms)
+    CustomerStatsCard
+      ΓêÜ should display lifetime value correctly (23 
+ms)
+      ΓêÜ should display order count (9 ms)
+      ΓêÜ should handle no orders (5 ms)
+    CustomerAddresses
+      ΓêÜ should display customer addresses (6 ms)
+      ΓêÜ should handle empty addresses (2 ms)
+    CustomerPreferences
+      ΓêÜ should display email preferences (8 ms)
+      ├ù should handle missing preferences (10 ms)
+
+  ΓùÅ Customer Components ΓÇ║ CustomerPreferences ΓÇ║ 
+should handle missing preferences
+
+    TestingLibraryElementError: Unable to find an 
+element with the text: Not Set. This could be because 
+the text is broken up by multiple elements. In this 
+case, you can provide a function for your text matcher 
+to make your matcher more flexible.
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"grid gap-4 
+md:grid-cols-2"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"bg-card 
+text-card-foreground flex flex-col gap-6 rounded-xl 
+border py-6 shadow-sm"[39m
+            [33mdata-slot[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"@container/card-header grid 
+auto-rows-min grid-rows-[auto_auto] items-start gap-2 
+px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] 
+[.border-b]:pb-6"[39m
+              
+[33mdata-slot[39m=[32m"card-header"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"font-semibold 
+text-lg flex items-center gap-2"[39m
+                
+[33mdata-slot[39m=[32m"card-title"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"lucide 
+lucide-mail h-4 w-4"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"24"[39m
+                  
+[33mstroke[39m=[32m"currentColor"[39m
+                  
+[33mstroke-linecap[39m=[32m"round"[39m
+                  
+[33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  [33mwidth[39m=[32m"24"[39m
+                  
+[33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"m22 7-8.991 
+5.727a2 2 0 0 1-2.009 0L2 7"[39m
+                  [36m/>[39m
+                  [36m<rect[39m
+                    [33mheight[39m=[32m"16"[39m
+                    [33mrx[39m=[32m"2"[39m
+                    [33mwidth[39m=[32m"20"[39m
+                    [33mx[39m=[32m"2"[39m
+                    [33my[39m=[32m"4"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0mEmail Preferences[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"px-6 space-y-3"[39m
+              
+[33mdata-slot[39m=[32m"card-content"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mEmail Opt-in[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mNewsletter Subscription[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mMarketing Opt-in[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mOrder Updates[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mPromotional Emails[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"bg-card 
+text-card-foreground flex flex-col gap-6 rounded-xl 
+border py-6 shadow-sm"[39m
+            [33mdata-slot[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"@container/card-header grid 
+auto-rows-min grid-rows-[auto_auto] items-start gap-2 
+px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] 
+[.border-b]:pb-6"[39m
+              
+[33mdata-slot[39m=[32m"card-header"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"font-semibold 
+text-lg flex items-center gap-2"[39m
+                
+[33mdata-slot[39m=[32m"card-title"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"lucide 
+lucide-message-square h-4 w-4"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"24"[39m
+                  
+[33mstroke[39m=[32m"currentColor"[39m
+                  
+[33mstroke-linecap[39m=[32m"round"[39m
+                  
+[33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  [33mwidth[39m=[32m"24"[39m
+                  
+[33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M22 17a2 2 0 0 
+1-2 2H6.828a2 2 0 0 0-1.414.586l-2.202 2.202A.71.71 0 0 
+1 2 21.286V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2z"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0mCommunication Preferences[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"px-6 space-y-3"[39m
+              
+[33mdata-slot[39m=[32m"card-content"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mSMS Opt-in[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mSMS Notifications[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mPreferred Contact Method[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"bg-card 
+text-card-foreground flex flex-col gap-6 rounded-xl 
+border py-6 shadow-sm"[39m
+            [33mdata-slot[39m=[32m"card"[39m
+          [36m>[39m
+            [36m<div[39m
+              
+[33mclass[39m=[32m"@container/card-header grid 
+auto-rows-min grid-rows-[auto_auto] items-start gap-2 
+px-6 has-data-[slot=card-action]:grid-cols-[1fr_auto] 
+[.border-b]:pb-6"[39m
+              
+[33mdata-slot[39m=[32m"card-header"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"font-semibold 
+text-lg flex items-center gap-2"[39m
+                
+[33mdata-slot[39m=[32m"card-title"[39m
+              [36m>[39m
+                [36m<svg[39m
+                  [33maria-hidden[39m=[32m"true"[39m
+                  [33mclass[39m=[32m"lucide 
+lucide-settings h-4 w-4"[39m
+                  [33mfill[39m=[32m"none"[39m
+                  [33mheight[39m=[32m"24"[39m
+                  
+[33mstroke[39m=[32m"currentColor"[39m
+                  
+[33mstroke-linecap[39m=[32m"round"[39m
+                  
+[33mstroke-linejoin[39m=[32m"round"[39m
+                  [33mstroke-width[39m=[32m"2"[39m
+                  [33mviewBox[39m=[32m"0 0 24 
+24"[39m
+                  [33mwidth[39m=[32m"24"[39m
+                  
+[33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                [36m>[39m
+                  [36m<path[39m
+                    [33md[39m=[32m"M9.671 4.136a2.34 
+2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 
+2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 
+0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 
+0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 
+1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 
+6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"[39m
+                  [36m/>[39m
+                  [36m<circle[39m
+                    [33mcx[39m=[32m"12"[39m
+                    [33mcy[39m=[32m"12"[39m
+                    [33mr[39m=[32m"3"[39m
+                  [36m/>[39m
+                [36m</svg>[39m
+                [0mCustomer Preferences[0m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"px-6 space-y-3"[39m
+              
+[33mdata-slot[39m=[32m"card-content"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mSize Preferences[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mStyle Preferences[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center 
+justify-between"[39m
+              [36m>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mGeneral Preferences[0m
+                [36m</span>[39m
+                [36m<span[39m
+                  [33mclass[39m=[32m"text-sm 
+text-muted-foreground"[39m
+                [36m>[39m
+                  [0mNot set[0m
+                [36m</span>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 217 |[39m       )[33m;[39m
+     [90m 218 |[39m
+    [31m[1m>[22m[39m[90m 219 |[39m       
+expect(screen[33m.[39mgetByText([32m'Not 
+Set'[39m))[33m.[39mtoBeInTheDocument()[33m;[39m
+     [90m     |[39m                     
+[31m[1m^[22m[39m
+     [90m 220 |[39m     })[33m;[39m
+     [90m 221 |[39m   })[33m;[39m
+     [90m 222 |[39m })[33m;[39m[0m
+
+      at Object.getElementError 
+(node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/dom/dist/query-he
+lpers.js:76:38
+      at node_modules/@testing-library/dom/dist/query-he
+lpers.js:52:17
+      at node_modules/@testing-library/dom/dist/query-he
+lpers.js:95:19
+      at Object.getByText (src/components/admin/customer
+s/__tests__/customer-components.test.tsx:219:21)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 9 passed, 10 total
+Snapshots:   0 total
+Time:        1.23 s
+Ran all test suites matching 
+src/components/admin/customers.

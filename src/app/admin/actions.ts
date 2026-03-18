@@ -549,7 +549,7 @@ export async function getLowInventoryProducts(
       .from('products')
       .select('id, name, inventory!inner(quantity)')
       .lt('inventory.quantity', threshold)
-      .order('inventory.quantity', { ascending: true })
+      .order('quantity', { foreignTable: 'inventory', ascending: true })
       .limit(10);
 
     if (error) {
@@ -596,8 +596,12 @@ export async function getPendingReturns(): Promise<{
         order_id,
         reason,
         requested_at,
-        orders!inner(customer_id),
-        customers!orders.customer_id(full_name)
+        orders!inner(
+          customer_id,
+          customers (
+            name
+          )
+        )
       `
       )
       .eq('status', 'requested')
@@ -614,7 +618,7 @@ export async function getPendingReturns(): Promise<{
       returns?.map((r: any) => ({
         id: r.id,
         order_id: r.order_id,
-        customer_name: r.customers?.full_name || 'Unknown',
+        customer_name: r.orders?.customers?.name || 'Unknown',
         request_date: r.requested_at,
         reason: r.reason || 'Not specified',
       })) || [];
@@ -660,7 +664,7 @@ export async function getOpenSupportTickets(): Promise<{
         id,
         subject,
         created_at,
-        customers!inner(full_name)
+        customers!inner(name)
       `
       )
       .eq('status', 'open')
@@ -678,7 +682,7 @@ export async function getOpenSupportTickets(): Promise<{
         id: t.id,
         subject: t.subject,
         created_at: t.created_at,
-        customer_name: t.customers?.full_name || 'Unknown',
+        customer_name: t.customers?.name || 'Unknown',
         priority: getSupportTicketPriority([t]),
       })) || [];
 
@@ -714,7 +718,7 @@ export async function getFailedPaymentOrders(): Promise<{
         total,
         created_at,
         payment_error_message,
-        customers!inner(full_name, email)
+        customers!inner(name, email)
       `
       )
       .eq('status', 'payment_failed')
@@ -733,7 +737,7 @@ export async function getFailedPaymentOrders(): Promise<{
         order_number: o.order_number,
         total: o.total,
         failure_date: o.created_at,
-        customer_name: o.customers?.full_name || 'Unknown',
+        customer_name: o.customers?.name || 'Unknown',
         customer_email: o.customers?.email || 'Unknown',
         payment_error_message: o.payment_error_message,
       })) || [];

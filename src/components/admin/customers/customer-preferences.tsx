@@ -1,25 +1,38 @@
 /**
  * Customer Preferences Component
  * Story 7.4a: Customer Lookup & Profile
- * AC4: Customer Addresses & Preferences
+ * AC2 & AC4: Customer Profile View, Customer Addresses & Preferences
  * 
  * Displays customer communication and marketing preferences
  */
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Mail, MessageSquare, Bell } from 'lucide-react';
+import { Mail, MessageSquare, Bell, Settings } from 'lucide-react';
 
 interface CustomerPreferencesProps {
   customer: {
     email_preferences?: any | null;
     preferences?: any | null;
+    customer_preferences?: {
+      preferences: any | null;
+      size_preferences: any | null;
+      style_preferences: any | null;
+    } | null;
+    communication_preferences?: {
+      email_opt_in: boolean | null;
+      sms_opt_in: boolean | null;
+      marketing_opt_in: boolean | null;
+      newsletter_subscription: boolean | null;
+    } | null;
   };
 }
 
 export function CustomerPreferences({ customer }: CustomerPreferencesProps) {
-  const emailPrefs = customer.email_preferences || {};
-  const generalPrefs = customer.preferences || {};
+  const emailPrefs = (customer.email_preferences || {}) as Record<string, any>;
+  const generalPrefs = (customer.preferences || {}) as Record<string, any>;
+  const commPrefs = (customer.communication_preferences || {}) as Record<string, any>;
+  const customerPrefs = (customer.customer_preferences || {}) as Record<string, any>;
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -32,8 +45,16 @@ export function CustomerPreferences({ customer }: CustomerPreferencesProps) {
         </CardHeader>
         <CardContent className="space-y-3">
           <PreferenceRow
-            label="Newsletter"
-            value={emailPrefs.marketing_opt_in}
+            label="Email Opt-in"
+            value={commPrefs.email_opt_in}
+          />
+          <PreferenceRow
+            label="Newsletter Subscription"
+            value={commPrefs.newsletter_subscription}
+          />
+          <PreferenceRow
+            label="Marketing Opt-in"
+            value={commPrefs.marketing_opt_in}
           />
           <PreferenceRow
             label="Order Updates"
@@ -55,12 +76,39 @@ export function CustomerPreferences({ customer }: CustomerPreferencesProps) {
         </CardHeader>
         <CardContent className="space-y-3">
           <PreferenceRow
+            label="SMS Opt-in"
+            value={commPrefs.sms_opt_in}
+          />
+          <PreferenceRow
             label="SMS Notifications"
             value={generalPrefs.sms_notifications}
           />
           <PreferenceRow
             label="Preferred Contact Method"
             value={generalPrefs.preferred_contact_method}
+          />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Settings className="h-4 w-4" />
+            Customer Preferences
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <PreferenceRow
+            label="Size Preferences"
+            value={customerPrefs.size_preferences}
+          />
+          <PreferenceRow
+            label="Style Preferences"
+            value={customerPrefs.style_preferences}
+          />
+          <PreferenceRow
+            label="General Preferences"
+            value={customerPrefs.preferences}
           />
         </CardContent>
       </Card>

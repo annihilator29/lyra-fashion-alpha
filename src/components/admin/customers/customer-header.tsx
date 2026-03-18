@@ -12,11 +12,12 @@ import { Mail, Phone, Calendar } from 'lucide-react';
 
 interface CustomerHeaderProps {
   customer: {
-    first_name: string | null;
-    last_name: string | null;
+    name?: string | null;
+    first_name?: string | null;
+    last_name?: string | null;
     email: string;
-    phone: string | null;
-    phone_number: string | null;
+    phone?: string | null;
+    phone_number?: string | null;
     created_at: string;
     segment: 'VIP' | 'Regular' | 'New';
     avatar_url?: string | null;
@@ -30,12 +31,15 @@ const segmentColors = {
 };
 
 export function CustomerHeader({ customer }: CustomerHeaderProps) {
-  const fullName = [customer.first_name, customer.last_name]
-    .filter(Boolean)
-    .join(' ') || 'N/A';
-
+  // Derive display name: prefer first_name + last_name, fallback to name, then 'N/A'
+  const fullName = (
+    [customer.first_name, customer.last_name].filter(Boolean).join(' ').trim() ||
+    customer.name ||
+    'N/A'
+  );
+  const phone = customer.phone || customer.phone_number || null;
+  const initials = getInitials(fullName);
   const accountAge = calculateAccountAge(customer.created_at);
-  const phone = customer.phone || customer.phone_number;
 
   return (
     <div className="flex items-start justify-between mb-6">
