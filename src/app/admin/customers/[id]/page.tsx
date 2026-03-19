@@ -18,11 +18,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Mail, MessageSquare } from 'lucide-react';
 import { getCustomerById, getCustomerOrderHistory } from '@/app/admin/customers/actions';
+import { getCustomerActivityTimeline } from '@/app/admin/customers/activity-actions';
 import { CustomerHeader } from '@/components/admin/customers/customer-header';
 import { CustomerStatsCard } from '@/components/admin/customers/customer-stats-card';
 import { CustomerAddresses } from '@/components/admin/customers/customer-addresses';
 import { CustomerPreferences } from '@/components/admin/customers/customer-preferences';
 import { CustomerOrders } from '@/components/admin/customers/customer-orders';
+import { ActivityTimeline } from '@/components/admin/customers/activity-timeline';
 
 interface CustomerDetailPageProps {
   params: Promise<{ id: string }>;
@@ -32,6 +34,7 @@ interface CustomerDetailPageProps {
     orderDateFrom?: string;
     orderDateTo?: string;
     orderPage?: string;
+    activityType?: string;
   }>;
 }
 
@@ -77,6 +80,12 @@ export default async function CustomerDetailPage({ params, searchParams }: Custo
       page: orderPage,
       limit: 25,
     });
+  }
+
+  // Fetch activity timeline if on activity tab
+  let activityData: { activities: import('@/types/activity').ActivityItem[]; total: number; hasMore: boolean } = { activities: [], total: 0, hasMore: false };
+  if (currentTab === 'activity') {
+    activityData = await getCustomerActivityTimeline(customerId, { limit: 50, offset: 0 });
   }
 
   return (
@@ -152,6 +161,14 @@ export default async function CustomerDetailPage({ params, searchParams }: Custo
           initialOrders={orderHistory.orders} 
           totalCount={orderHistory.total}
           customerId={customerId}
+        />
+      )}
+
+      {currentTab === 'activity' && (
+        <ActivityTimeline
+          customerId={customerId}
+          initialActivities={activityData.activities}
+          initialTotal={activityData.total}
         />
       )}
     </div>

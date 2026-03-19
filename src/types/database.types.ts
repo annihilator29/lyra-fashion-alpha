@@ -877,6 +877,30 @@ export interface Database {
         };
         Relationships: [];
       };
+      customer_activities: {
+        Row: {
+          id: string;
+          customer_id: string;
+          activity_type: string;
+          activity_data: Json | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          customer_id: string;
+          activity_type: string;
+          activity_data?: Json | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          customer_id?: string;
+          activity_type?: string;
+          activity_data?: Json | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -909,6 +933,7 @@ export type BlogPost = Tables<'blog_posts'>;
 export type ProductReview = Tables<'product_reviews'>;
 export type ReviewRequestQueue = Tables<'review_request_queue'>;
 export type EmailQueue = Tables<'email_queue'>;
+export type CustomerActivity = Tables<'customer_activities'>;
 
 // Insert types
 export type ProductInsert = InsertTables<'products'>;

@@ -29,9 +29,10 @@ export function CustomerTabs({ children }: CustomerTabsProps) {
 
   return (
     <Tabs value={currentTab} onValueChange={onTabChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-2 mb-6">
+      <TabsList className="grid w-full grid-cols-3 mb-6">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         <TabsTrigger value="orders">Order History</TabsTrigger>
+        <TabsTrigger value="activity">Activity</TabsTrigger>
       </TabsList>
       
       <TabsContent value="overview" className="space-y-6">
@@ -39,6 +40,10 @@ export function CustomerTabs({ children }: CustomerTabsProps) {
       </TabsContent>
       
       <TabsContent value="orders" className="space-y-6">
+        {children}
+      </TabsContent>
+      
+      <TabsContent value="activity" className="space-y-6">
         {children}
       </TabsContent>
     </Tabs>
