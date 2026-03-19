@@ -31,16 +31,29 @@ interface TemplatesListProps {
 
 export function TemplatesList({ initialTemplates }: TemplatesListProps) {
   const [templates, setTemplates] = useState(initialTemplates);
+  const [search, setSearch] = useState('');
   const [editingTemplate, setEditingTemplate] = useState<SupportTemplate | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  // Group by category
+  // Client-side keyword filter
+  const filtered = search.trim()
+    ? templates.filter((t) => {
+        const q = search.trim().toLowerCase();
+        return (
+          t.title.toLowerCase().includes(q) ||
+          t.subject.toLowerCase().includes(q) ||
+          t.body.toLowerCase().includes(q)
+        );
+      })
+    : templates;
+
+  // Group filtered results by category
   const grouped = Object.entries(CATEGORY_LABELS).map(([cat, label]) => ({
     category: cat as TemplateCategory,
     label,
-    items: templates.filter((t) => t.category === cat),
+    items: filtered.filter((t) => t.category === cat),
   }));
 
   function handleDelete(templateId: string) {
@@ -70,14 +83,25 @@ export function TemplatesList({ initialTemplates }: TemplatesListProps) {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-4 flex-wrap mb-2">
         <p className="text-sm text-muted-foreground">
-          {templates.length} template{templates.length !== 1 ? 's' : ''}
+          {filtered.length}{templates.length !== filtered.length ? ` of ${templates.length}` : ''} template{filtered.length !== 1 ? 's' : ''}
         </p>
         <Button size="sm" onClick={() => setShowCreate(true)}>
           <Plus className="h-4 w-4 mr-2" />
           New Template
         </Button>
+      </div>
+
+      {/* Search */}
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Search templates by title, subject, or body..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full px-3 py-2 border border-input rounded-md text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+        />
       </div>
 
       {/* Create / Edit modal */}
@@ -139,17 +163,23 @@ export function TemplatesList({ initialTemplates }: TemplatesListProps) {
         )
       )}
 
-      {templates.length === 0 && (
+      {filtered.length === 0 && (
         <div className="text-center py-16 text-muted-foreground">
-          <p>No templates yet.</p>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-4"
-            onClick={() => setShowCreate(true)}
-          >
-            Create your first template
-          </Button>
+          {search.trim() ? (
+            <p>No templates match &ldquo;{search}&rdquo;.</p>
+          ) : (
+            <>
+              <p>No templates yet.</p>
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-4"
+                onClick={() => setShowCreate(true)}
+              >
+                Create your first template
+              </Button>
+            </>
+          )}
         </div>
       )}
     </div>

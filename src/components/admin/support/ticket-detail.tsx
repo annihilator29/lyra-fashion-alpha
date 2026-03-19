@@ -65,6 +65,7 @@ interface TicketDetailProps {
 export function TicketDetail({ ticket, messages }: TicketDetailProps) {
   const [isPending, startTransition] = useTransition();
   const [statusError, setStatusError] = useState<string | null>(null);
+  const [assignError, setAssignError] = useState<string | null>(null);
 
   const customer = ticket.customer;
   const customerName = customer?.first_name
@@ -79,6 +80,17 @@ export function TicketDetail({ ticket, messages }: TicketDetailProps) {
       });
       if (result.error) setStatusError(result.error);
       else setStatusError(null);
+    });
+  }
+
+  function handleAssignChange(assignedTo: string) {
+    startTransition(async () => {
+      const result = await assignTicket({
+        ticketId: ticket.id,
+        assignedTo: assignedTo || null,
+      });
+      if (result.error) setAssignError(result.error);
+      else setAssignError(null);
     });
   }
 
@@ -197,6 +209,23 @@ export function TicketDetail({ ticket, messages }: TicketDetailProps) {
             <div>
               <p className="text-xs text-muted-foreground">Priority</p>
               <p className="font-medium mt-0.5">{PRIORITY_LABELS[ticket.priority]}</p>
+            </div>
+
+            <Separator />
+
+            <div>
+              <p className="text-xs text-muted-foreground mb-1">Assigned To</p>
+              <input
+                type="text"
+                placeholder="Agent UUID or leave blank"
+                defaultValue={ticket.assigned_to ?? ''}
+                disabled={isPending}
+                onBlur={(e) => handleAssignChange(e.target.value.trim())}
+                className="w-full px-2 py-1.5 border border-input rounded-md text-sm bg-background disabled:opacity-50 font-mono text-xs"
+              />
+              {assignError && (
+                <p className="text-xs text-destructive mt-1">{assignError}</p>
+              )}
             </div>
 
             <Separator />

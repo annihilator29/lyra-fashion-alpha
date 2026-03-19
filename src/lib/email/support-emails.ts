@@ -32,12 +32,12 @@ export interface SendTicketConfirmationParams {
   subject: string;
 }
 
-export interface NotifyTicketAssignedParams {
-  to: string;           // agent email
-  agentName: string;
+export interface NotifyTicketResolvedParams {
+  to: string;           // customer email
+  customerName: string;
   ticketNumber: string;
   ticketSubject: string;
-  customerName: string;
+  agentName?: string;
 }
 
 // ============================================================
@@ -118,11 +118,12 @@ export async function sendTicketConfirmation(
 }
 
 // ============================================================
-// Ticket Resolution (AC1)
+// Ticket Resolution Notification (AC1)
+// Sent to customer when their ticket is marked resolved.
 // ============================================================
 
-export async function notifyTicketAssigned(
-  params: NotifyTicketAssignedParams
+export async function notifyTicketResolved(
+  params: NotifyTicketResolvedParams
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const html = await render(
@@ -130,7 +131,7 @@ export async function notifyTicketAssigned(
         customerName: params.customerName,
         ticketNumber: params.ticketNumber,
         ticketSubject: params.ticketSubject,
-        agentName: params.agentName,
+        agentName: params.agentName ?? 'Lyra Support Team',
       })
     );
 
@@ -142,14 +143,14 @@ export async function notifyTicketAssigned(
     });
 
     if (error) {
-      console.error('notifyTicketAssigned - Resend error:', error);
+      console.error('notifyTicketResolved - Resend error:', error);
       return { success: false, error: error.message };
     }
 
     console.log('Resolution notification sent:', data?.id);
     return { success: true };
   } catch (err) {
-    console.error('notifyTicketAssigned - Catch:', err);
+    console.error('notifyTicketResolved - Catch:', err);
     return {
       success: false,
       error: err instanceof Error ? err.message : 'Failed to send notification',

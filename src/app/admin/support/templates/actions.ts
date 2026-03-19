@@ -26,10 +26,11 @@ import type {
 // ============================================================
 
 /**
- * Get all templates, optionally filtered by category.
+ * Get all templates, optionally filtered by category and/or keyword search.
  */
 export async function getTemplates(
-  category?: TemplateCategory
+  category?: TemplateCategory,
+  search?: string
 ): Promise<TemplateListResult> {
   try {
     await requireAdmin();
@@ -43,6 +44,11 @@ export async function getTemplates(
 
     if (category) {
       query = query.eq('category', category);
+    }
+
+    if (search && search.trim().length > 0) {
+      const s = search.trim().replace(/[;'"\\]/g, '').slice(0, 100);
+      query = query.or(`title.ilike.%${s}%,subject.ilike.%${s}%,body.ilike.%${s}%`);
     }
 
     const { data, error, count } = await query;

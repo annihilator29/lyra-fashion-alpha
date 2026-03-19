@@ -37,29 +37,43 @@ export async function sendEmailToCustomer(
     const { customerId, subject, body, replyToTicketId } = parsed.data;
     const supabase = createAdminClient() as any;
 
-    // Fetch customer email
-    const { data: customer, error: customerError } = await supabase
-      .from('customers')
-      .select('email, first_name, last_name, name')
-      .eq('id', customerId)
-      .single();
+    // Fetch customer email + most recent order number for placeholder interpolation
+    const [customerRes, orderRes] = await Promise.all([
+      supabase
+        .from('customers')
+        .select('email, first_name, last_name, name')
+        .eq('id', customerId)
+        .single(),
+      supabase
+        .from('orders')
+        .select('order_number')
+        .eq('customer_id', customerId)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-    if (customerError || !customer) {
+    if (customerRes.error || !customerRes.data) {
       return { data: null, error: 'Customer not found' };
     }
+
+    const customer = customerRes.data;
+    const orderNumber: string = orderRes.data?.order_number ?? 'N/A';
 
     const customerName =
       customer.first_name
         ? `${customer.first_name} ${customer.last_name ?? ''}`.trim()
         : customer.name ?? 'Customer';
 
-    // Interpolate placeholders
-    const interpolatedBody = body
-      .replace(/{{customer_name}}/g, customerName)
-      .replace(/{{support_agent}}/g, 'Lyra Support Team');
+    // Interpolate all supported placeholders (AC4)
+    const interpolate = (text: string) =>
+      text
+        .replace(/{{customer_name}}/g, customerName)
+        .replace(/{{order_number}}/g, orderNumber)
+        .replace(/{{support_agent}}/g, 'Lyra Support Team');
 
-    const interpolatedSubject = subject
-      .replace(/{{customer_name}}/g, customerName);
+    const interpolatedBody = interpolate(body);
+    const interpolatedSubject = interpolate(subject);
 
     // Send via Resend
     const sendResult = await sendSupportEmail({
