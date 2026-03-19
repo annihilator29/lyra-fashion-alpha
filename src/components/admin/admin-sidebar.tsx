@@ -20,6 +20,7 @@ import {
   Settings,
   LogOut,
   Shield,
+  LifeBuoy,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -61,6 +62,11 @@ const navItems: NavItem[] = [
     label: 'Reviews',
     href: '/admin/reviews',
     icon: <Shield className="h-5 w-5" />,
+  },
+  {
+    label: 'Support',
+    href: '/admin/support',
+    icon: <LifeBuoy className="h-5 w-5" />,
   },
   {
     label: 'Production',
@@ -124,7 +130,9 @@ export function AdminSidebar() {
         {/* Navigation */}
         <nav className="flex-1 space-y-1 p-4 overflow-y-auto h-[calc(100%-180px)]">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const isActive = item.href === '/admin' 
+              ? pathname === '/admin' 
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
             
             return (
               <Link
@@ -134,7 +142,7 @@ export function AdminSidebar() {
                 className={cn(
                   'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                   isActive
-                    ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                    ? 'bg-slate-800 text-white border-l-2 border-white'
                     : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                 )}
                 data-testid={`nav-${item.label.toLowerCase()}`}

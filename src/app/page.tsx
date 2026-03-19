@@ -93,7 +93,6 @@ function HeroSection() {
         fill
         className="object-cover"
         priority
-        quality={90}
       />
       
       {/* Overlay - adjusting opacity for text readability */}

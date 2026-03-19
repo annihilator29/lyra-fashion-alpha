@@ -68,7 +68,9 @@ export function useConnectionStatus(): UseConnectionStatusReturn {
 
     const cleanup = () => {
       if (channelRef) {
-        supabase.removeChannel(channelRef);
+        const ref = channelRef;
+        channelRef = null;
+        supabase.removeChannel(ref);
       }
     };
 

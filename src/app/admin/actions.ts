@@ -717,7 +717,6 @@ export async function getFailedPaymentOrders(): Promise<{
         order_number,
         total,
         created_at,
-        payment_error_message,
         customers!inner(name, email)
       `
       )
@@ -739,7 +738,6 @@ export async function getFailedPaymentOrders(): Promise<{
         failure_date: o.created_at,
         customer_name: o.customers?.name || 'Unknown',
         customer_email: o.customers?.email || 'Unknown',
-        payment_error_message: o.payment_error_message,
       })) || [];
 
     return { orders: failedOrders };
