@@ -122,8 +122,44 @@ export default async function CustomerDetailPage({ params, searchParams }: Custo
         </div>
       </div>
 
+      {/* Tab Navigation */}
+      <div className="mb-6 border-b">
+        <div className="flex gap-4">
+          <Link
+            href={`/admin/customers/${customerId}?tab=overview`}
+            className={`pb-3 px-1 text-sm font-medium transition-colors ${
+              currentTab === 'overview'
+                ? 'border-b-2 border-primary text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Overview
+          </Link>
+          <Link
+            href={`/admin/customers/${customerId}?tab=orders`}
+            className={`pb-3 px-1 text-sm font-medium transition-colors ${
+              currentTab === 'orders'
+                ? 'border-b-2 border-primary text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Order History
+          </Link>
+          <Link
+            href={`/admin/customers/${customerId}?tab=activity`}
+            className={`pb-3 px-1 text-sm font-medium transition-colors ${
+              currentTab === 'activity'
+                ? 'border-b-2 border-primary text-primary'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            Activity
+          </Link>
+        </div>
+      </div>
+
       {/* Tabs Content */}
-      {currentTab === 'overview' && (
+        {currentTab === 'overview' && (
         <div className="space-y-6">
           {/* Customer Information */}
           <div className="grid gap-4 md:grid-cols-2">

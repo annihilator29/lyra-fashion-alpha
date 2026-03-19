@@ -206,11 +206,13 @@ function FilterBar({
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Filter className="h-4 w-4 text-muted-foreground" />
+      <Filter className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
       <Button
         variant={selected.length === 0 ? 'secondary' : 'ghost'}
         size="sm"
         onClick={clearAll}
+        aria-label="Show all activity types"
+        aria-pressed={selected.length === 0}
       >
         All
       </Button>
@@ -223,6 +225,8 @@ function FilterBar({
             variant={isActive ? 'secondary' : 'ghost'}
             size="sm"
             onClick={() => toggle(type)}
+            aria-label={`Filter by ${config.label}`}
+            aria-pressed={isActive}
           >
             <config.icon className="mr-1 h-3 w-3" />
             {config.label}
@@ -286,6 +290,7 @@ export function ActivityTimeline({
   const [filter, setFilter] = React.useState<ActivityType[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
   const [isLoadingMore, setIsLoadingMore] = React.useState(false);
+  const [total, setTotal] = React.useState(initialTotal);
   const [hasMore, setHasMore] = React.useState(initialActivities.length < initialTotal);
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
 
@@ -301,6 +306,7 @@ export function ActivityTimeline({
       });
       if (!cancelled) {
         setActivities(result.activities);
+        setTotal(result.total);
         setHasMore(result.hasMore);
         setIsLoading(false);
       }
@@ -310,7 +316,7 @@ export function ActivityTimeline({
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [customerId, filter.join(',')]);
+  }, [customerId, filter.length > 0 ? filter.join(',') : '']);
 
   // Infinite scroll observer
   React.useEffect(() => {
@@ -343,6 +349,10 @@ export function ActivityTimeline({
     setIsLoadingMore(false);
   };
 
+  const handleFilterChange = React.useCallback((newFilter: ActivityType[]) => {
+    setFilter(newFilter);
+  }, []);
+
   const grouped = groupByDate(activities);
 
   return (
@@ -352,14 +362,16 @@ export function ActivityTimeline({
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Filters */}
-        <FilterBar selected={filter} onChange={setFilter} />
+        <FilterBar selected={filter} onChange={handleFilterChange} />
 
         {/* Timeline */}
         {isLoading ? (
           <LoadingSkeleton />
         ) : activities.length === 0 ? (
           <div className="py-12 text-center">
-            <p className="text-sm text-muted-foreground">No activities found.</p>
+            <p className="text-sm text-muted-foreground">
+              {filter.length > 0 ? 'No activities match the selected filters.' : 'No activities found.'}
+            </p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -392,7 +404,7 @@ export function ActivityTimeline({
         {/* Count */}
         {!isLoading && activities.length > 0 && (
           <p className="text-xs text-muted-foreground text-center">
-            Showing {activities.length} of {initialTotal} activities
+            Showing {activities.length} of {total} activities
           </p>
         )}
       </CardContent>
