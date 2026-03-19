@@ -118,8 +118,8 @@ export function StatusUpdateDialog({
             {/* Current Status */}
             <div className="flex items-center gap-2 p-3 bg-muted rounded-lg">
               <span className="text-sm font-medium">Current Status:</span>
-              <Badge variant="secondary" className={ORDER_STATUS_CONFIG[currentStatus]?.color}>
-                {ORDER_STATUS_CONFIG[currentStatus]?.label}
+              <Badge variant="secondary" className={ORDER_STATUS_CONFIG[currentStatus]?.color ?? 'bg-gray-100 text-gray-800 border-gray-200'}>
+                {ORDER_STATUS_CONFIG[currentStatus]?.label ?? currentStatus}
               </Badge>
             </div>
 
@@ -143,7 +143,7 @@ export function StatusUpdateDialog({
                         disabled={!valid}
                       >
                         <div className="flex items-center gap-2">
-                          {ORDER_STATUS_CONFIG[status]?.label}
+                          {ORDER_STATUS_CONFIG[status]?.label ?? status}
                           {!valid && status !== currentStatus && (
                             <span className="text-muted-foreground text-xs">
                               (Not available)

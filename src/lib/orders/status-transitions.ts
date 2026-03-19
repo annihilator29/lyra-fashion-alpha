@@ -11,7 +11,8 @@ import type { OrderStatus } from '@/types/order';
  * Defines which statuses can transition to which other statuses
  */
 export const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
-  pending: ['production', 'cancelled'],
+  pending: ['paid', 'production', 'cancelled'],
+  paid: ['production', 'cancelled'],
   production: ['quality_check', 'cancelled'],
   quality_check: ['shipped', 'cancelled'],
   shipped: ['delivered', 'cancelled'],
@@ -24,6 +25,7 @@ export const STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
  */
 export const ALL_ORDER_STATUSES: OrderStatus[] = [
   'pending',
+  'paid',
   'production',
   'quality_check',
   'shipped',
@@ -41,6 +43,7 @@ export const TERMINAL_STATUSES: OrderStatus[] = ['delivered', 'cancelled'];
  */
 export const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: 'Pending',
+  paid: 'Paid',
   production: 'In Production',
   quality_check: 'Quality Check',
   shipped: 'Shipped',

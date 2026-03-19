@@ -4,6 +4,7 @@
 
 export type OrderStatus =
   | 'pending'
+  | 'paid'
   | 'production'
   | 'quality_check'
   | 'shipped'
@@ -117,6 +118,11 @@ export const ORDER_STATUS_CONFIG: Record<OrderStatus, StatusConfig> = {
     label: 'Pending',
     color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     icon: 'clock',
+  },
+  paid: {
+    label: 'Paid',
+    color: 'bg-emerald-100 text-emerald-800 border-emerald-200',
+    icon: 'credit-card',
   },
   production: {
     label: 'In Production',

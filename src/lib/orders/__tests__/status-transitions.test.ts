@@ -60,8 +60,9 @@ describe('status-transitions', () => {
 
   describe('ALL_ORDER_STATUSES', () => {
     it('contains all valid order statuses', () => {
-      expect(ALL_ORDER_STATUSES).toHaveLength(6);
+      expect(ALL_ORDER_STATUSES).toHaveLength(7);
       expect(ALL_ORDER_STATUSES).toContain('pending');
+      expect(ALL_ORDER_STATUSES).toContain('paid');
       expect(ALL_ORDER_STATUSES).toContain('production');
       expect(ALL_ORDER_STATUSES).toContain('quality_check');
       expect(ALL_ORDER_STATUSES).toContain('shipped');
@@ -169,7 +170,7 @@ describe('status-transitions', () => {
   describe('getStatusOptions', () => {
     it('returns options for all statuses', () => {
       const options = getStatusOptions('pending');
-      expect(options).toHaveLength(6);
+      expect(options).toHaveLength(7);
     });
 
     it('marks valid transitions as isValid', () => {
