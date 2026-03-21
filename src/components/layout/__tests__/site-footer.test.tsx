@@ -36,7 +36,8 @@ describe('SiteFooter', () => {
     render(<SiteFooter />);
 
     const footer = screen.getByRole('contentinfo');
-    expect(footer).toHaveClass('bg-[#3A3531]');
+    expect(footer).toHaveClass('bg-slate-900');
+    expect(footer).toHaveClass('text-white');
   });
 
   it('renders social media links with icons', () => {
