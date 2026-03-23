@@ -10,6 +10,7 @@ import { ReviewSectionWrapper } from '@/components/reviews/review-section-wrappe
 import { ReviewErrorBoundary } from '@/components/reviews/error-boundary';
 import { generateProductReviewSchema } from '@/lib/reviews/json-ld';
 import type { Review, ReviewSummary } from '@/lib/reviews/types';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 // ISR: Revalidate every hour
 export const revalidate = 3600;
@@ -44,7 +45,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         };
     }
 
-    const imageUrl = product.images?.[0] || '/placeholder-product.jpg';
+    const rawImage = product.images?.[0] || '/placeholder-product.jpg';
+    const imageUrl = rawImage.startsWith('/') || rawImage.startsWith('http') ? rawImage : getStorageImageUrl(rawImage);
 
     return {
         title: `${product.name} | Lyra Fashion`,

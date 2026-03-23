@@ -4,6 +4,7 @@ import { useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface ImageGalleryProps {
     images: string[];
@@ -35,7 +36,10 @@ export function ImageGallery({
 
     // Handle empty or missing images - use useMemo for stable reference
     const displayImages = useMemo(() => {
-        return images?.length > 0 ? images : ['/placeholder-product.jpg'];
+        const raw = images?.length > 0 ? images : ['/placeholder-product.jpg'];
+        return raw.map(img =>
+            img.startsWith('/') || img.startsWith('http') ? img : getStorageImageUrl(img)
+        );
     }, [images]);
 
     const currentImage = displayImages[selectedIndex];

@@ -28,6 +28,7 @@ import { ShippingForm } from '@/components/admin/orders/shipping-form';
 import { RefundForm } from '@/components/admin/orders/refund-form';
 import { InternalNotes } from '@/components/admin/orders/internal-notes';
 import type { InternalNote as InternalNoteType } from '@/app/admin/orders/actions';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface AdminOrderDetailPageProps {
   order: OrderWithItems;
@@ -235,7 +236,7 @@ export default function AdminOrderDetailPage({ order, notes = [] }: AdminOrderDe
                       <div className="w-20 h-20 bg-muted rounded-lg flex items-center justify-center flex-shrink-0">
                         {item.products?.images?.[0] ? (
                           <img
-                            src={item.products.images[0]}
+                            src={item.products.images[0].startsWith('/') || item.products.images[0].startsWith('http') ? item.products.images[0] : getStorageImageUrl(item.products.images[0])}
                             alt={item.products.name}
                             className="w-full h-full object-cover rounded-lg"
                           />

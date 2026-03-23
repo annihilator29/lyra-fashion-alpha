@@ -6,6 +6,7 @@ import { isAdmin } from '@/lib/auth/roles';
 import { ProductionStages } from '@/components/orders/production-stages';
 import { ProductionStageUpdateForm } from '@/components/orders/production-update-form';
 import type { OrderWithItems } from '@/types/order';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -151,7 +152,7 @@ export default async function AdminProductionDetailPage({ params }: PageProps) {
                 <div key={item.id} className="flex items-center gap-4">
                   {item.products?.images?.[0] && (
                     <Image
-                      src={item.products.images[0]}
+                      src={item.products.images[0].startsWith('/') || item.products.images[0].startsWith('http') ? item.products.images[0] : getStorageImageUrl(item.products.images[0])}
                       alt={item.products.name}
                       width={64}
                       height={64}

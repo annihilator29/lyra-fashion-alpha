@@ -20,6 +20,7 @@ import type { ReturnReason } from '@/types/returns';
 import { RETURN_REASON_LABELS } from '@/types/returns';
 import Image from 'next/image';
 import { Loader2, AlertCircle, Package } from 'lucide-react';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface GuestReturnRequestFormProps {
   order: OrderWithItems;
@@ -166,7 +167,7 @@ export function GuestReturnRequestForm({
                 {item.products?.images?.[0] && (
                   <div className="relative w-20 h-20 flex-shrink-0">
                     <Image
-                      src={item.products.images[0]}
+                      src={item.products.images[0].startsWith('/') || item.products.images[0].startsWith('http') ? item.products.images[0] : getStorageImageUrl(item.products.images[0])}
                       alt={item.products.name}
                       fill
                       className="object-cover rounded-md"

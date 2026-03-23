@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import { type OrderWithItems } from '@/types/order';
 import { formatPrice } from '@/lib/utils';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface OrderItemsListProps {
   order: OrderWithItems;
@@ -22,7 +23,7 @@ export default function OrderItemsList({ order }: OrderItemsListProps) {
           {item.products?.images && item.products.images[0] && (
             <div className="relative h-20 w-20 flex-shrink-0">
               <Image
-                src={item.products.images[0]}
+                src={item.products.images[0].startsWith('/') || item.products.images[0].startsWith('http') ? item.products.images[0] : getStorageImageUrl(item.products.images[0])}
                 alt={item.products.name}
                 fill
                 className="object-cover rounded-md"

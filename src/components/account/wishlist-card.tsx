@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { Product } from '@/types/database.types';
 import { removeFromWishlist } from '@/app/account/actions';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface WishlistCardProps {
   product: Product;
@@ -36,7 +37,8 @@ export function WishlistCard({
 }: WishlistCardProps) {
 
   // Get product image URL
-  const imageUrl = product.images?.[0] || '/placeholder-product.jpg';
+  const rawImage = product.images?.[0] || '/placeholder-product.jpg';
+  const imageUrl = rawImage.startsWith('/') || rawImage.startsWith('http') ? rawImage : getStorageImageUrl(rawImage);
 
   // Price change detection
   const priceChanged = originalPrice !== undefined && originalPrice !== product.price;

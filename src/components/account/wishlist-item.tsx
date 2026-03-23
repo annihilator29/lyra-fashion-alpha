@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import type { Product } from '@/types/database.types';
 import { isInGuestWishlist, addToGuestWishlist, removeFromGuestWishlist } from '@/lib/wishlist-utils';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface WishlistItemProps {
   product: Product;
@@ -40,7 +41,8 @@ export function WishlistItem({
   const [isFavorited, setIsFavorited] = useState(() => isInGuestWishlist(product.id));
 
   // Get product image URL
-  const imageUrl = product.images?.[0] || '/placeholder-product.jpg';
+  const rawImage = product.images?.[0] || '/placeholder-product.jpg';
+  const imageUrl = rawImage.startsWith('/') || rawImage.startsWith('http') ? rawImage : getStorageImageUrl(rawImage);
 
   // Price change detection
   const priceChanged = originalPrice !== undefined && originalPrice !== product.price;

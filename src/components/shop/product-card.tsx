@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import type { Product } from '@/types/database.types';
 import { isInGuestWishlist, addToGuestWishlist, removeFromGuestWishlist } from '@/lib/wishlist-utils';
 import { createClient } from '@/lib/supabase/client';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface ProductCardProps {
     product: Pick<Product, 'id' | 'name' | 'slug' | 'price' | 'images' | 'category'>;
@@ -30,7 +31,8 @@ interface ProductCardProps {
  */
 export function ProductCard({ product, priority = false, className }: ProductCardProps) {
     const { name, slug, price, images, category, id } = product;
-    const imageUrl = images?.[0] || '/placeholder-product.jpg';
+    const rawImage = images?.[0] || '/placeholder-product.jpg';
+    const imageUrl = rawImage.startsWith('/') ? rawImage : getStorageImageUrl(rawImage);
     // const router = useRouter();
 
     // Optimistic favorite state

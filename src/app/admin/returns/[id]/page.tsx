@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { RETURN_STATUS_CONFIG, RETURN_REASON_LABELS, type ReturnStatus, type ReturnReason } from '@/types/returns';
 import { ReturnInspectionForm } from '@/components/returns/return-inspection-form';
+import { getStorageImageUrl } from '@/lib/utils/image';
 
 interface AdminReturnDetailPageProps {
   params: Promise<{ id: string }>;
@@ -170,7 +171,7 @@ export default async function AdminReturnDetailPage({ params }: AdminReturnDetai
                     {item.products?.images?.[0] && (
                       <div className="relative w-20 h-20 flex-shrink-0">
                         <Image
-                          src={item.products.images[0]}
+                          src={item.products.images[0].startsWith('/') || item.products.images[0].startsWith('http') ? item.products.images[0] : getStorageImageUrl(item.products.images[0])}
                           alt={item.products.name}
                           width={80}
                           height={80}
