@@ -21,7 +21,6 @@ jest.mock('next/link', () => ({
 jest.mock('lucide-react', () => ({
   Instagram: () => <svg data-testid="instagram-icon" />,
   Facebook: () => <svg data-testid="facebook-icon" />,
-  Twitter: () => <svg data-testid="twitter-icon" />,
 }));
 
 describe('SiteFooter', () => {
@@ -32,12 +31,11 @@ describe('SiteFooter', () => {
     expect(footer).toBeInTheDocument();
   });
 
-  it('renders with dark theme styling', () => {
+  it('renders with light theme styling', () => {
     render(<SiteFooter />);
 
     const footer = screen.getByRole('contentinfo');
-    expect(footer).toHaveClass('bg-slate-900');
-    expect(footer).toHaveClass('text-white');
+    expect(footer).toHaveClass('bg-[#f8f7f5]');
   });
 
   it('renders social media links with icons', () => {
@@ -45,7 +43,6 @@ describe('SiteFooter', () => {
 
     expect(screen.getByTestId('instagram-icon')).toBeInTheDocument();
     expect(screen.getByTestId('facebook-icon')).toBeInTheDocument();
-    expect(screen.getByTestId('twitter-icon')).toBeInTheDocument();
   });
 
   it('opens social links in new tab', () => {
@@ -56,33 +53,24 @@ describe('SiteFooter', () => {
 
     const facebookLink = screen.getByLabelText('Follow us on Facebook');
     expect(facebookLink).toHaveAttribute('target', '_blank');
-
-    const twitterLink = screen.getByLabelText('Follow us on Twitter');
-    expect(twitterLink).toHaveAttribute('target', '_blank');
-  });
-
-  it('renders newsletter form component', () => {
-    render(<SiteFooter />);
-
-    const emailInput = screen.getByLabelText('Email address for newsletter subscription');
-    expect(emailInput).toBeInTheDocument();
-
-    const subscribeButton = screen.getByRole('button', { name: /subscribe/i });
-    expect(subscribeButton).toBeInTheDocument();
   });
 
   it('renders navigation links grouped logically', () => {
     render(<SiteFooter />);
 
-    // Company links
-    expect(screen.getByRole('link', { name: /about/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /factory story/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /blog/i })).toBeInTheDocument();
+    // Shop links
+    expect(screen.getByRole('link', { name: /new arrivals/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /collections/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /bestsellers/i })).toBeInTheDocument();
 
-    // Customer Service links
+    // Information links
+    expect(screen.getByRole('link', { name: /^shipping$/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^returns$/i })).toBeInTheDocument();
+
+    // About Us links
+    expect(screen.getByRole('link', { name: /our story/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /atelier/i })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /contact/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /shipping.*returns/i })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /faq/i })).toBeInTheDocument();
   });
 
   it('renders legal links', () => {
@@ -96,33 +84,20 @@ describe('SiteFooter', () => {
     const currentYear = new Date().getFullYear();
     render(<SiteFooter />);
 
-    expect(screen.getByText(new RegExp(`© ${currentYear} Lyra Fashion`, 'i'))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`${currentYear} LYRA`, 'i'))).toBeInTheDocument();
   });
 
-  it('has responsive layout classes', () => {
+  it('renders LYRA branding', () => {
     render(<SiteFooter />);
 
-    const footer = screen.getByRole('contentinfo');
-    expect(footer).toHaveClass('grid');
-    expect(footer).toHaveClass('grid-cols-1');
+    const brandLinks = screen.getAllByRole('link', { name: /^LYRA$/i });
+    expect(brandLinks.length).toBeGreaterThan(0);
   });
 
   it('includes ARIA labels for accessibility', () => {
     render(<SiteFooter />);
 
-    // Social media links
     expect(screen.getByLabelText('Follow us on Instagram')).toBeInTheDocument();
     expect(screen.getByLabelText('Follow us on Facebook')).toBeInTheDocument();
-    expect(screen.getByLabelText('Follow us on Twitter')).toBeInTheDocument();
-
-    // Newsletter form
-    expect(screen.getByLabelText('Email address for newsletter subscription')).toBeInTheDocument();
-  });
-
-  it('renders NewsletterForm as child component', () => {
-    render(<SiteFooter />);
-
-    const emailInput = screen.getByLabelText('Email address for newsletter subscription');
-    expect(emailInput).toBeInTheDocument();
   });
 });

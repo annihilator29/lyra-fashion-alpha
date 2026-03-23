@@ -31,7 +31,7 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased h-full flex flex-col`}>
         <Header />
-        <main className="flex-1">
+        <main className="flex-1 pt-16">
           {children}
         </main>
         <SiteFooter />

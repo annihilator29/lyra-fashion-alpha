@@ -1,142 +1,122 @@
 import Link from 'next/link';
-import { Instagram, Facebook, Twitter } from 'lucide-react';
-import { NewsletterForm } from './newsletter-form';
+import { Instagram, Facebook } from 'lucide-react';
 
 export function SiteFooter() {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer
-      role="contentinfo"
-      className="bg-slate-900 text-white py-6 px-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-    >
-      {/* Social Media & Newsletter Section */}
-      <div className="space-y-2">
-        <h3 className="text-sm font-sans font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-slate-800">Follow Us</h3>
-        <div className="flex gap-2">
-          <a
-            href="https://instagram.com/lyrafashion"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Follow us on Instagram"
-            className="text-white hover:text-[#C9B89E] transition-colors"
-          >
-            <Instagram className="w-4 h-4" />
-          </a>
-          <a
-            href="https://facebook.com/lyrafashion"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Follow us on Facebook"
-            className="text-white hover:text-[#C9B89E] transition-colors"
-          >
-            <Facebook className="w-4 h-4" />
-          </a>
-          <a
-            href="https://twitter.com/lyrafashion"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Follow us on Twitter"
-            className="text-white hover:text-[#C9B89E] transition-colors"
-          >
-            <Twitter className="w-4 h-4" />
-          </a>
+    <footer className="border-t border-gray-200 bg-[#f8f7f5] pt-20 pb-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mb-16 grid grid-cols-1 gap-12 md:grid-cols-4">
+          {/* Brand Info */}
+          <div className="md:col-span-1">
+            <Link
+              href="/"
+              className="mb-6 inline-block font-serif text-2xl font-semibold tracking-widest text-black"
+            >
+              LYRA
+            </Link>
+            <p className="mb-6 pr-4 text-xs leading-relaxed text-gray-500">
+              Curating a world of thoughtful design and enduring quality for the modern wardrobe.
+            </p>
+            <div className="flex space-x-4 text-gray-400">
+              <a
+                href="https://instagram.com/lyrafashion"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Instagram"
+                className="transition-colors hover:text-black"
+              >
+                <Instagram className="h-[18px] w-[18px]" />
+              </a>
+              <a
+                href="https://facebook.com/lyrafashion"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Facebook"
+                className="transition-colors hover:text-black"
+              >
+                <Facebook className="h-[18px] w-[18px]" />
+              </a>
+            </div>
+          </div>
+
+          {/* Shop Links */}
+          <div>
+            <h4 className="mb-6 text-xs font-semibold tracking-widest uppercase">Shop</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
+              <li>
+                <Link href="/products" className="transition-colors hover:text-black">
+                  New Arrivals
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="transition-colors hover:text-black">
+                  Collections
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="transition-colors hover:text-black">
+                  Bestsellers
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Information Links */}
+          <div>
+            <h4 className="mb-6 text-xs font-semibold tracking-widest uppercase">Information</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
+              <li>
+                <Link href="/shipping-returns" className="transition-colors hover:text-black">
+                  Shipping
+                </Link>
+              </li>
+              <li>
+                <Link href="/shipping-returns" className="transition-colors hover:text-black">
+                  Returns
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy-policy" className="transition-colors hover:text-black">
+                  Privacy
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* About Us Links */}
+          <div>
+            <h4 className="mb-6 text-xs font-semibold tracking-widest uppercase">About Us</h4>
+            <ul className="space-y-4 text-sm text-gray-500">
+              <li>
+                <Link href="/about" className="transition-colors hover:text-black">
+                  Our Story
+                </Link>
+              </li>
+              <li>
+                <Link href="/factory-story" className="transition-colors hover:text-black">
+                  Atelier
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="transition-colors hover:text-black">
+                  Contact
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <div className="mt-4">
-          <h3 className="text-sm font-sans font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-slate-800">Newsletter</h3>
-          <NewsletterForm />
-        </div>
-      </div>
-
-      {/* Company Section */}
-      <div>
-        <h3 className="text-sm font-sans font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-slate-800">Company</h3>
-        <ul className="space-y-1">
-          <li>
-            <Link
-              href="/about"
-              className="text-white hover:text-[#C9B89E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C9B89E] rounded"
-            >
-              About
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/factory-story"
-              className="text-white hover:text-[#C9B89E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C9B89E] rounded"
-            >
-              Factory Story
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/blog"
-              className="text-white hover:text-[#C9B89E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C9B89E] rounded"
-            >
-              Blog
-            </Link>
-          </li>
-        </ul>
-      </div>
-
-      {/* Customer Service Section */}
-      <div>
-        <h3 className="text-sm font-sans font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-slate-800">Customer Service</h3>
-        <ul className="space-y-1">
-          <li>
-            <Link
-              href="/contact"
-              className="text-white hover:text-[#C9B89E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C9B89E] rounded"
-            >
-              Contact
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/shipping-returns"
-              className="text-white hover:text-[#C9B89E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C9B89E] rounded"
-            >
-              Shipping & Returns
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/faq"
-              className="text-white hover:text-[#C9B89E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C9B89E] rounded"
-            >
-              FAQ
-            </Link>
-          </li>
-        </ul>
-      </div>
-
-      {/* Legal Section */}
-      <div>
-        <h3 className="text-sm font-sans font-semibold uppercase tracking-wider text-[#C9B89E] mb-2 pb-1 border-b border-slate-800">Legal</h3>
-        <ul className="space-y-1">
-          <li>
-            <Link
-              href="/privacy-policy"
-              className="text-white hover:text-[#C9B89E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C9B89E] rounded"
-            >
-              Privacy Policy
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/terms-of-service"
-              className="text-white hover:text-[#C9B89E] transition-colors focus:outline-none focus:ring-2 focus:ring-[#C9B89E] rounded"
-            >
+        {/* Bottom Footer */}
+        <div className="flex flex-col items-center justify-between border-t border-gray-300 pt-8 text-xs text-gray-400 md:flex-row">
+          <p>&copy; {new Date().getFullYear()} LYRA. All rights reserved.</p>
+          <div className="mt-4 flex space-x-4 md:mt-0">
+            <Link href="/terms-of-service" className="transition-colors hover:text-gray-600">
               Terms of Service
             </Link>
-          </li>
-        </ul>
-
-        <div className="mt-4 pt-4 border-t border-slate-800">
-          <p className="text-xs text-white">
-            © {currentYear} Lyra Fashion. All rights reserved.
-          </p>
+            <Link href="/privacy-policy" className="transition-colors hover:text-gray-600">
+              Privacy Policy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
