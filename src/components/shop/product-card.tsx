@@ -157,13 +157,13 @@ export function ProductCard({ product, priority = false, className }: ProductCar
             {/* Product Info */}
             <div className="flex flex-1 flex-col gap-1 p-4">
                 {/* Category */}
-                <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <span className="text-[10px] font-light tracking-widest uppercase text-[#888]">
                     {category}
                 </span>
 
                 {/* Name with Favorite Button */}
                 <div className="flex items-start justify-between gap-2">
-                    <h3 className="font-serif text-lg font-medium leading-tight text-foreground line-clamp-2 flex-1">
+                    <h3 className="font-serif text-lg font-normal leading-tight text-foreground line-clamp-2 flex-1">
                         {name}
                     </h3>
                     {/* Favorite Button */}
@@ -188,7 +188,7 @@ export function ProductCard({ product, priority = false, className }: ProductCar
                 </div>
 
                 {/* Price */}
-                <p className="mt-auto pt-2 text-base font-semibold text-foreground">{formattedPrice}</p>
+                <p className="mt-auto pt-2 font-serif text-lg italic text-foreground">{formattedPrice}</p>
             </div>
         </Link>
     );

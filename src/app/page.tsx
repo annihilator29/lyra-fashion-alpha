@@ -57,24 +57,32 @@ const NEW_ARRIVALS = [
     color: 'Oatmeal / Natural',
     price: '$345.00',
     image: `${SUPABASE_URL}/products/product-silk-dress.jpg`,
+    slug: 'silk-blend-midi-dress',
+    category: 'dresses',
   },
   {
     name: 'Structured Wool Blazer',
     color: 'Checkered',
     price: '$480.00',
     image: `${SUPABASE_URL}/products/product-wool-blazer.jpg`,
+    slug: 'structured-wool-blazer',
+    category: 'outerwear',
   },
   {
     name: 'Pleated Linen Trousers',
     color: 'Sand',
     price: '$210.00',
     image: `${SUPABASE_URL}/products/product-linen-trousers.jpg`,
+    slug: 'pleated-linen-trousers',
+    category: 'bottoms',
   },
   {
     name: 'Soft Grain Leather Tote',
     color: 'Mahogany',
     price: '$590.00',
     image: `${SUPABASE_URL}/products/product-leather-tote.jpg`,
+    slug: 'soft-grain-leather-tote',
+    category: 'accessories',
   },
 ];
 
@@ -96,7 +104,7 @@ function NewArrivalsSection() {
       </div>
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
         {NEW_ARRIVALS.map((product) => (
-          <div key={product.name} className="group cursor-pointer">
+          <Link key={product.name} href={`/products/${product.category}/${product.slug}`} className="group">
             <div className="relative mb-4 aspect-[3/4] overflow-hidden bg-transparent">
               <Image
                 src={product.image}
@@ -108,7 +116,7 @@ function NewArrivalsSection() {
             <h3 className="mb-1 font-serif text-lg font-normal">{product.name}</h3>
             <p className="mb-2 text-[10px] font-light text-[#888]">{product.color}</p>
             <p className="font-serif text-lg italic">{product.price}</p>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

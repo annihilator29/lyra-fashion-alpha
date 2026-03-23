@@ -168,17 +168,17 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
             <div className="flex flex-col gap-6">
                 {/* Product Title and Category */}
                 <div>
-                    <span className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                    <span className="text-[10px] font-light tracking-widest uppercase text-[#888]">
                         {product.category}
                     </span>
-                    <h1 className="mt-1 font-serif text-3xl font-bold text-foreground sm:text-4xl">
+                    <h1 className="mt-1 font-serif text-3xl font-normal text-foreground sm:text-4xl">
                         {product.name}
                     </h1>
                 </div>
 
                 {/* Price Display */}
                 <div className="flex items-baseline gap-3">
-                    <span className="text-2xl font-semibold text-foreground">
+                    <span className="font-serif text-2xl italic text-foreground">
                         {formattedPrice}
                     </span>
                     {selectedVariant?.price_modifier !== undefined &&
@@ -188,6 +188,14 @@ export function ProductDetailClient({ product, craftsmanship }: ProductDetailCli
                             </span>
                         )}
                 </div>
+
+                {/* Fabric Type */}
+                {craftsmanship?.materials?.fabric && (
+                    <p className="text-[11px] font-light tracking-wider uppercase text-[#999]">
+                        {craftsmanship.materials.fabric}
+                        {craftsmanship.materials.origin && ` · ${craftsmanship.materials.origin}`}
+                    </p>
+                )}
 
                 {/* Description */}
                 {product.description && (
