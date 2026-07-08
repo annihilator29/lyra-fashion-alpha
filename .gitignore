@@ -41,4 +41,30 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# build & test artifacts (generated, never commit)
+*.log
+*.log.txt
+build_output.txt
+build_*.log
+build_*.txt
+cart_test_*.log
+test_*.log
+test_*.txt
+test_fail*.log
+test_failure*.txt
+full_*.log
+full_*.txt
+lint_*.log
+lint_*.txt
+lint_*.json
+lint_errors*.json
+src_lint.txt
+dashboard_clean.txt
+resend_test_*.log
+tsc_*.txt
+tsc_*.output
+typescript_errors*.txt
+test-results*.json
+test-results/
 nul

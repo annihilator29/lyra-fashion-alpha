@@ -1,6 +1,0 @@
-﻿src/components/inventory/__tests__/stock-indicator.test.tsx(49,5): error TS2578: Unused '@ts-expect-error' directive.
-src/components/inventory/__tests__/stock-indicator.test.tsx(72,7): error TS2578: Unused '@ts-expect-error' directive.
-src/components/inventory/__tests__/stock-indicator.test.tsx(96,7): error TS2578: Unused '@ts-expect-error' directive.
-src/components/inventory/__tests__/stock-indicator.test.tsx(120,7): error TS2578: Unused '@ts-expect-error' directive.
-src/components/inventory/__tests__/stock-indicator.test.tsx(138,7): error TS2578: Unused '@ts-expect-error' directive.
-src/components/inventory/__tests__/stock-indicator.test.tsx(163,7): error TS2578: Unused '@ts-expect-error' directive.
