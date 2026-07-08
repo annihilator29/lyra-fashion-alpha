@@ -83,6 +83,7 @@ export default {
       fontFamily: {
         sans: ['var(--font-inter)', 'sans-serif'],
         serif: ['var(--font-playfair)', 'serif'],
+        fraunces: ['var(--font-fraunces)', 'var(--font-playfair)', 'serif'],
       },
       borderRadius: {
         sm: '4px',

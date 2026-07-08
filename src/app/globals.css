@@ -120,3 +120,46 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Landing redesign — scoped motion (degrades gracefully, no JS) */
+@keyframes lyra-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lyra-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lyra-reveal {
+  animation: lyra-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.lyra-reveal-2 {
+  animation: lyra-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+.lyra-reveal-3 {
+  animation: lyra-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+}
+.lyra-fade {
+  animation: lyra-fade-in 1.6s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lyra-reveal,
+  .lyra-reveal-2,
+  .lyra-reveal-3,
+  .lyra-fade {
+    animation: none;
+  }
+}
