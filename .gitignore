@@ -66,5 +66,7 @@ tsc_*.txt
 tsc_*.output
 typescript_errors*.txt
 test-results*.json
+test_results*.json
 test-results/
+jest_output.txt
 nul
