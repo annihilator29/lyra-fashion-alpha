@@ -1,6 +1,6 @@
 # Lyra Fashion
 
-[![CI](https://github.com/bibekthapa007/lyra-fashion/actions/workflows/ci.yml/badge.svg)](https://github.com/bibekthapa007/lyra-fashion/actions/workflows/ci.yml)
+[![CI](https://github.com/annihilator29/lyra-fashion-alpha/actions/workflows/ci.yml/badge.svg)](https://github.com/annihilator29/lyra-fashion-alpha/actions/workflows/ci.yml)
 
 A premium, factory-direct e-commerce platform bringing ethically-made artisan fashion directly to consumers. Built with modern web technologies for performance, SEO, and a seamless shopping experience.
 
@@ -81,7 +81,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the a
 
 This project is deployed on [Vercel](https://vercel.com/) with automatic deployments:
 
-- **Production**: Deployed on merge to `main` branch
+- **Production**: Deployed on merge to `master` branch
 - **Preview**: Deployed for every pull request
 
 #### Initial Setup

@@ -1,3 +1,0 @@
-﻿src/app/admin/emails/actions.ts(139,36): error TS7006: Parameter 't' implicitly has an 'any' type.
-src/app/admin/emails/actions.ts(140,44): error TS7006: Parameter 't' implicitly has an 'any' type.
-src/app/admin/emails/actions.ts(155,43): error TS7006: Parameter 'm' implicitly has an 'any' type.
